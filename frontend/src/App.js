@@ -76,11 +76,16 @@ function AppRouter() {
 
 function App() {
   return (
-    <div className="App">
+    <div className="App relative">
+      {/* Global starry background for all pages */}
+      <StarryBackground density={100} enableParallax={true} />
+      
       <BrowserRouter>
         <AuthProvider>
           <NotificationProvider>
-            <AppRouter />
+            <div className="relative z-10">
+              <AppRouter />
+            </div>
             <Toaster 
               position="top-center" 
               richColors 
@@ -89,7 +94,8 @@ function App() {
                   background: '#1c1917',
                   color: 'white',
                   border: '1px solid #44403c'
-                }
+                },
+                className: 'animate-scale-in'
               }}
             />
           </NotificationProvider>
