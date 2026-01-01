@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Bell, X, ShoppingBag, CheckCircle, Clock, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
