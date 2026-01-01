@@ -11,6 +11,13 @@ const FloatingNotification = ({ notification, onClose }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
 
+  const handleClose = useCallback(() => {
+    setIsLeaving(true);
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  }, [onClose]);
+
   useEffect(() => {
     // Entrada con animación
     setTimeout(() => setIsVisible(true), 50);
@@ -21,14 +28,7 @@ const FloatingNotification = ({ notification, onClose }) => {
     }, 8000);
 
     return () => clearTimeout(autoClose);
-  }, []);
-
-  const handleClose = () => {
-    setIsLeaving(true);
-    setTimeout(() => {
-      onClose();
-    }, 300);
-  };
+  }, [handleClose]);
 
   const handleClick = () => {
     navigate('/orders');
