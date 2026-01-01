@@ -232,7 +232,18 @@ const PulperiaDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Fetch pulperia data when selected pulperia changes
+  useEffect(() => {
+    if (selectedPulperia) {
+      fetchPulperiaData(selectedPulperia.pulperia_id);
+    }
+  }, [selectedPulperia]);
 
   const fetchPulperiaData = async (pulperiaId) => {
     try {
