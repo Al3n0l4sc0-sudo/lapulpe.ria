@@ -213,14 +213,14 @@ const LandingPage = () => {
         </div>
 
         {/* Bottom Section - Redes y Compartir */}
-        <div className="px-6 pb-8">
+        <div className="px-6 pb-8 animate-slide-in" style={{ animationDelay: '0.3s' }}>
           {/* Social Links */}
           <div className="flex justify-center gap-3 mb-4">
             <a
               href="https://x.com/LaPul_periaHN"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 bg-stone-900 hover:bg-stone-800 text-white py-2.5 px-4 rounded-xl transition-colors border border-stone-800"
+              className="flex items-center gap-2 bg-stone-900/80 backdrop-blur-sm hover:bg-stone-800 text-white py-2.5 px-4 rounded-xl transition-all duration-300 border border-stone-800 hover-lift"
             >
               <XIcon />
               <span className="text-sm font-medium">X</span>
@@ -229,7 +229,7 @@ const LandingPage = () => {
               href="https://www.instagram.com/lapulperiah?igsh=MXJlemJzaTl4NDIxdQ=="
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white py-2.5 px-4 rounded-xl transition-colors"
+              className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white py-2.5 px-4 rounded-xl transition-all duration-300 hover-lift"
             >
               <InstagramIcon />
               <span className="text-sm font-medium">Instagram</span>
@@ -238,7 +238,7 @@ const LandingPage = () => {
 
           {/* Share Section */}
           <div className="max-w-sm mx-auto">
-            <div className="bg-stone-900/50 rounded-2xl p-3 border border-stone-800">
+            <div className="bg-stone-900/50 backdrop-blur-sm rounded-2xl p-3 border border-stone-800">
               <p className="text-stone-500 text-xs text-center mb-2">Comparte La Pulpería</p>
               <div className="flex gap-2">
                 <div className="flex-1 bg-stone-800 rounded-lg px-3 py-2 text-xs text-stone-500 truncate">
@@ -246,13 +246,13 @@ const LandingPage = () => {
                 </div>
                 <button
                   onClick={handleCopyLink}
-                  className={`px-3 py-2 rounded-lg transition-colors ${copied ? 'bg-green-600' : 'bg-stone-700 hover:bg-stone-600'} text-white`}
+                  className={`px-3 py-2 rounded-lg transition-all duration-300 ${copied ? 'bg-green-600' : 'bg-stone-700 hover:bg-stone-600'} text-white hover-lift`}
                 >
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </button>
                 <button
                   onClick={handleShare}
-                  className="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white transition-colors"
+                  className="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white transition-all duration-300 hover-lift"
                 >
                   <ExternalLink className="w-4 h-4" />
                 </button>
