@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
+import StarryBackground from './components/StarryBackground';
 import LandingPage from './pages/LandingPage';
 import './App.css';
 
@@ -26,10 +27,14 @@ const Advertising = lazy(() => import('./pages/Advertising'));
 const AdminPanel = lazy(() => import('./pages/AdminPanel'));
 const AdAssignmentLog = lazy(() => import('./pages/AdAssignmentLog'));
 
-// Simple loading spinner
+// Enhanced loading spinner with starry background
 const LoadingSpinner = () => (
-  <div className="min-h-screen bg-stone-950 flex items-center justify-center">
-    <div className="w-8 h-8 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin"></div>
+  <div className="min-h-screen bg-stone-950 flex items-center justify-center relative overflow-hidden">
+    <StarryBackground density={80} enableParallax={false} />
+    <div className="relative z-10 flex flex-col items-center gap-4">
+      <div className="w-12 h-12 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin"></div>
+      <p className="text-stone-500 text-sm animate-pulse">Cargando...</p>
+    </div>
   </div>
 );
 
