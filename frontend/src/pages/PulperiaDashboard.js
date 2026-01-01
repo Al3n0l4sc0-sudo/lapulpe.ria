@@ -210,18 +210,7 @@ const PulperiaDashboard = () => {
   });
   const [uploadingImage, setUploadingImage] = useState(false);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  // Fetch pulperia data when selected pulperia changes
-  useEffect(() => {
-    if (selectedPulperia) {
-      fetchPulperiaData(selectedPulperia.pulperia_id);
-    }
-  }, [selectedPulperia]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [userRes, pulperiasRes] = await Promise.all([
         api.get(`/api/auth/me`),
