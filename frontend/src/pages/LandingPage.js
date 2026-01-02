@@ -116,10 +116,14 @@ const LandingPage = () => {
     if (isLoggingIn) return;
     setIsLoggingIn(true);
     
-    // REDIRIGIR DIRECTAMENTE A EMERGENT AUTH
-    // Sin llamadas al backend, sin configuración externa
+    // EMERGENT AUTH - Redirigir con URL de retorno correcta
+    const returnUrl = window.location.origin;
+    const emergentAuthUrl = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(returnUrl)}`;
+    
     console.log('[Login] Redirecting to Emergent Auth...');
-    window.location.href = 'https://auth.emergentagent.com/google';
+    console.log('[Login] Return URL:', returnUrl);
+    
+    window.location.href = emergentAuthUrl;
   };
 
   const handleDisclaimerClose = () => {
