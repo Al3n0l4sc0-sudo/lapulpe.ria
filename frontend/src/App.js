@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
-import StarryBackground from './components/StarryBackground';
 import LandingPage from './pages/LandingPage';
 import './App.css';
 
@@ -26,15 +25,13 @@ const OrderHistory = lazy(() => import('./pages/OrderHistory'));
 const Advertising = lazy(() => import('./pages/Advertising'));
 const AdminPanel = lazy(() => import('./pages/AdminPanel'));
 const AdAssignmentLog = lazy(() => import('./pages/AdAssignmentLog'));
+const RecommendedPage = lazy(() => import('./pages/RecommendedPage'));
+const FeaturedAdsPage = lazy(() => import('./pages/FeaturedAdsPage'));
 
-// Enhanced loading spinner with starry background
+// Simple loading spinner
 const LoadingSpinner = () => (
-  <div className="min-h-screen bg-stone-950 flex items-center justify-center relative overflow-hidden">
-    <StarryBackground density={80} enableParallax={false} />
-    <div className="relative z-10 flex flex-col items-center gap-4">
-      <div className="w-12 h-12 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin"></div>
-      <p className="text-stone-500 text-sm animate-pulse">Cargando...</p>
-    </div>
+  <div className="min-h-screen bg-stone-950 flex items-center justify-center">
+    <div className="w-8 h-8 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin"></div>
   </div>
 );
 
@@ -67,8 +64,10 @@ function AppRouter() {
         <Route path="/jobs-services" element={<ProtectedRoute><JobsServices /></ProtectedRoute>} />
         <Route path="/order-history" element={<ProtectedRoute><OrderHistory /></ProtectedRoute>} />
         <Route path="/advertising" element={<ProtectedRoute><Advertising /></ProtectedRoute>} />
+        <Route path="/recommended" element={<ProtectedRoute><RecommendedPage /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
         <Route path="/ad-log" element={<AdAssignmentLog />} />
+        <Route path="/anuncios" element={<ProtectedRoute><FeaturedAdsPage /></ProtectedRoute>} />
       </Routes>
     </Suspense>
   );
@@ -76,16 +75,11 @@ function AppRouter() {
 
 function App() {
   return (
-    <div className="App relative">
-      {/* Global starry background for all pages */}
-      <StarryBackground density={100} enableParallax={true} />
-      
+    <div className="App">
       <BrowserRouter>
         <AuthProvider>
           <NotificationProvider>
-            <div className="relative z-10">
-              <AppRouter />
-            </div>
+            <AppRouter />
             <Toaster 
               position="top-center" 
               richColors 
@@ -94,8 +88,7 @@ function App() {
                   background: '#1c1917',
                   color: 'white',
                   border: '1px solid #44403c'
-                },
-                className: 'animate-scale-in'
+                }
               }}
             />
           </NotificationProvider>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { api, BACKEND_URL } from '../config/api';
+import { api } from '../config/api';
 import { toast } from 'sonner';
 import { Search, Package, Store } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -43,12 +43,12 @@ const SearchProducts = () => {
 
     setLoading(true);
     try {
-      let url = `${BACKEND_URL}/api/products?search=${searchTerm}`;
+      let url = `/api/products?search=${searchTerm}`;
       if (sortBy) {
         url += `&sort_by=${sortBy}`;
       }
       
-      const response = await axios.get(url);
+      const response = await api.get(url);
       setProducts(response.data);
       
       if (response.data.length === 0) {
@@ -67,12 +67,12 @@ const SearchProducts = () => {
     if (products.length > 0) {
       setLoading(true);
       try {
-        let url = `${BACKEND_URL}/api/products?search=${searchTerm}`;
+        let url = `/api/products?search=${searchTerm}`;
         if (newSort) {
           url += `&sort_by=${newSort}`;
         }
         
-        const response = await axios.get(url);
+        const response = await api.get(url);
         setProducts(response.data);
       } catch (error) {
         console.error('Error sorting products:', error);

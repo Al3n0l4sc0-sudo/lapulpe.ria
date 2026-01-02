@@ -58,7 +58,7 @@ const MapView = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [radius, setRadius] = useState(5);
+  const [radius, setRadius] = useState(50); // 50km default to show more stores
   const [cart, setCart] = useState([]);
   const [isMapFullscreen, setIsMapFullscreen] = useState(false);
   const [activeTab, setActiveTab] = useState('nearby'); // 'nearby' | 'favorites'
@@ -84,7 +84,13 @@ const MapView = () => {
       );
       return distance <= radiusKm;
     });
-    setPulperias(filtered);
+    
+    // If no pulperias found nearby, show ALL pulperias
+    if (filtered.length === 0 && pulperiasData.length > 0) {
+      setPulperias(pulperiasData);
+    } else {
+      setPulperias(filtered);
+    }
   }, [calculateDistance]);
 
   // Fetch favorites
@@ -100,18 +106,26 @@ const MapView = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [userRes, pulperiasRes, featuredRes] = await Promise.all([
-          api.get(`/api/auth/me`),
-          api.get(`/api/pulperias`),
-          api.get(`/api/ads/featured`).catch(() => ({ data: [] }))
-        ]);
-        
-        setUser(userRes.data);
+        // Fetch pulperias first (doesn't require auth)
+        const pulperiasRes = await api.get(`/api/pulperias`);
         setAllPulperias(pulperiasRes.data);
-        setFeaturedPulperias(featuredRes.data);
-
-        // Fetch favorites
-        fetchFavorites();
+        
+        // Try to get featured
+        try {
+          const featuredRes = await api.get(`/api/ads/featured`);
+          setFeaturedPulperias(featuredRes.data);
+        } catch (e) {
+          setFeaturedPulperias([]);
+        }
+        
+        // Try to get user (might not be logged in)
+        try {
+          const userRes = await api.get(`/api/auth/me`);
+          setUser(userRes.data);
+          fetchFavorites();
+        } catch (e) {
+          setUser(null);
+        }
 
         // Get cart from localStorage
         const savedCart = localStorage.getItem('cart');
@@ -128,19 +142,22 @@ const MapView = () => {
               filterPulperiasByRadius(pulperiasRes.data, coords, radius);
             },
             () => {
-              const fallbackCoords = [14.0723, -87.1921];
+              // Use Siguatepeque as fallback (where the pulperias are)
+              const fallbackCoords = [14.6, -87.83];
               setUserLocation(fallbackCoords);
               filterPulperiasByRadius(pulperiasRes.data, fallbackCoords, radius);
             },
             { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
           );
         } else {
-          const fallbackCoords = [14.0723, -87.1921];
+          const fallbackCoords = [14.6, -87.83];
           setUserLocation(fallbackCoords);
           filterPulperiasByRadius(pulperiasRes.data, fallbackCoords, radius);
         }
       } catch (error) {
-        setUserLocation([14.0723, -87.1921]);
+        console.error('Error fetching data:', error);
+        // Still set a location so the map shows
+        setUserLocation([14.6, -87.83]);
       } finally {
         setLoading(false);
       }

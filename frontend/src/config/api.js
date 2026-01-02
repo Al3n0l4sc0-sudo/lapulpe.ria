@@ -3,8 +3,8 @@
 
 import axios from 'axios';
 
-// Backend URL - SIEMPRE usar el de Emergent preview
-export const BACKEND_URL = 'https://lapulperia.preview.emergentagent.com';
+// Backend URL - SIEMPRE usar la variable de entorno del preview
+export const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://achiev-meritocracy.preview.emergentagent.com';
 
 // Dominio personalizado
 export const CUSTOM_DOMAIN = 'lapulperiastore.net';
@@ -44,7 +44,7 @@ api.interceptors.response.use(
       // Token expirado o inválido
       localStorage.removeItem('session_token');
       // Solo redirigir si no estamos ya en la landing page
-      if (window.location.pathname !== '/') {
+      if (window.location.pathname !== '/' && window.location.pathname !== '/auth/callback') {
         window.location.href = '/';
       }
     }

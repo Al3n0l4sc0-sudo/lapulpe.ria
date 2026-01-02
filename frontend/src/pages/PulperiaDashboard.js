@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api, BACKEND_URL } from '../config/api';
 import { toast } from 'sonner';
-import { Store as StoreIcon, Package, Plus, Edit, Trash2, Bell, Briefcase, Palette, Type, Megaphone, Image, MessageSquare, Shield, Clock, MapPin, Phone, Check, Share2, Copy, ExternalLink } from 'lucide-react';
+import { Store as StoreIcon, Package, Plus, Edit, Trash2, Bell, Briefcase, Palette, Type, Megaphone, Image, MessageSquare, Shield, Clock, MapPin, Phone, Check, Share2, Copy, ExternalLink, Award, RefreshCw } from 'lucide-react';
 import BottomNav from '../components/BottomNav';
 import Header from '../components/Header';
 import ImageUpload from '../components/ImageUpload';
 import AnimatedBackground from '../components/AnimatedBackground';
+import ArtDecoBadge, { BADGES_ARTDECO } from '../components/ArtDecoBadge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -13,6 +15,7 @@ import { Textarea } from '../components/ui/textarea';
 import { Button } from '../components/ui/button';
 import useWebSocket from '../hooks/useWebSocket';
 import { useNotifications } from '../contexts/NotificationContext';
+import { useAuth } from '../contexts/AuthContext';
 
 
 // Font options
@@ -55,6 +58,8 @@ const getErrorMessage = (error, defaultMsg = 'Error desconocido') => {
 const JOB_CATEGORIES = ['Ventas', 'Construcción', 'Limpieza', 'Cocina', 'Seguridad', 'Otro'];
 
 const PulperiaDashboard = () => {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
   const [user, setUser] = useState(null);
   const [pulperias, setPulperias] = useState([]);
   const [selectedPulperia, setSelectedPulperia] = useState(null);
@@ -63,6 +68,8 @@ const PulperiaDashboard = () => {
   const [jobs, setJobs] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
   const [adminMessages, setAdminMessages] = useState([]);
+  const [achievements, setAchievements] = useState([]);
+  const [pulperiaStats, setPulperiaStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showPulperiaDialog, setShowPulperiaDialog] = useState(false);
   const [showProductDialog, setShowProductDialog] = useState(false);
@@ -210,15 +217,25 @@ const PulperiaDashboard = () => {
   });
   const [uploadingImage, setUploadingImage] = useState(false);
 
-  const fetchData = useCallback(async () => {
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // Fetch pulperia data when selected pulperia changes
+  useEffect(() => {
+    if (selectedPulperia) {
+      fetchPulperiaData(selectedPulperia.pulperia_id);
+    }
+  }, [selectedPulperia]);
+
+  const fetchData = async () => {
     try {
-      const [userRes, pulperiasRes] = await Promise.all([
-        api.get(`/api/auth/me`),
-        api.get(`/api/pulperias`)
-      ]);
-      
+      // First get user data
+      const userRes = await api.get(`/api/auth/me`);
       setUser(userRes.data);
       
+      // Then get pulperias
+      const pulperiasRes = await api.get(`/api/pulperias`);
       const myPulperias = pulperiasRes.data.filter(p => p.owner_user_id === userRes.data.user_id);
       setPulperias(myPulperias);
       
@@ -228,37 +245,37 @@ const PulperiaDashboard = () => {
       }
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error('Error al cargar datos');
+      // More specific error handling
+      if (error.response?.status === 401) {
+        toast.error('Sesión expirada. Por favor inicia sesión nuevamente.');
+      } else if (error.response?.status === 403) {
+        toast.error('No tienes permisos para acceder a esta página.');
+      } else {
+        toast.error('Error al cargar datos. Intenta recargar la página.');
+      }
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  // Fetch pulperia data when selected pulperia changes
-  useEffect(() => {
-    if (selectedPulperia) {
-      fetchPulperiaData(selectedPulperia.pulperia_id);
-    }
-  }, [selectedPulperia]);
+  };
 
   const fetchPulperiaData = async (pulperiaId) => {
     try {
-      const [productsRes, ordersRes, jobsRes, announcementsRes, adminMsgsRes] = await Promise.all([
+      const [productsRes, ordersRes, jobsRes, announcementsRes, adminMsgsRes, achievementsRes, statsRes] = await Promise.all([
         api.get(`/api/pulperias/${pulperiaId}/products`),
         api.get(`/api/orders`),
         api.get(`/api/pulperias/${pulperiaId}/jobs`).catch(() => ({ data: [] })),
         api.get(`/api/pulperias/${pulperiaId}/announcements`).catch(() => ({ data: [] })),
-        api.get(`/api/pulperias/${pulperiaId}/admin-messages`).catch(() => ({ data: [] }))
+        api.get(`/api/pulperias/${pulperiaId}/admin-messages`).catch(() => ({ data: [] })),
+        api.get(`/api/pulperias/${pulperiaId}/achievements`).catch(() => ({ data: [] })),
+        api.get(`/api/pulperias/${pulperiaId}/stats`).catch(() => ({ data: null }))
       ]);
       
       setProducts(productsRes.data);
       setJobs(jobsRes.data);
       setAnnouncements(announcementsRes.data);
       setAdminMessages(adminMsgsRes.data);
+      setAchievements(achievementsRes.data);
+      setPulperiaStats(statsRes.data);
       const pulperiaOrders = ordersRes.data.filter(o => o.pulperia_id === pulperiaId);
       setOrders(pulperiaOrders);
       
@@ -267,6 +284,27 @@ const PulperiaDashboard = () => {
       setNewOrdersCount(newOrders);
     } catch (error) {
       console.error('Error fetching pulperia data:', error);
+    }
+  };
+
+  // Función para verificar y desbloquear nuevos logros
+  const checkForNewAchievements = async () => {
+    if (!selectedPulperia) return;
+    try {
+      const res = await api.post(`/api/pulperias/${selectedPulperia.pulperia_id}/check-achievements`);
+      if (res.data.new_achievements && res.data.new_achievements.length > 0) {
+        res.data.new_achievements.forEach(ach => {
+          toast.success(`🏆 ¡Nuevo logro desbloqueado: ${ach.name}!`, {
+            duration: 5000,
+            style: { background: '#D4AF37', color: '#1a1a1a', fontWeight: 'bold' }
+          });
+        });
+        // Recargar achievements
+        const achievementsRes = await api.get(`/api/pulperias/${selectedPulperia.pulperia_id}/achievements`);
+        setAchievements(achievementsRes.data);
+      }
+    } catch (error) {
+      console.error('Error checking achievements:', error);
     }
   };
 
@@ -512,15 +550,14 @@ const PulperiaDashboard = () => {
       
       const method = editingProduct ? 'put' : 'post';
       
-      await axios[method](
+      await api[method](
         url,
         {
           ...productForm,
           price: parseFloat(productForm.price),
           stock: 0,
           available: productForm.available
-        },
-        { withCredentials: true }
+        }
       );
       
       toast.success(editingProduct ? 'Producto actualizado' : 'Producto creado exitosamente');
@@ -861,6 +898,80 @@ const PulperiaDashboard = () => {
 
       {selectedPulperia && (
         <div className="px-6 py-6 space-y-6">
+          {/* Achievements Section - Sistema de Logros */}
+          <div className="bg-gradient-to-br from-amber-900/20 to-stone-900/50 rounded-2xl border border-amber-500/30 p-6">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center gap-3">
+                <Award className="w-6 h-6 text-amber-400" />
+                <h2 className="text-xl font-bold text-amber-400">Logros de tu Pulpería</h2>
+              </div>
+              <Button
+                onClick={checkForNewAchievements}
+                className="bg-amber-600 hover:bg-amber-500 text-black text-sm"
+              >
+                <RefreshCw className="w-4 h-4 mr-1" />
+                Verificar
+              </Button>
+            </div>
+            
+            {/* Stats */}
+            {pulperiaStats && (
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="bg-stone-800/50 rounded-lg p-3 text-center border border-stone-700/50">
+                  <p className="text-2xl font-bold text-amber-400">{pulperiaStats.products_count}</p>
+                  <p className="text-xs text-stone-400">Productos</p>
+                </div>
+                <div className="bg-stone-800/50 rounded-lg p-3 text-center border border-stone-700/50">
+                  <p className="text-2xl font-bold text-amber-400">{pulperiaStats.sales_count}</p>
+                  <p className="text-xs text-stone-400">Ventas</p>
+                </div>
+                <div className="bg-stone-800/50 rounded-lg p-3 text-center border border-stone-700/50">
+                  <p className="text-2xl font-bold text-amber-400">{pulperiaStats.profile_views}</p>
+                  <p className="text-xs text-stone-400">Visitas</p>
+                </div>
+              </div>
+            )}
+            
+            {/* Unlocked Achievements */}
+            {achievements.length > 0 ? (
+              <div className="flex flex-wrap gap-4">
+                {achievements.map((ach) => (
+                  <ArtDecoBadge 
+                    key={ach.badge_id} 
+                    badgeId={ach.badge_id} 
+                    size="md" 
+                    showName={true} 
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-6">
+                <p className="text-stone-400 text-sm">Aún no has desbloqueado ningún logro</p>
+                <p className="text-stone-500 text-xs mt-1">¡Agrega productos y completa ventas para ganar medallas!</p>
+              </div>
+            )}
+            
+            {/* Available Achievements Preview */}
+            <div className="mt-4 pt-4 border-t border-amber-500/20">
+              <p className="text-xs text-stone-500 mb-2">Logros disponibles:</p>
+              <div className="flex flex-wrap gap-2">
+                {BADGES_ARTDECO
+                  .filter(b => !achievements.find(a => a.badge_id === b.id))
+                  .slice(0, 5)
+                  .map(badge => (
+                    <span key={badge.id} className="px-2 py-1 bg-stone-800/50 rounded text-xs text-stone-500 border border-stone-700/50">
+                      {badge.name}
+                    </span>
+                  ))}
+                {BADGES_ARTDECO.filter(b => !achievements.find(a => a.badge_id === b.id)).length > 5 && (
+                  <span className="px-2 py-1 bg-stone-800/50 rounded text-xs text-stone-500 border border-stone-700/50">
+                    +{BADGES_ARTDECO.filter(b => !achievements.find(a => a.badge_id === b.id)).length - 5} más
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Products Section */}
           <div>
             <div className="flex justify-between items-center mb-4">

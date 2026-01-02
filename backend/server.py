@@ -147,7 +147,7 @@ class Advertisement(BaseModel):
     ad_id: str
     pulperia_id: str
     pulperia_name: str
-    plan: Literal["basico", "destacado", "premium"]
+    plan: Literal["basico", "destacado", "premium", "recomendado"]
     status: Literal["pending", "active", "expired"] = "pending"
     payment_method: str
     payment_reference: Optional[str] = None
@@ -168,6 +168,162 @@ class AdAssignmentLog(BaseModel):
     action: str  # "activated", "expired", "cancelled"
     assigned_by: str
     created_at: datetime
+
+# Sistema de Meritocracia - Logros basados en métricas reales
+ACHIEVEMENT_DEFINITIONS = {
+    # Nivel 1 - Principiante (fáciles de conseguir)
+    "primera_venta": {
+        "name": "Primera Venta",
+        "description": "¡Completaste tu primera venta!",
+        "icon": "ShoppingBag",
+        "criteria": {"sales_count": 1},
+        "points": 10
+    },
+    "catalogo_inicial": {
+        "name": "Catálogo Inicial",
+        "description": "5 productos en tu tienda",
+        "icon": "Package",
+        "criteria": {"products_count": 5},
+        "points": 10
+    },
+    
+    # Nivel 2 - En Progreso
+    "diez_ventas": {
+        "name": "10 Ventas",
+        "description": "10 ventas completadas",
+        "icon": "Star",
+        "criteria": {"sales_count": 10},
+        "points": 25
+    },
+    "catalogo_completo": {
+        "name": "Catálogo Completo",
+        "description": "15+ productos registrados",
+        "icon": "Package",
+        "criteria": {"products_count": 15},
+        "points": 25
+    },
+    "primeras_visitas": {
+        "name": "Ganando Visibilidad",
+        "description": "50 visitas a tu perfil",
+        "icon": "Eye",
+        "criteria": {"profile_views": 50},
+        "points": 20
+    },
+    
+    # Nivel 3 - Establecido
+    "cliente_feliz": {
+        "name": "Clientes Felices",
+        "description": "10 reseñas positivas (4+ estrellas)",
+        "icon": "Heart",
+        "criteria": {"happy_customers": 10},
+        "points": 40
+    },
+    "cincuenta_ventas": {
+        "name": "Vendedor Activo",
+        "description": "50 ventas completadas",
+        "icon": "TrendingUp",
+        "criteria": {"sales_count": 50},
+        "points": 50
+    },
+    "popular": {
+        "name": "Pulpería Popular",
+        "description": "200+ visitas a tu perfil",
+        "icon": "Users",
+        "criteria": {"profile_views": 200},
+        "points": 40
+    },
+    
+    # Nivel 4 - Experto
+    "cien_ventas": {
+        "name": "Vendedor Estrella",
+        "description": "100 ventas completadas",
+        "icon": "Star",
+        "criteria": {"sales_count": 100},
+        "points": 75
+    },
+    "super_catalogo": {
+        "name": "Super Catálogo",
+        "description": "30+ productos en tu tienda",
+        "icon": "Layers",
+        "criteria": {"products_count": 30},
+        "points": 50
+    },
+    "muy_popular": {
+        "name": "Muy Popular",
+        "description": "500+ visitas a tu perfil",
+        "icon": "Flame",
+        "criteria": {"profile_views": 500},
+        "points": 60
+    },
+    
+    # Nivel 5 - Maestro (Legendarios)
+    "verificado": {
+        "name": "Verificado",
+        "description": "Negocio verificado por admin",
+        "icon": "BadgeCheck",
+        "criteria": {"is_verified": True},
+        "points": 100,
+        "tier": "legendary"
+    },
+    "top_vendedor": {
+        "name": "Top Vendedor",
+        "description": "250+ ventas totales",
+        "icon": "Trophy",
+        "criteria": {"sales_count": 250},
+        "points": 150,
+        "tier": "legendary"
+    },
+    "leyenda": {
+        "name": "Leyenda Local",
+        "description": "1000+ visitas y 50+ reseñas positivas",
+        "icon": "Crown",
+        "criteria": {"profile_views": 1000, "happy_customers": 50},
+        "points": 200,
+        "tier": "legendary"
+    }
+}
+
+class PulperiaAchievement(BaseModel):
+    achievement_id: str
+    pulperia_id: str
+    badge_id: str  # ID del badge (primera_venta, cliente_feliz, etc.)
+    unlocked_at: datetime
+    
+class PulperiaStats(BaseModel):
+    pulperia_id: str
+    sales_count: int = 0
+    products_count: int = 0
+    profile_views: int = 0
+    happy_customers: int = 0  # Clientes con rating >= 4
+    avg_response_time: int = 999  # En minutos
+    is_verified: bool = False
+    updated_at: datetime
+
+# Sistema de Anuncios Destacados (1000 Lps/mes)
+# Admin habilita -> Pulpería sube 1 anuncio -> Todos lo ven
+class FeaturedAd(BaseModel):
+    ad_id: str
+    pulperia_id: str
+    pulperia_name: str
+    title: Optional[str] = None
+    description: Optional[str] = None
+    image_url: Optional[str] = None
+    video_url: Optional[str] = None
+    link_url: Optional[str] = None  # URL de destino al hacer click
+    is_active: bool = True
+    created_at: datetime
+    expires_at: datetime  # Fecha de expiración (30 días después de activación)
+
+class FeaturedAdSlot(BaseModel):
+    """Slot habilitado por admin para que una pulpería suba su anuncio"""
+    slot_id: str
+    pulperia_id: str
+    pulperia_name: str
+    enabled_by: str  # Admin que lo habilitó
+    enabled_at: datetime
+    expires_at: datetime  # Fecha límite para usar el slot
+    is_used: bool = False  # True cuando la pulpería subió su anuncio
+    ad_id: Optional[str] = None  # ID del anuncio subido
 
 # ============================================
 # REQUEST MODELS
@@ -239,13 +395,13 @@ class ServiceCreate(BaseModel):
     images: List[str] = []
 
 class AdvertisementCreate(BaseModel):
-    plan: Literal["basico", "destacado", "premium"]
+    plan: Literal["basico", "destacado", "premium", "recomendado"]
     payment_method: str
     payment_reference: Optional[str] = None
 
 class AdminAdActivation(BaseModel):
     pulperia_id: str
-    plan: Literal["basico", "destacado", "premium"]
+    plan: Literal["basico", "destacado", "premium", "recomendado"]
     duration_days: int = 7
 
 class UserTypeChange(BaseModel):
@@ -676,6 +832,72 @@ async def update_pulperia(pulperia_id: str, pulperia_data: PulperiaCreate, autho
     
     return await db.pulperias.find_one({"pulperia_id": pulperia_id}, {"_id": 0})
 
+@api_router.delete("/admin/pulperias/{pulperia_id}")
+async def admin_delete_pulperia(pulperia_id: str, authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
+    """Admin: Delete a pulperia and all related data"""
+    await get_admin_user(authorization, session_token)
+    
+    pulperia = await db.pulperias.find_one({"pulperia_id": pulperia_id})
+    if not pulperia:
+        raise HTTPException(status_code=404, detail="Pulpería no encontrada")
+    
+    # Delete all related data
+    await db.products.delete_many({"pulperia_id": pulperia_id})
+    await db.orders.delete_many({"pulperia_id": pulperia_id})
+    await db.reviews.delete_many({"pulperia_id": pulperia_id})
+    await db.achievements.delete_many({"pulperia_id": pulperia_id})
+    await db.announcements.delete_many({"pulperia_id": pulperia_id})
+    await db.jobs.delete_many({"pulperia_id": pulperia_id})
+    await db.featured_ads.delete_many({"pulperia_id": pulperia_id})
+    await db.featured_ad_slots.delete_many({"pulperia_id": pulperia_id})
+    await db.pulperias.delete_one({"pulperia_id": pulperia_id})
+    
+    return {"message": f"Pulpería '{pulperia.get('name', pulperia_id)}' eliminada"}
+
+class ClosePulperiaRequest(BaseModel):
+    confirmation_phrase: str  # Debe ser el nombre exacto de la pulpería
+
+@api_router.delete("/pulperias/{pulperia_id}/close")
+async def close_own_pulperia(pulperia_id: str, close_request: ClosePulperiaRequest, authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
+    """Owner: Close/delete their own pulperia with confirmation"""
+    user = await get_current_user(authorization, session_token)
+    
+    pulperia = await db.pulperias.find_one({"pulperia_id": pulperia_id})
+    if not pulperia:
+        raise HTTPException(status_code=404, detail="Pulpería no encontrada")
+    
+    # Solo el dueño puede cerrar su tienda
+    if pulperia["owner_user_id"] != user.user_id:
+        raise HTTPException(status_code=403, detail="Solo el dueño puede cerrar esta pulpería")
+    
+    # Verificar que la frase de confirmación sea correcta (nombre de la pulpería)
+    if close_request.confirmation_phrase.strip().lower() != pulperia["name"].strip().lower():
+        raise HTTPException(status_code=400, detail=f"La frase de confirmación no coincide. Escribe '{pulperia['name']}' para confirmar.")
+    
+    pulperia_name = pulperia.get('name', pulperia_id)
+    
+    # Eliminar todos los datos relacionados
+    await db.products.delete_many({"pulperia_id": pulperia_id})
+    await db.orders.delete_many({"pulperia_id": pulperia_id})
+    await db.reviews.delete_many({"pulperia_id": pulperia_id})
+    await db.achievements.delete_many({"pulperia_id": pulperia_id})
+    await db.announcements.delete_many({"pulperia_id": pulperia_id})
+    await db.jobs.delete_many({"pulperia_id": pulperia_id})
+    await db.featured_ads.delete_many({"pulperia_id": pulperia_id})
+    await db.featured_ad_slots.delete_many({"pulperia_id": pulperia_id})
+    await db.pulperias.delete_one({"pulperia_id": pulperia_id})
+    
+    # NO cambiar tipo de usuario - mantener como "pulperia" para que pueda crear otra
+    # El usuario sigue siendo tipo pulpería y puede crear una nueva tienda
+    
+    logger.info(f"[CLOSE STORE] User {user.user_id} closed pulperia '{pulperia_name}'")
+    
+    return {
+        "message": f"Tu pulpería '{pulperia_name}' ha sido cerrada. Puedes crear una nueva cuando quieras.",
+        "redirect_to": "/dashboard",
+        "can_create_new": True
+    }
+
 @api_router.get("/pulperias/{pulperia_id}/products")
 async def get_pulperia_products(pulperia_id: str):
     """Get all products for a pulperia"""
@@ -917,6 +1139,479 @@ async def toggle_product_availability(product_id: str, authorization: Optional[s
     return await db.products.find_one({"product_id": product_id}, {"_id": 0})
 
 # ============================================
+# ACHIEVEMENT SYSTEM ENDPOINTS
+# ============================================
+
+async def calculate_pulperia_stats(pulperia_id: str) -> dict:
+    """Calculate statistics for a pulperia to determine achievements"""
+    # Contar productos
+    products_count = await db.products.count_documents({"pulperia_id": pulperia_id})
+    
+    # Contar ventas completadas
+    sales_count = await db.orders.count_documents({
+        "pulperia_id": pulperia_id,
+        "status": "completed"
+    })
+    
+    # Contar clientes felices (reviews con rating >= 4)
+    happy_customers = await db.reviews.count_documents({
+        "pulperia_id": pulperia_id,
+        "rating": {"$gte": 4}
+    })
+    
+    # Obtener visitas al perfil (si existe el contador)
+    pulperia = await db.pulperias.find_one({"pulperia_id": pulperia_id}, {"_id": 0})
+    profile_views = pulperia.get("profile_views", 0) if pulperia else 0
+    
+    # Verificar si está verificado
+    is_verified = pulperia.get("is_verified", False) if pulperia else False
+    
+    return {
+        "pulperia_id": pulperia_id,
+        "products_count": products_count,
+        "sales_count": sales_count,
+        "happy_customers": happy_customers,
+        "profile_views": profile_views,
+        "is_verified": is_verified,
+        "avg_response_time": 999,  # Placeholder
+        "growth_rate": 0,  # Placeholder
+        "community_score": 0,  # Placeholder
+        "top_rank": 999  # Placeholder
+    }
+
+async def check_and_award_achievements(pulperia_id: str) -> list:
+    """Check stats and award any new achievements"""
+    stats = await calculate_pulperia_stats(pulperia_id)
+    
+    # Obtener logros ya desbloqueados
+    existing_achievements = await db.achievements.find(
+        {"pulperia_id": pulperia_id},
+        {"_id": 0, "badge_id": 1}
+    ).to_list(100)
+    existing_badges = {a["badge_id"] for a in existing_achievements}
+    
+    new_achievements = []
+    
+    # Verificar cada logro
+    for badge_id, definition in ACHIEVEMENT_DEFINITIONS.items():
+        if badge_id in existing_badges:
+            continue
+        
+        criteria = definition.get("criteria", {})
+        unlocked = True
+        
+        for key, value in criteria.items():
+            stat_value = stats.get(key, 0)
+            
+            if key == "is_verified":
+                if stat_value != value:
+                    unlocked = False
+                    break
+            elif key in ["avg_response_time", "top_rank"]:
+                # Menor es mejor (top_rank 1 es mejor que 10)
+                if stat_value > value:
+                    unlocked = False
+                    break
+            else:
+                # Mayor es mejor
+                if stat_value < value:
+                    unlocked = False
+                    break
+        
+        if unlocked:
+            achievement_id = f"achievement_{uuid.uuid4().hex[:12]}"
+            achievement_doc = {
+                "achievement_id": achievement_id,
+                "pulperia_id": pulperia_id,
+                "badge_id": badge_id,
+                "unlocked_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.achievements.insert_one(achievement_doc)
+            new_achievements.append({
+                "badge_id": badge_id,
+                "name": definition["name"],
+                "description": definition["description"],
+                "tier": definition.get("tier", "gold"),
+                "unlocked_at": achievement_doc["unlocked_at"]
+            })
+    
+    return new_achievements
+
+@api_router.get("/achievements/definitions")
+async def get_achievement_definitions():
+    """Get all available achievement definitions"""
+    return ACHIEVEMENT_DEFINITIONS
+
+@api_router.get("/pulperias/{pulperia_id}/achievements")
+async def get_pulperia_achievements(pulperia_id: str):
+    """Get all achievements for a pulperia"""
+    achievements = await db.achievements.find(
+        {"pulperia_id": pulperia_id},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Enrich with definition data
+    result = []
+    for ach in achievements:
+        badge_id = ach.get("badge_id")
+        definition = ACHIEVEMENT_DEFINITIONS.get(badge_id, {})
+        result.append({
+            **ach,
+            "name": definition.get("name", badge_id),
+            "description": definition.get("description", ""),
+            "icon": definition.get("icon", "Star"),
+            "tier": definition.get("tier", "gold")
+        })
+    
+    return result
+
+@api_router.get("/pulperias/{pulperia_id}/stats")
+async def get_pulperia_stats(pulperia_id: str, auto_check: bool = True):
+    """Get statistics for a pulperia and optionally check achievements"""
+    stats = await calculate_pulperia_stats(pulperia_id)
+    
+    # Auto-check achievements when stats are fetched
+    if auto_check:
+        await check_and_award_achievements(pulperia_id)
+    
+    return stats
+
+@api_router.post("/pulperias/{pulperia_id}/check-achievements")
+async def check_achievements(pulperia_id: str, authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
+    """Check and award new achievements for a pulperia"""
+    user = await get_current_user(authorization, session_token)
+    
+    pulperia = await db.pulperias.find_one({"pulperia_id": pulperia_id}, {"_id": 0})
+    if not pulperia:
+        raise HTTPException(status_code=404, detail="Pulpería no encontrada")
+    
+    # Solo el dueño puede verificar logros
+    if pulperia["owner_user_id"] != user.user_id and user.email != ADMIN_EMAIL:
+        raise HTTPException(status_code=403, detail="No tienes permiso")
+    
+    new_achievements = await check_and_award_achievements(pulperia_id)
+    
+    return {
+        "new_achievements": new_achievements,
+        "message": f"Se desbloquearon {len(new_achievements)} nuevos logros" if new_achievements else "No hay nuevos logros disponibles"
+    }
+
+@api_router.post("/pulperias/{pulperia_id}/increment-views")
+async def increment_profile_views(pulperia_id: str):
+    """Increment the profile view counter for a pulperia"""
+    result = await db.pulperias.update_one(
+        {"pulperia_id": pulperia_id},
+        {"$inc": {"profile_views": 1}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Pulpería no encontrada")
+    
+    return {"message": "Vista registrada"}
+
+@api_router.post("/admin/pulperias/{pulperia_id}/verify")
+async def verify_pulperia(pulperia_id: str, authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
+    """Admin: Verify a pulperia (unlocks 'verificado' achievement)"""
+    await get_admin_user(authorization, session_token)
+    
+    result = await db.pulperias.update_one(
+        {"pulperia_id": pulperia_id},
+        {"$set": {"is_verified": True}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Pulpería no encontrada")
+    
+    # Check achievements after verification
+    new_achievements = await check_and_award_achievements(pulperia_id)
+    
+    return {
+        "message": "Pulpería verificada",
+        "new_achievements": new_achievements
+    }
+
+@api_router.post("/admin/pulperias/{pulperia_id}/award-badge")
+async def admin_award_badge(pulperia_id: str, badge_id: str, authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
+    """Admin: Manually award a badge to a pulperia"""
+    user = await get_admin_user(authorization, session_token)
+    
+    if badge_id not in ACHIEVEMENT_DEFINITIONS:
+        raise HTTPException(status_code=400, detail="Badge inválido")
+    
+    # Check if already has badge
+    existing = await db.achievements.find_one({
+        "pulperia_id": pulperia_id,
+        "badge_id": badge_id
+    })
+    
+    if existing:
+        raise HTTPException(status_code=400, detail="La pulpería ya tiene este logro")
+    
+    achievement_id = f"achievement_{uuid.uuid4().hex[:12]}"
+    achievement_doc = {
+        "achievement_id": achievement_id,
+        "pulperia_id": pulperia_id,
+        "badge_id": badge_id,
+        "awarded_by": user.user_id,
+        "unlocked_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.achievements.insert_one(achievement_doc)
+    
+    definition = ACHIEVEMENT_DEFINITIONS[badge_id]
+    return {
+        "message": f"Logro '{definition['name']}' otorgado exitosamente",
+        "achievement": {
+            **achievement_doc,
+            "name": definition["name"],
+            "description": definition["description"]
+        }
+    }
+
+# ============================================
+# FEATURED ADS SYSTEM - Anuncios Destacados (1000 Lps/mes)
+# ============================================
+
+@api_router.get("/featured-ads")
+async def get_featured_ads():
+    """Get all active featured ads - visible to everyone"""
+    now = datetime.now(timezone.utc)
+    
+    # Get active ads that haven't expired
+    ads = await db.featured_ads.find({
+        "is_active": True,
+        "expires_at": {"$gt": now.isoformat()}
+    }, {"_id": 0}).to_list(50)
+    
+    return ads
+
+@api_router.get("/featured-ads/my-slot")
+async def get_my_ad_slot(authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
+    """Get current user's pulperia ad slot status"""
+    user = await get_current_user(authorization, session_token)
+    
+    # Find user's pulperias
+    pulperias = await db.pulperias.find({"owner_user_id": user.user_id}, {"_id": 0}).to_list(10)
+    
+    if not pulperias:
+        return {"has_slot": False, "message": "No tienes pulperías registradas"}
+    
+    pulperia_ids = [p["pulperia_id"] for p in pulperias]
+    
+    # Check for active slot
+    now = datetime.now(timezone.utc)
+    slot = await db.featured_ad_slots.find_one({
+        "pulperia_id": {"$in": pulperia_ids},
+        "expires_at": {"$gt": now.isoformat()}
+    }, {"_id": 0})
+    
+    if not slot:
+        return {"has_slot": False, "message": "No tienes un slot habilitado. Contacta al admin."}
+    
+    # Get the ad if exists
+    ad = None
+    if slot.get("ad_id"):
+        ad = await db.featured_ads.find_one({"ad_id": slot["ad_id"]}, {"_id": 0})
+    
+    return {
+        "has_slot": True,
+        "slot": slot,
+        "ad": ad,
+        "can_upload": not slot.get("is_used", False)
+    }
+
+@api_router.post("/featured-ads/upload")
+async def upload_featured_ad(
+    title: Optional[str] = None,
+    description: Optional[str] = None,
+    image_url: Optional[str] = None,
+    video_url: Optional[str] = None,
+    link_url: Optional[str] = None,
+    authorization: Optional[str] = Header(None), 
+    session_token: Optional[str] = Cookie(None)
+):
+    """Upload a featured ad (requires enabled slot)"""
+    user = await get_current_user(authorization, session_token)
+    
+    # Find user's pulperia with active slot
+    pulperias = await db.pulperias.find({"owner_user_id": user.user_id}, {"_id": 0}).to_list(10)
+    
+    if not pulperias:
+        raise HTTPException(status_code=400, detail="No tienes pulperías registradas")
+    
+    pulperia_ids = [p["pulperia_id"] for p in pulperias]
+    
+    now = datetime.now(timezone.utc)
+    slot = await db.featured_ad_slots.find_one({
+        "pulperia_id": {"$in": pulperia_ids},
+        "is_used": False,
+        "expires_at": {"$gt": now.isoformat()}
+    })
+    
+    if not slot:
+        raise HTTPException(status_code=403, detail="No tienes un slot disponible. Contacta al admin para habilitarlo (1000 Lps/mes).")
+    
+    if not image_url and not video_url:
+        raise HTTPException(status_code=400, detail="Debes subir al menos una imagen o video")
+    
+    # Get pulperia info
+    pulperia = await db.pulperias.find_one({"pulperia_id": slot["pulperia_id"]}, {"_id": 0})
+    
+    # Create the ad
+    ad_id = f"featured_ad_{uuid.uuid4().hex[:12]}"
+    expires_at = now + timedelta(days=30)
+    
+    ad_doc = {
+        "ad_id": ad_id,
+        "pulperia_id": slot["pulperia_id"],
+        "pulperia_name": pulperia["name"] if pulperia else "Pulpería",
+        "title": title,
+        "description": description,
+        "image_url": image_url,
+        "video_url": video_url,
+        "link_url": link_url or f"/p/{slot['pulperia_id']}",
+        "is_active": True,
+        "created_at": now.isoformat(),
+        "expires_at": expires_at.isoformat()
+    }
+    
+    await db.featured_ads.insert_one(ad_doc)
+    
+    # Mark slot as used
+    await db.featured_ad_slots.update_one(
+        {"slot_id": slot["slot_id"]},
+        {"$set": {"is_used": True, "ad_id": ad_id}}
+    )
+    
+    return {
+        "message": "¡Anuncio destacado creado exitosamente!",
+        "ad": {k: v for k, v in ad_doc.items() if k != "_id"},
+        "expires_at": expires_at.isoformat()
+    }
+
+@api_router.delete("/featured-ads/{ad_id}")
+async def delete_my_featured_ad(ad_id: str, authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
+    """Delete own featured ad"""
+    user = await get_current_user(authorization, session_token)
+    
+    # Find user's pulperias
+    pulperias = await db.pulperias.find({"owner_user_id": user.user_id}, {"_id": 0}).to_list(10)
+    pulperia_ids = [p["pulperia_id"] for p in pulperias]
+    
+    ad = await db.featured_ads.find_one({"ad_id": ad_id})
+    
+    if not ad:
+        raise HTTPException(status_code=404, detail="Anuncio no encontrado")
+    
+    if ad["pulperia_id"] not in pulperia_ids:
+        raise HTTPException(status_code=403, detail="No tienes permiso para eliminar este anuncio")
+    
+    await db.featured_ads.delete_one({"ad_id": ad_id})
+    
+    return {"message": "Anuncio eliminado"}
+
+# Admin endpoints for managing featured ad slots
+@api_router.post("/admin/featured-ads/enable-slot")
+async def admin_enable_ad_slot(
+    pulperia_id: str,
+    days: int = 30,
+    authorization: Optional[str] = Header(None), 
+    session_token: Optional[str] = Cookie(None)
+):
+    """Admin: Enable a featured ad slot for a pulperia (after payment)"""
+    admin = await get_admin_user(authorization, session_token)
+    
+    pulperia = await db.pulperias.find_one({"pulperia_id": pulperia_id}, {"_id": 0})
+    if not pulperia:
+        raise HTTPException(status_code=404, detail="Pulpería no encontrada")
+    
+    now = datetime.now(timezone.utc)
+    expires_at = now + timedelta(days=days)
+    
+    # Check if already has active slot
+    existing_slot = await db.featured_ad_slots.find_one({
+        "pulperia_id": pulperia_id,
+        "expires_at": {"$gt": now.isoformat()}
+    })
+    
+    if existing_slot:
+        raise HTTPException(status_code=400, detail="Esta pulpería ya tiene un slot activo")
+    
+    slot_id = f"slot_{uuid.uuid4().hex[:12]}"
+    slot_doc = {
+        "slot_id": slot_id,
+        "pulperia_id": pulperia_id,
+        "pulperia_name": pulperia["name"],
+        "enabled_by": admin.user_id,
+        "enabled_at": now.isoformat(),
+        "expires_at": expires_at.isoformat(),
+        "is_used": False,
+        "ad_id": None
+    }
+    
+    await db.featured_ad_slots.insert_one(slot_doc)
+    
+    # Create notification for pulperia owner
+    notification_doc = {
+        "notification_id": f"notif_{uuid.uuid4().hex[:12]}",
+        "user_id": pulperia["owner_user_id"],
+        "type": "ad_slot_enabled",
+        "title": "¡Slot de Anuncio Habilitado!",
+        "message": f"Tu slot de anuncio destacado para '{pulperia['name']}' ha sido activado. Tienes {days} días para subir tu anuncio.",
+        "read": False,
+        "created_at": now.isoformat()
+    }
+    await db.notifications.insert_one(notification_doc)
+    
+    return {
+        "message": f"Slot habilitado para '{pulperia['name']}' por {days} días",
+        "slot": {k: v for k, v in slot_doc.items() if k != "_id"},
+        "expires_at": expires_at.isoformat()
+    }
+
+@api_router.get("/admin/featured-ads/slots")
+async def admin_get_all_slots(authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
+    """Admin: Get all featured ad slots"""
+    await get_admin_user(authorization, session_token)
+    
+    slots = await db.featured_ad_slots.find({}, {"_id": 0}).sort("enabled_at", -1).to_list(100)
+    return slots
+
+@api_router.delete("/admin/featured-ads/slot/{slot_id}")
+async def admin_delete_slot(slot_id: str, authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
+    """Admin: Delete/revoke a featured ad slot"""
+    await get_admin_user(authorization, session_token)
+    
+    slot = await db.featured_ad_slots.find_one({"slot_id": slot_id})
+    if not slot:
+        raise HTTPException(status_code=404, detail="Slot no encontrado")
+    
+    # Also delete the ad if exists
+    if slot.get("ad_id"):
+        await db.featured_ads.delete_one({"ad_id": slot["ad_id"]})
+    
+    await db.featured_ad_slots.delete_one({"slot_id": slot_id})
+    
+    return {"message": "Slot y anuncio eliminados"}
+
+@api_router.delete("/admin/featured-ads/{ad_id}")
+async def admin_delete_ad(ad_id: str, authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
+    """Admin: Delete any featured ad"""
+    await get_admin_user(authorization, session_token)
+    
+    result = await db.featured_ads.delete_one({"ad_id": ad_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Anuncio no encontrado")
+    
+    # Also update the slot
+    await db.featured_ad_slots.update_one(
+        {"ad_id": ad_id},
+        {"$set": {"is_used": False, "ad_id": None}}
+    )
+    
+    return {"message": "Anuncio eliminado"}
+
+# ============================================
 # FAVORITES ENDPOINTS
 # ============================================
 
@@ -1115,6 +1810,13 @@ async def get_notifications(authorization: Optional[str] = Header(None), session
     """Get notifications for current user - shows recent orders with full details"""
     user = await get_current_user(authorization, session_token)
     
+    # Get user's read notifications
+    read_notifications = await db.read_notifications.find(
+        {"user_id": user.user_id},
+        {"_id": 0, "notification_id": 1}
+    ).to_list(100)
+    read_ids = set(n["notification_id"] for n in read_notifications)
+    
     notifications = []
     
     if user.user_type == "cliente":
@@ -1139,8 +1841,11 @@ async def get_notifications(authorization: Optional[str] = Header(None), session
             if len(items) > 3:
                 item_summary += f" +{len(items) - 3} más"
             
+            notification_id = order["order_id"]
+            is_read = notification_id in read_ids
+            
             notifications.append({
-                "id": order["order_id"],
+                "id": notification_id,
                 "type": "order_status",
                 "title": f"Orden en {pulperia_name}",
                 "message": item_summary or "Sin productos",
@@ -1151,7 +1856,8 @@ async def get_notifications(authorization: Optional[str] = Header(None), session
                 "total": order.get("total", 0),
                 "total_items": total_items,
                 "pulperia_name": pulperia_name,
-                "role": "customer"
+                "role": "customer",
+                "read": is_read
             })
     else:
         # Pulperia owners see orders received
@@ -1175,8 +1881,11 @@ async def get_notifications(authorization: Optional[str] = Header(None), session
             if len(items) > 3:
                 item_summary += f" +{len(items) - 3} más"
             
+            notification_id = order["order_id"]
+            is_read = notification_id in read_ids
+            
             notifications.append({
-                "id": order["order_id"],
+                "id": notification_id,
                 "type": "new_order" if order.get("status") == "pending" else "order_update",
                 "title": f"Pedido de {customer_name}",
                 "message": item_summary or "Sin productos",
@@ -1188,10 +1897,26 @@ async def get_notifications(authorization: Optional[str] = Header(None), session
                 "total": order.get("total", 0),
                 "total_items": total_items,
                 "pulperia_name": pulperia_name,
-                "role": "owner"
+                "role": "owner",
+                "read": is_read
             })
     
     return notifications
+
+
+@api_router.post("/notifications/mark-read")
+async def mark_notifications_read(notification_ids: List[str], authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
+    """Mark notifications as read"""
+    user = await get_current_user(authorization, session_token)
+    
+    for nid in notification_ids:
+        await db.read_notifications.update_one(
+            {"user_id": user.user_id, "notification_id": nid},
+            {"$set": {"user_id": user.user_id, "notification_id": nid, "read_at": datetime.now(timezone.utc)}},
+            upsert=True
+        )
+    
+    return {"success": True, "marked": len(notification_ids)}
 
 # ============================================
 # JOB ENDPOINTS
@@ -1316,7 +2041,8 @@ async def delete_service(service_id: str, authorization: Optional[str] = Header(
 AD_PLANS = {
     "basico": {"price": 200, "duration": 7, "name": "Básico", "features": ["Aparece en lista destacada"]},
     "destacado": {"price": 400, "duration": 15, "name": "Destacado", "features": ["Aparece primero en búsquedas", "Badge destacado"]},
-    "premium": {"price": 600, "duration": 30, "name": "Premium", "features": ["Aparece primero", "Badge premium", "Banner en inicio"]}
+    "premium": {"price": 600, "duration": 30, "name": "Premium", "features": ["Aparece primero", "Badge premium", "Banner en inicio"]},
+    "recomendado": {"price": 1000, "duration": 30, "name": "Recomendado", "features": ["Aparece en Pulperías Recomendadas", "Badge exclusivo", "Máxima visibilidad", "Prioridad en mapa"]}
 }
 
 @api_router.get("/ads/plans")
@@ -1342,6 +2068,32 @@ async def get_featured_pulperias():
             featured.append(pulperia)
     
     return featured
+
+
+@api_router.get("/ads/recommended")
+async def get_recommended_pulperias():
+    """Get pulperias with 'recomendado' plan - Premium tier for featured section"""
+    now = datetime.now(timezone.utc)
+    
+    # Only get ads with 'recomendado' plan that are active
+    active_ads = await db.advertisements.find(
+        {
+            "status": "active", 
+            "plan": "recomendado",
+            "end_date": {"$gte": now.isoformat()}
+        },
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    
+    recommended = []
+    for ad in active_ads:
+        pulperia = await db.pulperias.find_one({"pulperia_id": ad["pulperia_id"]}, {"_id": 0})
+        if pulperia:
+            pulperia["ad_plan"] = "recomendado"
+            pulperia["ad_end_date"] = ad.get("end_date")
+            recommended.append(pulperia)
+    
+    return recommended
 
 @api_router.get("/ads/my-ads")
 async def get_my_ads(authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
@@ -1752,7 +2504,7 @@ async def websocket_orders_endpoint(websocket: WebSocket, user_id: str):
             except asyncio.TimeoutError:
                 try:
                     await ws_manager.send_personal_message({"type": "ping"}, websocket)
-                except:
+                except Exception:
                     break
                     
     except WebSocketDisconnect:
@@ -1822,7 +2574,7 @@ async def broadcast_order_update(order: dict, event_type: str):
 @api_router.post("/upload-image")
 async def upload_image(file: UploadFile = File(...), authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
     """Upload an image and return its base64 data URL"""
-    user = await get_current_user(authorization, session_token)
+    await get_current_user(authorization, session_token)
     
     # Validate file type
     allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
@@ -1882,11 +2634,13 @@ async def admin_clear_data(keep_products: bool = True, authorization: Optional[s
 
 # Dominios permitidos para CORS
 ALLOWED_ORIGINS = [
-    "https://lapulperia.preview.emergentagent.com",
+    "https://achiev-meritocracy.preview.emergentagent.com",
     "https://lapulperiastore.net",
     "https://www.lapulperiastore.net",
+    "https://red-auth-connect.emergent.host",
     "http://localhost:3000",
-    "http://127.0.0.1:3000"
+    "http://127.0.0.1:3000",
+    "*"  # Allow all for deployment flexibility
 ]
 
 app.add_middleware(
@@ -1897,7 +2651,58 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Health check endpoint - MUST be at root level for deployment
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for Kubernetes/deployment"""
+    return {"status": "healthy", "service": "lapulperia-backend"}
+
+# Also add health check under /api for nginx routing
+@api_router.get("/health")
+async def api_health_check():
+    """Health check endpoint under /api prefix"""
+    return {"status": "healthy", "service": "lapulperia-backend"}
+
 app.include_router(api_router)
+
+@app.on_event("startup")
+async def startup_db_client():
+    """Create indexes for faster queries on startup"""
+    try:
+        # Índices para pulperías
+        await db.pulperias.create_index("pulperia_id", unique=True)
+        await db.pulperias.create_index("owner_user_id")
+        await db.pulperias.create_index([("location.lat", 1), ("location.lng", 1)])
+        
+        # Índices para productos
+        await db.products.create_index("product_id", unique=True)
+        await db.products.create_index("pulperia_id")
+        await db.products.create_index([("name", "text"), ("description", "text")])
+        
+        # Índices para órdenes
+        await db.orders.create_index("order_id", unique=True)
+        await db.orders.create_index("pulperia_id")
+        await db.orders.create_index("customer_user_id")
+        await db.orders.create_index("status")
+        
+        # Índices para usuarios
+        await db.users.create_index("user_id", unique=True)
+        await db.users.create_index("email", unique=True)
+        
+        # Índices para sesiones
+        await db.user_sessions.create_index("session_token", unique=True)
+        await db.user_sessions.create_index("user_id")
+        
+        # Índices para logros
+        await db.achievements.create_index("pulperia_id")
+        await db.achievements.create_index([("pulperia_id", 1), ("badge_id", 1)], unique=True)
+        
+        # Índices para favoritos
+        await db.favorites.create_index([("user_id", 1), ("pulperia_id", 1)], unique=True)
+        
+        logger.info("[STARTUP] Database indexes created successfully")
+    except Exception as e:
+        logger.warning(f"[STARTUP] Index creation warning: {e}")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():

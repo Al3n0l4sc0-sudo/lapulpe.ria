@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Bell, X, ShoppingBag, CheckCircle, Clock, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,13 +11,6 @@ const FloatingNotification = ({ notification, onClose }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
 
-  const handleClose = useCallback(() => {
-    setIsLeaving(true);
-    setTimeout(() => {
-      onClose();
-    }, 300);
-  }, [onClose]);
-
   useEffect(() => {
     // Entrada con animación
     setTimeout(() => setIsVisible(true), 50);
@@ -28,7 +21,14 @@ const FloatingNotification = ({ notification, onClose }) => {
     }, 8000);
 
     return () => clearTimeout(autoClose);
-  }, [handleClose]);
+  }, []);
+
+  const handleClose = () => {
+    setIsLeaving(true);
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
 
   const handleClick = () => {
     navigate('/orders');

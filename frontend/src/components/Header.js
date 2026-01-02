@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api, BACKEND_URL } from '../config/api';
-import { Bell, LogOut, User, Store, CheckCircle, Clock, XCircle, Package, Sparkles, ChevronRight, X, ShoppingBag, BellRing } from 'lucide-react';
+import { Bell, LogOut, User, Store, CheckCircle2, Clock, XCircle, Package, Sparkles, ChevronRight, X, ShoppingBag, BellRing, Truck, AlertCircle, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { requestNotificationPermission } from '../hooks/useNotifications';
 
@@ -10,7 +10,7 @@ const Header = ({ user, title, subtitle, onOrderUpdate }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState('default');
@@ -49,16 +49,19 @@ const Header = ({ user, title, subtitle, onOrderUpdate }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Fetch unread count
   useEffect(() => {
     if (!user) return;
     const fetchCount = async () => {
       try {
         const response = await api.get(`/api/notifications`);
-        setNotificationCount(response.data.filter(n => n.status === 'pending' || n.status === 'accepted' || n.status === 'ready' || n.type === 'admin_message').length);
+        // Count only unread notifications
+        const unread = response.data.filter(n => !n.read).length;
+        setUnreadCount(unread);
       } catch (error) { /* Silently ignore */ }
     };
     fetchCount();
-    const interval = setInterval(fetchCount, 30000); // Reduced frequency
+    const interval = setInterval(fetchCount, 30000);
     return () => clearInterval(interval);
   }, [user]);
 
@@ -67,7 +70,8 @@ const Header = ({ user, title, subtitle, onOrderUpdate }) => {
     try {
       const response = await api.get(`/api/notifications`);
       setNotifications(response.data);
-      setNotificationCount(response.data.filter(n => n.status === 'pending' || n.status === 'accepted' || n.status === 'ready' || n.type === 'admin_message').length);
+      const unread = response.data.filter(n => !n.read).length;
+      setUnreadCount(unread);
     } catch (error) {
       /* Ignore errors */
     } finally {
@@ -75,11 +79,35 @@ const Header = ({ user, title, subtitle, onOrderUpdate }) => {
     }
   }, []);
 
+  // Mark notifications as read when dropdown is opened
+  const markAsRead = useCallback(async () => {
+    const unreadIds = notifications.filter(n => !n.read).map(n => n.id);
+    if (unreadIds.length === 0) return;
+    
+    try {
+      await api.post(`/api/notifications/mark-read`, unreadIds);
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      setUnreadCount(0);
+    } catch (error) {
+      /* Silently ignore */
+    }
+  }, [notifications]);
+
   useEffect(() => {
     if (showDropdown && user) {
       fetchNotifications();
     }
   }, [showDropdown, user, fetchNotifications]);
+
+  // Mark as read when dropdown is opened and notifications are loaded
+  useEffect(() => {
+    if (showDropdown && notifications.length > 0) {
+      const timer = setTimeout(() => {
+        markAsRead();
+      }, 1500); // Mark as read after 1.5 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [showDropdown, notifications, markAsRead]);
 
   const handleLogout = async () => {
     try {
@@ -111,9 +139,9 @@ const Header = ({ user, title, subtitle, onOrderUpdate }) => {
 
   const getStatusConfig = (status) => ({
     pending: { icon: Clock, text: 'En Cola', color: 'text-amber-400', bg: 'bg-amber-500/20' },
-    accepted: { icon: Sparkles, text: 'Preparando', color: 'text-blue-400', bg: 'bg-blue-500/20' },
-    ready: { icon: CheckCircle, text: 'Lista', color: 'text-green-400', bg: 'bg-green-500/20' },
-    completed: { icon: CheckCircle, text: 'Completada', color: 'text-stone-400', bg: 'bg-stone-500/20' },
+    accepted: { icon: Truck, text: 'Preparando', color: 'text-blue-400', bg: 'bg-blue-500/20' },
+    ready: { icon: CheckCircle2, text: 'Lista', color: 'text-green-400', bg: 'bg-green-500/20' },
+    completed: { icon: CheckCircle2, text: 'Completada', color: 'text-stone-400', bg: 'bg-stone-500/20' },
     cancelled: { icon: XCircle, text: 'Cancelada', color: 'text-red-400', bg: 'bg-red-500/20' }
   })[status] || { icon: Package, text: status, color: 'text-stone-400', bg: 'bg-stone-500/20' };
 
@@ -141,14 +169,14 @@ const Header = ({ user, title, subtitle, onOrderUpdate }) => {
                 data-testid="notifications-button"
               >
                 <Bell className="w-5 h-5 text-stone-400" />
-                {notificationCount > 0 && (
+                {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
-                    {notificationCount > 9 ? '9+' : notificationCount}
+                    {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
               </button>
 
-              {/* Dropdown - FIXED z-index */}
+              {/* Dropdown */}
               {showDropdown && (
                 <div 
                   className="fixed inset-x-4 top-16 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96 bg-stone-900 rounded-2xl border border-stone-700 shadow-2xl shadow-black/50 overflow-hidden"

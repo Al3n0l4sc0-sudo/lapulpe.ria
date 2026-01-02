@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { 
   Shield, Store, Crown, Sparkles, Star, Check, X, Clock, Calendar, Search, 
   Ban, MessageSquare, Award, Zap, Flame, Gem, Trophy, Target, Rocket, 
-  Users, ChevronRight, Send, Eye, AlertTriangle, Lock, Unlock
+  Users, ChevronRight, Send, Eye, AlertTriangle, Lock, Unlock, BadgeCheck, Tv, Plus, Trash2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
@@ -15,60 +15,16 @@ import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Button } from '../components/ui/button';
 import { Label } from '../components/ui/label';
+import ArtDecoBadge, { BADGES_ARTDECO, BadgeInline } from '../components/ArtDecoBadge';
 
 const ADMIN_PASSWORD = 'AlEjA127';
 
-// Sistema de Badges en Español - Estilo Gaming
-const BADGES = [
-  { id: 'novato', name: 'Novato', icon: Star, color: 'from-gray-500 to-gray-600', glow: 'shadow-gray-500/50', description: 'Nuevo en la plataforma' },
-  { id: 'en_ascenso', name: 'En Ascenso', icon: Zap, color: 'from-blue-500 to-blue-600', glow: 'shadow-blue-500/50', description: 'Creciendo rápidamente' },
-  { id: 'en_llamas', name: 'En Llamas', icon: Flame, color: 'from-orange-500 to-red-500', glow: 'shadow-orange-500/50', description: 'Muy activo' },
-  { id: 'elite', name: 'Élite', icon: Gem, color: 'from-purple-500 to-pink-500', glow: 'shadow-purple-500/50', description: 'Vendedor destacado' },
-  { id: 'campeon', name: 'Campeón', icon: Trophy, color: 'from-yellow-400 to-amber-500', glow: 'shadow-yellow-500/50', description: 'Top vendedor' },
-  { id: 'legendario', name: 'Legendario', icon: Crown, color: 'from-amber-400 via-yellow-500 to-amber-600', glow: 'shadow-amber-500/50', description: 'Leyenda viviente' },
-  { id: 'verificado', name: 'Verificado', icon: Check, color: 'from-emerald-500 to-green-600', glow: 'shadow-emerald-500/50', description: 'Verificado oficialmente' },
-  { id: 'socio', name: 'Socio Oficial', icon: Target, color: 'from-cyan-500 to-blue-500', glow: 'shadow-cyan-500/50', description: 'Socio de La Pulpería' },
-];
+// Use Art Deco style badges
+const BADGES = BADGES_ARTDECO;
 
-// Componente de Badge con efectos gaming
+// Componente de Badge Art Deco
 const BadgeDisplay = ({ badgeId, size = 'md', showName = true, animated = true }) => {
-  const badge = BADGES.find(b => b.id === badgeId);
-  if (!badge) return null;
-
-  const sizes = {
-    sm: 'w-6 h-6',
-    md: 'w-10 h-10',
-    lg: 'w-14 h-14'
-  };
-
-  const iconSizes = {
-    sm: 'w-3 h-3',
-    md: 'w-5 h-5',
-    lg: 'w-7 h-7'
-  };
-
-  const Icon = badge.icon;
-
-  return (
-    <div className="flex items-center gap-2">
-      <div className={`relative ${animated ? 'group' : ''}`}>
-        <div className={`absolute inset-0 bg-gradient-to-r ${badge.color} rounded-xl blur-lg opacity-50 ${animated ? 'group-hover:opacity-80' : ''} transition-opacity`}></div>
-        <div className={`relative ${sizes[size]} bg-gradient-to-br ${badge.color} rounded-xl flex items-center justify-center shadow-lg ${badge.glow} ${animated ? 'group-hover:scale-110' : ''} transition-transform`}>
-          <Icon className={`${iconSizes[size]} text-white drop-shadow-lg`} />
-        </div>
-        {animated && (
-          <div className="absolute -top-1 -right-1 w-2 h-2 bg-white rounded-full animate-ping opacity-75"></div>
-        )}
-      </div>
-      
-      {showName && (
-        <div>
-          <p className={`font-bold text-white ${size === 'sm' ? 'text-xs' : 'text-sm'}`}>{badge.name}</p>
-          {size !== 'sm' && <p className="text-xs text-stone-400">{badge.description}</p>}
-        </div>
-      )}
-    </div>
-  );
+  return <ArtDecoBadge badgeId={badgeId} size={size} showName={showName} animated={animated} />;
 };
 
 const AdminPanel = () => {
@@ -78,6 +34,7 @@ const AdminPanel = () => {
   const [ads, setAds] = useState([]);
   const [logs, setLogs] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [featuredAdSlots, setFeaturedAdSlots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPlan, setSelectedPlan] = useState('destacado');
@@ -93,6 +50,7 @@ const AdminPanel = () => {
   const [showMessageDialog, setShowMessageDialog] = useState(false);
   const [showBadgeDialog, setShowBadgeDialog] = useState(false);
   const [showSuspendDialog, setShowSuspendDialog] = useState(false);
+  const [showEnableAdSlotDialog, setShowEnableAdSlotDialog] = useState(false);
   const [selectedPulperia, setSelectedPulperia] = useState(null);
   
   // Forms
@@ -100,6 +58,7 @@ const AdminPanel = () => {
   const [selectedBadge, setSelectedBadge] = useState('');
   const [suspendReason, setSuspendReason] = useState('');
   const [suspendDays, setSuspendDays] = useState(7);
+  const [adSlotDays, setAdSlotDays] = useState(30);
 
   const handlePasswordSubmit = () => {
     if (passwordInput === ADMIN_PASSWORD) {
@@ -114,12 +73,13 @@ const AdminPanel = () => {
 
   const fetchData = async () => {
     try {
-      const [userRes, pulperiasRes, adsRes, logsRes, messagesRes] = await Promise.all([
+      const [userRes, pulperiasRes, adsRes, logsRes, messagesRes, slotsRes] = await Promise.all([
         api.get(`/api/auth/me`),
         api.get(`/api/admin/pulperias`),
         api.get(`/api/admin/ads`),
         api.get(`/api/ads/assignment-log`),
-        api.get(`/api/admin/messages`).catch(() => ({ data: [] }))
+        api.get(`/api/admin/messages`).catch(() => ({ data: [] })),
+        api.get(`/api/admin/featured-ads/slots`).catch(() => ({ data: [] }))
       ]);
       
       setUser(userRes.data);
@@ -127,6 +87,7 @@ const AdminPanel = () => {
       setAds(adsRes.data);
       setLogs(logsRes.data);
       setMessages(messagesRes.data);
+      setFeaturedAdSlots(slotsRes.data);
       
       if (!userRes.data.is_admin) {
         toast.error('Acceso denegado');
@@ -237,6 +198,42 @@ const AdminPanel = () => {
     } catch (error) {
       toast.error('Error al enviar mensaje');
     }
+  };
+
+  // Featured Ad Slots Functions
+  const handleEnableAdSlot = async () => {
+    if (!selectedPulperia) return;
+    
+    try {
+      await api.post(`/api/admin/featured-ads/enable-slot?pulperia_id=${selectedPulperia.pulperia_id}&days=${adSlotDays}`);
+      toast.success(`Slot de anuncio habilitado para ${selectedPulperia.name} por ${adSlotDays} días`);
+      setShowEnableAdSlotDialog(false);
+      setSelectedPulperia(null);
+      setAdSlotDays(30);
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Error al habilitar slot');
+    }
+  };
+
+  const handleDeleteAdSlot = async (slotId) => {
+    if (!confirm('¿Seguro que quieres eliminar este slot y su anuncio?')) return;
+    
+    try {
+      await api.delete(`/api/admin/featured-ads/slot/${slotId}`);
+      toast.success('Slot eliminado');
+      fetchData();
+    } catch (error) {
+      toast.error('Error al eliminar slot');
+    }
+  };
+
+  const hasActiveAdSlot = (pulperiaId) => {
+    const now = new Date();
+    return featuredAdSlots.some(slot => 
+      slot.pulperia_id === pulperiaId && 
+      new Date(slot.expires_at) > now
+    );
   };
 
   const getPlanIcon = (plan) => {
@@ -367,6 +364,7 @@ const AdminPanel = () => {
         <div className="flex bg-stone-800/50 backdrop-blur-sm rounded-xl p-1 border border-stone-700/50 overflow-x-auto">
           {[
             { id: 'pulperias', label: 'Pulperías', icon: Store },
+            { id: 'anuncios', label: 'Anuncios', icon: Tv },
             { id: 'badges', label: 'Badges', icon: Award },
             { id: 'messages', label: 'Mensajes', icon: MessageSquare },
             { id: 'logs', label: 'Historial', icon: Clock }
@@ -611,6 +609,98 @@ const AdminPanel = () => {
           </div>
         )}
 
+        {/* Featured Ads Tab */}
+        {activeTab === 'anuncios' && (
+          <div className="space-y-4">
+            {/* Active Slots */}
+            <div className="bg-amber-900/20 backdrop-blur-sm rounded-2xl p-4 border border-amber-500/30">
+              <h3 className="font-bold text-amber-400 mb-4 flex items-center gap-2">
+                <Tv className="w-5 h-5" />
+                Slots de Anuncios Activos (1000 Lps/mes)
+              </h3>
+              
+              {featuredAdSlots.length === 0 ? (
+                <div className="text-center py-8">
+                  <Tv className="w-12 h-12 mx-auto text-stone-600 mb-3" />
+                  <p className="text-stone-500">No hay slots activos</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {featuredAdSlots.map(slot => (
+                    <div key={slot.slot_id} className="bg-stone-900/50 rounded-xl p-4 border border-stone-700/50">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-bold text-white">{slot.pulperia_name}</p>
+                          <p className="text-xs text-stone-500">
+                            Habilitado: {new Date(slot.enabled_at).toLocaleDateString()}
+                          </p>
+                          <p className="text-xs text-stone-500">
+                            Expira: {new Date(slot.expires_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-xs px-2 py-1 rounded-full font-bold ${
+                            slot.is_used 
+                              ? 'bg-green-500/20 text-green-400' 
+                              : 'bg-yellow-500/20 text-yellow-400'
+                          }`}>
+                            {slot.is_used ? 'Anuncio Subido' : 'Pendiente'}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteAdSlot(slot.slot_id)}
+                            className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            {/* Enable New Slot */}
+            <div className="bg-stone-800/50 backdrop-blur-sm rounded-2xl p-4 border border-stone-700/50">
+              <h3 className="font-bold text-white mb-4 flex items-center gap-2">
+                <Plus className="w-5 h-5 text-green-400" />
+                Habilitar Nuevo Slot
+              </h3>
+              
+              <div className="space-y-3">
+                {filteredPulperias.filter(p => !hasActiveAdSlot(p.pulperia_id)).map(pulperia => (
+                  <div key={pulperia.pulperia_id} className="flex items-center justify-between bg-stone-900/50 rounded-xl p-3 border border-stone-700/50">
+                    <div className="flex items-center gap-3">
+                      {pulperia.logo_url && (
+                        <img src={pulperia.logo_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                      )}
+                      <div>
+                        <p className="font-bold text-white text-sm">{pulperia.name}</p>
+                        <p className="text-xs text-stone-500">{pulperia.address}</p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        setSelectedPulperia(pulperia);
+                        setShowEnableAdSlotDialog(true);
+                      }}
+                      className="bg-amber-600 hover:bg-amber-500 text-black text-xs"
+                    >
+                      <Plus className="w-3 h-3 mr-1" />
+                      Habilitar
+                    </Button>
+                  </div>
+                ))}
+                {filteredPulperias.filter(p => !hasActiveAdSlot(p.pulperia_id)).length === 0 && (
+                  <p className="text-center text-stone-500 py-4">Todas las pulperías ya tienen slot activo</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Messages Tab */}
         {activeTab === 'messages' && (
           <div className="space-y-4">
@@ -814,6 +904,45 @@ const AdminPanel = () => {
             <Button onClick={handleSuspend} className="w-full bg-orange-600 hover:bg-orange-500">
               <Ban className="w-4 h-4 mr-2" />
               Confirmar Baneo por {suspendDays} días
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Enable Ad Slot Dialog */}
+      <Dialog open={showEnableAdSlotDialog} onOpenChange={setShowEnableAdSlotDialog}>
+        <DialogContent className="bg-stone-900 border-stone-700 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-amber-400 flex items-center gap-2">
+              <Tv className="w-5 h-5" />
+              Habilitar Slot de Anuncio
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="bg-amber-900/20 rounded-lg p-3 border border-amber-500/20">
+              <p className="text-white font-medium">{selectedPulperia?.name}</p>
+              <p className="text-stone-400 text-sm">{selectedPulperia?.address}</p>
+            </div>
+            <div>
+              <Label className="text-stone-300">Duración (días)</Label>
+              <Input
+                type="number"
+                value={adSlotDays}
+                onChange={(e) => setAdSlotDays(parseInt(e.target.value) || 30)}
+                className="bg-stone-800 border-stone-700 text-white mt-1"
+                min={1}
+                max={365}
+              />
+              <p className="text-stone-500 text-xs mt-1">
+                Precio: 1000 Lps/mes. La pulpería podrá subir 1 anuncio que todos verán.
+              </p>
+            </div>
+            <Button 
+              onClick={handleEnableAdSlot} 
+              className="w-full bg-amber-600 hover:bg-amber-500 text-black"
+            >
+              <Check className="w-4 h-4 mr-2" />
+              Habilitar Slot por {adSlotDays} días
             </Button>
           </div>
         </DialogContent>
