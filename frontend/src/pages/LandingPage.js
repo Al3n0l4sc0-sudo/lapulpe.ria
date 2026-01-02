@@ -3,10 +3,11 @@ import { ArrowRight, Copy, Check, ExternalLink, ShoppingBag, Store, Bell, MapPin
 import DisclaimerModal from '../components/DisclaimerModal';
 import { BACKEND_URL } from '../config/api';
 
-// REDIRECT URI DINÁMICO - Se construye con el dominio actual
-// Asegúrate de tener estos dominios configurados en Google Cloud Console:
-// - https://lapulperiastore.net/auth/callback
-// - https://galactic-lapulpe.preview.emergentagent.com/auth/callback
+// Detectar si es un dominio custom (lapulperiastore.net) o preview/local
+const isCustomDomain = () => {
+  const hostname = window.location.hostname;
+  return hostname === 'lapulperiastore.net' || hostname === 'www.lapulperiastore.net';
+};
 
 // Iconos de redes sociales
 const XIcon = () => (
@@ -118,44 +119,71 @@ const LandingPage = () => {
     if (isLoggingIn) return;
     setIsLoggingIn(true);
     
-    // USAR DOMINIO ACTUAL para redirect_uri
-    const redirectUri = `${window.location.origin}/auth/callback`;
+    // SISTEMA DUAL: Emergent Auth (preview) o Google OAuth propio (custom domain)
+    const useCustomDomain = isCustomDomain();
     
-    try {
-      console.log('[Login] Initiating Google OAuth');
-      console.log('[Login] Current domain:', window.location.origin);
-      console.log('[Login] Backend:', BACKEND_URL);
-      console.log('[Login] Redirect URI:', redirectUri);
-      
-      const response = await fetch(
-        `${BACKEND_URL}/api/auth/google/url?redirect_uri=${encodeURIComponent(redirectUri)}`,
-        { 
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
+    console.log('[Login] Domain type:', useCustomDomain ? 'CUSTOM (lapulperiastore.net)' : 'PREVIEW');
+    console.log('[Login] Will use:', useCustomDomain ? 'Google OAuth Propio' : 'Emergent OAuth');
+    
+    if (useCustomDomain) {
+      // USAR GOOGLE OAUTH PROPIO para dominio custom
+      try {
+        const redirectUri = `${window.location.origin}/auth/callback`;
+        console.log('[Login] Using Google OAuth with redirect:', redirectUri);
+        
+        const response = await fetch(
+          `${BACKEND_URL}/api/auth/google/url?redirect_uri=${encodeURIComponent(redirectUri)}`,
+          { 
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
           }
+        );
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(`HTTP ${response.status}: ${errorData.detail || response.statusText}`);
         }
-      );
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('[Login] Server error:', errorData);
-        throw new Error(`HTTP ${response.status}: ${errorData.detail || response.statusText}`);
+        
+        const data = await response.json();
+        
+        if (data?.auth_url) {
+          console.log('[Login] Redirecting to Google OAuth...');
+          window.location.href = data.auth_url;
+        } else {
+          throw new Error('No auth URL received');
+        }
+      } catch (error) {
+        console.error('[Login] Google OAuth error:', error);
+        alert(`Error al iniciar sesión: ${error.message}`);
+        setIsLoggingIn(false);
       }
-      
-      const data = await response.json();
-      console.log('[Login] Auth URL received');
-      
-      if (data?.auth_url) {
-        console.log('[Login] Redirecting to Google OAuth...');
-        window.location.href = data.auth_url;
-      } else {
-        throw new Error('No auth URL received from server');
+    } else {
+      // USAR EMERGENT AUTH para preview/local
+      try {
+        console.log('[Login] Using Emergent OAuth');
+        
+        const response = await fetch(`${BACKEND_URL}/api/auth/url`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data?.auth_url) {
+          console.log('[Login] Redirecting to Emergent Auth...');
+          window.location.href = data.auth_url;
+        } else {
+          throw new Error('No auth URL received');
+        }
+      } catch (error) {
+        console.error('[Login] Emergent OAuth error:', error);
+        alert('Error al iniciar sesión. Por favor intenta de nuevo.');
+        setIsLoggingIn(false);
       }
-    } catch (error) {
-      console.error('[Login] OAuth error:', error);
-      alert(`Error al iniciar sesión: ${error.message}\n\nVerifica que tu dominio esté configurado en Google Cloud Console.`);
-      setIsLoggingIn(false);
     }
   };
 
@@ -230,6 +258,11 @@ const LandingPage = () => {
                 </>
               )}
             </button>
+            
+            {/* Auth type indicator (for debugging) */}
+            <p className="text-stone-600 text-xs mt-3">
+              {isCustomDomain() ? '🔐 OAuth Propio' : '⚡ Emergent Auth'}
+            </p>
           </div>
         </div>
 
