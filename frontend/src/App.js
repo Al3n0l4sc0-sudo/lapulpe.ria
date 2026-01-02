@@ -29,10 +29,14 @@ const AdAssignmentLog = lazy(() => import('./pages/AdAssignmentLog'));
 const RecommendedPage = lazy(() => import('./pages/RecommendedPage'));
 const FeaturedAdsPage = lazy(() => import('./pages/FeaturedAdsPage'));
 
-// Simple loading spinner
+// Enhanced loading spinner with starry background
 const LoadingSpinner = () => (
-  <div className="min-h-screen bg-stone-950 flex items-center justify-center">
-    <div className="w-8 h-8 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin"></div>
+  <div className="min-h-screen bg-stone-950 flex items-center justify-center relative overflow-hidden">
+    <StarryBackground density={80} enableParallax={false} />
+    <div className="relative z-10 flex flex-col items-center gap-4">
+      <div className="w-12 h-12 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin"></div>
+      <p className="text-stone-500 text-sm animate-pulse">Cargando...</p>
+    </div>
   </div>
 );
 
