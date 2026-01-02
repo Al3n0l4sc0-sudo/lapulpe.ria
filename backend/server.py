@@ -508,6 +508,19 @@ GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
 CUSTOM_DOMAIN = os.environ.get('CUSTOM_DOMAIN', 'lapulperiastore.net')
 
+
+@api_router.get("/auth/url")
+async def get_emergent_auth_url():
+    """Get Emergent OAuth URL for non-custom domain authentication"""
+    # Emergent Auth configuration
+    emergent_auth_base = "https://auth.emergentagent.com/authorize"
+    client_id = "emergent_client"  # This is handled by Emergent
+    redirect_uri = f"{BACKEND_URL}/api/auth/callback"
+    
+    auth_url = f"{emergent_auth_base}?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope=openid email profile"
+    
+    return {"auth_url": auth_url}
+
 @api_router.get("/auth/google/url")
 async def get_google_auth_url(redirect_uri: str):
     """Get Google OAuth URL for custom domain authentication"""
