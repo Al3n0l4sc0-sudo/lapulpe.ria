@@ -5,8 +5,11 @@ import { Store } from 'lucide-react';
 import { BACKEND_URL } from '../config/api';
 import { useAuth } from '../contexts/AuthContext';
 
-// REDIRECT URI DINÁMICO - Se construye con el dominio actual
-// Debe coincidir con Google Cloud Console
+// Detectar si es un dominio custom
+const isCustomDomain = () => {
+  const hostname = window.location.hostname;
+  return hostname === 'lapulperiastore.net' || hostname === 'www.lapulperiastore.net';
+};
 
 const GoogleCallback = () => {
   const [searchParams] = useSearchParams();
@@ -21,8 +24,15 @@ const GoogleCallback = () => {
       const errorParam = searchParams.get('error');
 
       console.log('[GoogleCallback] Starting...');
+      console.log('[GoogleCallback] Domain type:', isCustomDomain() ? 'CUSTOM' : 'PREVIEW');
       console.log('[GoogleCallback] Code:', code ? 'present' : 'missing');
-      console.log('[GoogleCallback] Current domain:', window.location.origin);
+
+      // Solo procesar si es dominio custom
+      if (!isCustomDomain()) {
+        console.log('[GoogleCallback] Not a custom domain, redirecting to home');
+        navigate('/', { replace: true });
+        return;
+      }
 
       if (errorParam) {
         setError('Autenticación cancelada');
