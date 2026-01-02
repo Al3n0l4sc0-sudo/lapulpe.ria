@@ -1,20 +1,10 @@
 import { useState } from 'react';
 import { ArrowRight, Copy, Check, ExternalLink, ShoppingBag, Store, Bell, MapPin } from 'lucide-react';
 import DisclaimerModal from '../components/DisclaimerModal';
-import { BACKEND_URL } from '../config/api';
 
 // ========================================
-// CONFIGURACIÓN DE AUTENTICACIÓN
+// SOLO EMERGENT AUTH - Sin configuración externa
 // ========================================
-// ACTUALMENTE: Solo Emergent Auth (funciona en todos los dominios)
-// PARA ACTIVAR Google OAuth propio: Descomentar sección marcada con "GOOGLE OAUTH"
-
-/* GOOGLE OAUTH - DESACTIVADO (Listo para activar cuando lo necesites)
-const isCustomDomain = () => {
-  const hostname = window.location.hostname;
-  return hostname === 'lapulperiahn.shop' || hostname === 'www.lapulperiahn.shop';
-};
-*/
 
 // Iconos de redes sociales
 const XIcon = () => (
@@ -122,87 +112,14 @@ const LandingPage = () => {
   const [copied, setCopied] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  const handleLogin = async () => {
+  const handleLogin = () => {
     if (isLoggingIn) return;
     setIsLoggingIn(true);
     
-    // ========================================
-    // USAR SOLO EMERGENT AUTH (ACTIVO)
-    // ========================================
-    console.log('[Login] Using Emergent OAuth');
-    console.log('[Login] Domain:', window.location.hostname);
-    console.log('[Login] Backend:', BACKEND_URL);
-    
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/auth/url`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data?.auth_url) {
-        console.log('[Login] Redirecting to Emergent Auth...');
-        window.location.href = data.auth_url;
-      } else {
-        throw new Error('No auth URL received');
-      }
-    } catch (error) {
-      console.error('[Login] Emergent OAuth error:', error);
-      alert('Error al iniciar sesión. Por favor intenta de nuevo.');
-      setIsLoggingIn(false);
-    }
-
-    /* ========================================
-       GOOGLE OAUTH - DESACTIVADO
-       ========================================
-       Para activar Google OAuth propio:
-       1. Descomentar esta sección completa
-       2. Descomentar la función isCustomDomain() arriba
-       3. Reemplazar el código de arriba con este:
-       
-    const useCustomDomain = isCustomDomain();
-    
-    if (useCustomDomain) {
-      // USAR GOOGLE OAUTH PROPIO para lapulperiahn.shop
-      try {
-        const redirectUri = `${window.location.origin}/auth/callback`;
-        console.log('[Login] Google OAuth redirect:', redirectUri);
-        
-        const response = await fetch(
-          `${BACKEND_URL}/api/auth/google/url?redirect_uri=${encodeURIComponent(redirectUri)}`,
-          { 
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-          }
-        );
-        
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(`HTTP ${response.status}: ${errorData.detail || response.statusText}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data?.auth_url) {
-          console.log('[Login] Redirecting to Google OAuth...');
-          window.location.href = data.auth_url;
-        } else {
-          throw new Error('No auth URL received');
-        }
-      } catch (error) {
-        console.error('[Login] Google OAuth error:', error);
-        alert(`Error al iniciar sesión: ${error.message}`);
-        setIsLoggingIn(false);
-      }
-    } else {
-      // Emergent Auth (código de arriba)
-    }
-    ======================================== */
+    // REDIRIGIR DIRECTAMENTE A EMERGENT AUTH
+    // Sin llamadas al backend, sin configuración externa
+    console.log('[Login] Redirecting to Emergent Auth...');
+    window.location.href = 'https://auth.emergentagent.com/google';
   };
 
   const handleDisclaimerClose = () => {
