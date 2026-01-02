@@ -3,8 +3,10 @@ import { ArrowRight, Copy, Check, ExternalLink, ShoppingBag, Store, Bell, MapPin
 import DisclaimerModal from '../components/DisclaimerModal';
 import { BACKEND_URL } from '../config/api';
 
-// REDIRECT URI FIJO - Debe coincidir EXACTAMENTE con Google Cloud Console
-const REDIRECT_URI = 'https://galactic-lapulpe.preview.emergentagent.com/auth/callback';
+// REDIRECT URI DINÁMICO - Se construye con el dominio actual
+// Asegúrate de tener estos dominios configurados en Google Cloud Console:
+// - https://lapulperiastore.net/auth/callback
+// - https://galactic-lapulpe.preview.emergentagent.com/auth/callback
 
 // Iconos de redes sociales
 const XIcon = () => (
