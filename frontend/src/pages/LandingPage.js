@@ -3,11 +3,18 @@ import { ArrowRight, Copy, Check, ExternalLink, ShoppingBag, Store, Bell, MapPin
 import DisclaimerModal from '../components/DisclaimerModal';
 import { BACKEND_URL } from '../config/api';
 
-// Detectar si es el dominio de producción (lapulperiahn.shop) o preview/local
+// ========================================
+// CONFIGURACIÓN DE AUTENTICACIÓN
+// ========================================
+// ACTUALMENTE: Solo Emergent Auth (funciona en todos los dominios)
+// PARA ACTIVAR Google OAuth propio: Descomentar sección marcada con "GOOGLE OAUTH"
+
+/* GOOGLE OAUTH - DESACTIVADO (Listo para activar cuando lo necesites)
 const isCustomDomain = () => {
   const hostname = window.location.hostname;
   return hostname === 'lapulperiahn.shop' || hostname === 'www.lapulperiahn.shop';
 };
+*/
 
 // Iconos de redes sociales
 const XIcon = () => (
@@ -119,12 +126,46 @@ const LandingPage = () => {
     if (isLoggingIn) return;
     setIsLoggingIn(true);
     
-    // SISTEMA DUAL: Emergent Auth (preview) o Google OAuth propio (lapulperiahn.shop)
-    const useCustomDomain = isCustomDomain();
-    
+    // ========================================
+    // USAR SOLO EMERGENT AUTH (ACTIVO)
+    // ========================================
+    console.log('[Login] Using Emergent OAuth');
     console.log('[Login] Domain:', window.location.hostname);
-    console.log('[Login] Type:', useCustomDomain ? 'PRODUCTION (lapulperiahn.shop)' : 'PREVIEW/DEV');
-    console.log('[Login] Auth:', useCustomDomain ? 'Google OAuth Propio' : 'Emergent OAuth');
+    console.log('[Login] Backend:', BACKEND_URL);
+    
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/auth/url`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data?.auth_url) {
+        console.log('[Login] Redirecting to Emergent Auth...');
+        window.location.href = data.auth_url;
+      } else {
+        throw new Error('No auth URL received');
+      }
+    } catch (error) {
+      console.error('[Login] Emergent OAuth error:', error);
+      alert('Error al iniciar sesión. Por favor intenta de nuevo.');
+      setIsLoggingIn(false);
+    }
+
+    /* ========================================
+       GOOGLE OAUTH - DESACTIVADO
+       ========================================
+       Para activar Google OAuth propio:
+       1. Descomentar esta sección completa
+       2. Descomentar la función isCustomDomain() arriba
+       3. Reemplazar el código de arriba con este:
+       
+    const useCustomDomain = isCustomDomain();
     
     if (useCustomDomain) {
       // USAR GOOGLE OAUTH PROPIO para lapulperiahn.shop
@@ -159,33 +200,9 @@ const LandingPage = () => {
         setIsLoggingIn(false);
       }
     } else {
-      // USAR EMERGENT AUTH para preview/local/dev
-      try {
-        console.log('[Login] Using Emergent OAuth');
-        
-        const response = await fetch(`${BACKEND_URL}/api/auth/url`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data?.auth_url) {
-          console.log('[Login] Redirecting to Emergent Auth...');
-          window.location.href = data.auth_url;
-        } else {
-          throw new Error('No auth URL received');
-        }
-      } catch (error) {
-        console.error('[Login] Emergent OAuth error:', error);
-        alert('Error al iniciar sesión. Por favor intenta de nuevo.');
-        setIsLoggingIn(false);
-      }
+      // Emergent Auth (código de arriba)
     }
+    ======================================== */
   };
 
   const handleDisclaimerClose = () => {
@@ -259,11 +276,6 @@ const LandingPage = () => {
                 </>
               )}
             </button>
-            
-            {/* Auth type indicator */}
-            <p className="text-stone-600 text-xs mt-3">
-              {isCustomDomain() ? '🔐 OAuth Propio' : '⚡ Emergent Auth'}
-            </p>
           </div>
         </div>
 
