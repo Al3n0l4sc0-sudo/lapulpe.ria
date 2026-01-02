@@ -152,27 +152,44 @@ const LandingPage = () => {
     if (isLoggingIn) return;
     setIsLoggingIn(true);
     
-    if (isCustomDomain()) {
-      // Usar Google OAuth propio para el dominio personalizado
-      try {
-        const redirectUri = `${window.location.origin}/auth/callback`;
-        console.log('[Login] Custom domain detected');
-        console.log('[Login] Backend:', BACKEND_URL);
-        
-        // Retry logic para manejar errores de red
-        let attempts = 0;
-        const maxAttempts = 3;
-        let lastError = null;
-        
-        while (attempts < maxAttempts) {
-          try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000);
-            
-            const response = await fetch(
-              `${BACKEND_URL}/api/auth/google/url?redirect_uri=${encodeURIComponent(redirectUri)}`,
-              { signal: controller.signal }
-            );
+    // SIEMPRE usar Google OAuth propio
+    try {
+      const redirectUri = `${window.location.origin}/auth/callback`;
+      console.log('[Login] Initiating Google OAuth');
+      console.log('[Login] Backend:', BACKEND_URL);
+      console.log('[Login] Redirect URI:', redirectUri);
+      
+      const response = await fetch(
+        `${BACKEND_URL}/api/auth/google/url?redirect_uri=${encodeURIComponent(redirectUri)}`,
+        { 
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('[Login] Response:', data);
+      
+      if (data?.auth_url) {
+        console.log('[Login] Redirecting to Google...');
+        window.location.href = data.auth_url;
+      } else {
+        console.error('[Login] No auth URL received');
+        alert('Error al iniciar sesión. Por favor intenta de nuevo.');
+        setIsLoggingIn(false);
+      }
+    } catch (error) {
+      console.error('[Login] OAuth error:', error);
+      alert('Error al conectar con Google. Verifica tu conexión a internet.');
+      setIsLoggingIn(false);
+    }
+  };
             
             clearTimeout(timeoutId);
             
