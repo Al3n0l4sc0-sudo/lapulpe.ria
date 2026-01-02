@@ -3,6 +3,9 @@ import { ArrowRight, Copy, Check, ExternalLink, ShoppingBag, Store, Bell, MapPin
 import DisclaimerModal from '../components/DisclaimerModal';
 import { BACKEND_URL } from '../config/api';
 
+// REDIRECT URI FIJO - Debe coincidir EXACTAMENTE con Google Cloud Console
+const REDIRECT_URI = 'https://galactic-lapulpe.preview.emergentagent.com/auth/callback';
+
 // Iconos de redes sociales
 const XIcon = () => (
   <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
@@ -113,15 +116,14 @@ const LandingPage = () => {
     if (isLoggingIn) return;
     setIsLoggingIn(true);
     
-    // USAR SOLO GOOGLE OAUTH PROPIO
+    // USAR URL DE CALLBACK FIJA
     try {
-      const redirectUri = `${window.location.origin}/auth/callback`;
       console.log('[Login] Initiating Google OAuth');
       console.log('[Login] Backend:', BACKEND_URL);
-      console.log('[Login] Redirect URI:', redirectUri);
+      console.log('[Login] Redirect URI:', REDIRECT_URI);
       
       const response = await fetch(
-        `${BACKEND_URL}/api/auth/google/url?redirect_uri=${encodeURIComponent(redirectUri)}`,
+        `${BACKEND_URL}/api/auth/google/url?redirect_uri=${encodeURIComponent(REDIRECT_URI)}`,
         { 
           method: 'GET',
           headers: {
@@ -135,7 +137,7 @@ const LandingPage = () => {
       }
       
       const data = await response.json();
-      console.log('[Login] Response received');
+      console.log('[Login] Auth URL received');
       
       if (data?.auth_url) {
         console.log('[Login] Redirecting to Google OAuth...');
