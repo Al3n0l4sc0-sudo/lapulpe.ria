@@ -509,14 +509,9 @@ GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
 CUSTOM_DOMAIN = os.environ.get('CUSTOM_DOMAIN', 'lapulperiastore.net')
 
 
-@api_router.get("/auth/url")
-async def get_emergent_auth_url():
-    """Get Emergent OAuth URL - redirects to Emergent Auth"""
-    # Emergent Auth usa el sistema de la plataforma
-    # El session_id se pasa en el hash de la URL después de autenticarse
-    auth_url = "https://auth.emergentagent.com/google"
-    
-    return {"auth_url": auth_url}
+# ===== GOOGLE OAUTH - ELIMINADO =====
+# Google OAuth endpoints removidos
+# Solo Emergent Auth disponible
 
 @api_router.get("/auth/google/url")
 async def get_google_auth_url(redirect_uri: str):
