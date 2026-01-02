@@ -96,24 +96,36 @@ async def populate_database():
         {"name": "Queso Fresco", "category": "Lácteos", "price": 55.0, "stock": 30, "description": "Queso fresco artesanal"},
         {"name": "Crema", "category": "Lácteos", "price": 35.0, "stock": 25, "description": "Crema hondureña 250ml"},
         {"name": "Mantequilla", "category": "Lácteos", "price": 48.0, "stock": 40, "description": "Mantequilla 250g"},
-        \n        # Panadería\n        {"name": "Pan Dulce", "category": "Panadería", "price": 8.0, "stock": 100, "description": "Pan dulce tradicional"},
+        
+        # Panadería
+        {"name": "Pan Dulce", "category": "Panadería", "price": 8.0, "stock": 100, "description": "Pan dulce tradicional"},
         {"name": "Pan Francés", "category": "Panadería", "price": 5.0, "stock": 80, "description": "Pan francés fresco"},
         {"name": "Tortillas", "category": "Panadería", "price": 15.0, "stock": 60, "description": "Tortillas de maíz (docena)"},
-        \n        # Bebidas\n        {"name": "Coca-Cola 2L", "category": "Bebidas", "price": 35.0, "stock": 45, "description": "Coca-Cola 2 litros"},
+        
+        # Bebidas
+        {"name": "Coca-Cola 2L", "category": "Bebidas", "price": 35.0, "stock": 45, "description": "Coca-Cola 2 litros"},
         {"name": "Jugo Natural", "category": "Bebidas", "price": 25.0, "stock": 30, "description": "Jugo natural de frutas"},
         {"name": "Agua Mineral", "category": "Bebidas", "price": 15.0, "stock": 70, "description": "Agua mineral 1L"},
         {"name": "Café Soluble", "category": "Bebidas", "price": 65.0, "stock": 35, "description": "Café instantáneo 200g"},
-        \n        # Granos\n        {"name": "Frijoles Rojos", "category": "Granos", "price": 28.0, "stock": 50, "description": "Frijoles rojos por libra"},
+        
+        # Granos
+        {"name": "Frijoles Rojos", "category": "Granos", "price": 28.0, "stock": 50, "description": "Frijoles rojos por libra"},
         {"name": "Arroz", "category": "Granos", "price": 22.0, "stock": 60, "description": "Arroz blanco por libra"},
         {"name": "Maíz", "category": "Granos", "price": 18.0, "stock": 40, "description": "Maíz amarillo por libra"},
-        \n        # Carnes\n        {"name": "Pollo Fresco", "category": "Carnes", "price": 70.0, "stock": 25, "description": "Pollo fresco por libra"},
+        
+        # Carnes
+        {"name": "Pollo Fresco", "category": "Carnes", "price": 70.0, "stock": 25, "description": "Pollo fresco por libra"},
         {"name": "Carne de Res", "category": "Carnes", "price": 95.0, "stock": 20, "description": "Carne de res por libra"},
         {"name": "Jamón", "category": "Carnes", "price": 58.0, "stock": 30, "description": "Jamón de cerdo 250g"},
-        \n        # Productos Básicos\n        {"name": "Azúcar Blanca", "category": "Básicos", "price": 20.0, "stock": 55, "description": "Azúcar blanca por libra"},
+        
+        # Productos Básicos
+        {"name": "Azúcar Blanca", "category": "Básicos", "price": 20.0, "stock": 55, "description": "Azúcar blanca por libra"},
         {"name": "Sal", "category": "Básicos", "price": 8.0, "stock": 70, "description": "Sal de mesa 500g"},
         {"name": "Aceite Vegetal", "category": "Básicos", "price": 52.0, "stock": 35, "description": "Aceite vegetal 1L"},
         {"name": "Huevos", "category": "Básicos", "price": 48.0, "stock": 40, "description": "Huevos frescos (docena)"},
-        \n        # Snacks\n        {"name": "Papas Fritas", "category": "Snacks", "price": 18.0, "stock": 60, "description": "Papas fritas grandes"},
+        
+        # Snacks
+        {"name": "Papas Fritas", "category": "Snacks", "price": 18.0, "stock": 60, "description": "Papas fritas grandes"},
         {"name": "Galletas", "category": "Snacks", "price": 22.0, "stock": 50, "description": "Galletas surtidas"},
         {"name": "Chocolates", "category": "Snacks", "price": 15.0, "stock": 45, "description": "Barra de chocolate"},
     ]
