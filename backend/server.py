@@ -515,35 +515,7 @@ CUSTOM_DOMAIN = os.environ.get('CUSTOM_DOMAIN', 'lapulperiastore.net')
 # La aplicación usa SOLO Emergent Auth ahora
 # Sin configuración externa necesaria
 
-"""
-# CÓDIGO DE GOOGLE OAUTH COMENTADO (Por si lo necesitas en el futuro)
-
-@api_router.get("/auth/google/url")
-async def get_google_auth_url(redirect_uri: str):
-    # ... código comentado ...
-    pass
-
-@api_router.post("/auth/google/callback")  
-async def google_oauth_callback(code: str, redirect_uri: str, response: Response):
-    # ... código comentado ...
-    pass
-"""
-    
-    response.set_cookie(
-        key="session_token",
-        value=session_token,
-        httponly=True,
-        secure=True,
-        samesite="none",
-        max_age=7 * 24 * 60 * 60,
-        path="/"
-    )
-    
-    user = await db.users.find_one({"user_id": user_id}, {"_id": 0})
-    user["is_new_user"] = is_new_user
-    user["is_admin"] = user.get("email") == ADMIN_EMAIL
-    user["session_token"] = session_token
-    return user
+# Si necesitas reactivar Google OAuth en el futuro, el código está en el historial de git
 
 @api_router.post("/auth/session")
 async def create_session(request: SessionRequest, response: Response):
