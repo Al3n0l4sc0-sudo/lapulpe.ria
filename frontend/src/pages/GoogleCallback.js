@@ -5,6 +5,9 @@ import { Store } from 'lucide-react';
 import { BACKEND_URL } from '../config/api';
 import { useAuth } from '../contexts/AuthContext';
 
+// REDIRECT URI FIJO - Debe coincidir EXACTAMENTE con Google Cloud Console
+const REDIRECT_URI = 'https://galactic-lapulpe.preview.emergentagent.com/auth/callback';
+
 const GoogleCallback = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -35,22 +38,20 @@ const GoogleCallback = () => {
       try {
         setStatus('Verificando con Google...');
         
-        const redirectUri = `${window.location.origin}/auth/callback`;
         console.log('[GoogleCallback] Backend URL:', BACKEND_URL);
-        console.log('[GoogleCallback] Redirect URI:', redirectUri);
+        console.log('[GoogleCallback] Redirect URI:', REDIRECT_URI);
         
-        // Intercambiar código por sesión - SIN withCredentials para evitar problemas de cookies
+        // Intercambiar código por sesión
         const response = await axios.post(
           `${BACKEND_URL}/api/auth/google/callback`,
           null,
           {
-            params: { code, redirect_uri: redirectUri },
+            params: { code, redirect_uri: REDIRECT_URI },
             timeout: 30000
-            // NO usar withCredentials - usaremos el token del response
           }
         );
 
-        console.log('[GoogleCallback] Response:', response.data);
+        console.log('[GoogleCallback] Response received');
 
         if (response.data && response.data.session_token) {
           setStatus('¡Bienvenido!');
@@ -64,29 +65,11 @@ const GoogleCallback = () => {
           // Determinar redirección
           const user = response.data;
           
-          // Determinar la redirección correcta
           setTimeout(async () => {
             if (!user.user_type) {
               navigate('/select-type', { replace: true });
             } else if (user.user_type === 'pulperia') {
-              // Verificar si tiene una pulpería antes de ir al dashboard
-              try {
-                const token = localStorage.getItem('session_token');
-                const pulperiasRes = await axios.get(`${BACKEND_URL}/api/pulperias`, {
-                  headers: token ? { Authorization: `Bearer ${token}` } : {}
-                });
-                const myPulperias = pulperiasRes.data.filter(p => p.owner_user_id === user.user_id);
-                
-                if (myPulperias.length > 0) {
-                  navigate('/dashboard', { replace: true });
-                } else {
-                  // Si es tipo pulpería pero no tiene pulpería, ir al dashboard para crear una
-                  navigate('/dashboard', { replace: true });
-                }
-              } catch (err) {
-                console.error('[GoogleCallback] Error checking pulperias:', err);
-                navigate('/dashboard', { replace: true });
-              }
+              navigate('/dashboard', { replace: true });
             } else {
               navigate('/map', { replace: true });
             }
