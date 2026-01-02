@@ -5,10 +5,10 @@ import { Store } from 'lucide-react';
 import { BACKEND_URL } from '../config/api';
 import { useAuth } from '../contexts/AuthContext';
 
-// Detectar si es un dominio custom
+// Detectar si es el dominio de producción (lapulperiahn.shop)
 const isCustomDomain = () => {
   const hostname = window.location.hostname;
-  return hostname === 'lapulperiastore.net' || hostname === 'www.lapulperiastore.net';
+  return hostname === 'lapulperiahn.shop' || hostname === 'www.lapulperiahn.shop';
 };
 
 const GoogleCallback = () => {
@@ -24,12 +24,13 @@ const GoogleCallback = () => {
       const errorParam = searchParams.get('error');
 
       console.log('[GoogleCallback] Starting...');
-      console.log('[GoogleCallback] Domain type:', isCustomDomain() ? 'CUSTOM' : 'PREVIEW');
+      console.log('[GoogleCallback] Domain:', window.location.hostname);
+      console.log('[GoogleCallback] Is custom domain:', isCustomDomain());
       console.log('[GoogleCallback] Code:', code ? 'present' : 'missing');
 
-      // Solo procesar si es dominio custom
+      // Solo procesar si es dominio de producción (lapulperiahn.shop)
       if (!isCustomDomain()) {
-        console.log('[GoogleCallback] Not a custom domain, redirecting to home');
+        console.log('[GoogleCallback] Not production domain, redirecting to home');
         navigate('/', { replace: true });
         return;
       }

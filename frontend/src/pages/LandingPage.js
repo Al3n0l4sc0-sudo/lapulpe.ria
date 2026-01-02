@@ -3,10 +3,10 @@ import { ArrowRight, Copy, Check, ExternalLink, ShoppingBag, Store, Bell, MapPin
 import DisclaimerModal from '../components/DisclaimerModal';
 import { BACKEND_URL } from '../config/api';
 
-// Detectar si es un dominio custom (lapulperiastore.net) o preview/local
+// Detectar si es el dominio de producción (lapulperiahn.shop) o preview/local
 const isCustomDomain = () => {
   const hostname = window.location.hostname;
-  return hostname === 'lapulperiastore.net' || hostname === 'www.lapulperiastore.net';
+  return hostname === 'lapulperiahn.shop' || hostname === 'www.lapulperiahn.shop';
 };
 
 // Iconos de redes sociales
@@ -119,17 +119,18 @@ const LandingPage = () => {
     if (isLoggingIn) return;
     setIsLoggingIn(true);
     
-    // SISTEMA DUAL: Emergent Auth (preview) o Google OAuth propio (custom domain)
+    // SISTEMA DUAL: Emergent Auth (preview) o Google OAuth propio (lapulperiahn.shop)
     const useCustomDomain = isCustomDomain();
     
-    console.log('[Login] Domain type:', useCustomDomain ? 'CUSTOM (lapulperiastore.net)' : 'PREVIEW');
-    console.log('[Login] Will use:', useCustomDomain ? 'Google OAuth Propio' : 'Emergent OAuth');
+    console.log('[Login] Domain:', window.location.hostname);
+    console.log('[Login] Type:', useCustomDomain ? 'PRODUCTION (lapulperiahn.shop)' : 'PREVIEW/DEV');
+    console.log('[Login] Auth:', useCustomDomain ? 'Google OAuth Propio' : 'Emergent OAuth');
     
     if (useCustomDomain) {
-      // USAR GOOGLE OAUTH PROPIO para dominio custom
+      // USAR GOOGLE OAUTH PROPIO para lapulperiahn.shop
       try {
         const redirectUri = `${window.location.origin}/auth/callback`;
-        console.log('[Login] Using Google OAuth with redirect:', redirectUri);
+        console.log('[Login] Google OAuth redirect:', redirectUri);
         
         const response = await fetch(
           `${BACKEND_URL}/api/auth/google/url?redirect_uri=${encodeURIComponent(redirectUri)}`,
@@ -158,7 +159,7 @@ const LandingPage = () => {
         setIsLoggingIn(false);
       }
     } else {
-      // USAR EMERGENT AUTH para preview/local
+      // USAR EMERGENT AUTH para preview/local/dev
       try {
         console.log('[Login] Using Emergent OAuth');
         
@@ -259,7 +260,7 @@ const LandingPage = () => {
               )}
             </button>
             
-            {/* Auth type indicator (for debugging) */}
+            {/* Auth type indicator */}
             <p className="text-stone-600 text-xs mt-3">
               {isCustomDomain() ? '🔐 OAuth Propio' : '⚡ Emergent Auth'}
             </p>
