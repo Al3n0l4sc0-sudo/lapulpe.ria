@@ -118,14 +118,17 @@ const LandingPage = () => {
     if (isLoggingIn) return;
     setIsLoggingIn(true);
     
-    // USAR URL DE CALLBACK FIJA
+    // USAR DOMINIO ACTUAL para redirect_uri
+    const redirectUri = `${window.location.origin}/auth/callback`;
+    
     try {
       console.log('[Login] Initiating Google OAuth');
+      console.log('[Login] Current domain:', window.location.origin);
       console.log('[Login] Backend:', BACKEND_URL);
-      console.log('[Login] Redirect URI:', REDIRECT_URI);
+      console.log('[Login] Redirect URI:', redirectUri);
       
       const response = await fetch(
-        `${BACKEND_URL}/api/auth/google/url?redirect_uri=${encodeURIComponent(REDIRECT_URI)}`,
+        `${BACKEND_URL}/api/auth/google/url?redirect_uri=${encodeURIComponent(redirectUri)}`,
         { 
           method: 'GET',
           headers: {
@@ -135,7 +138,9 @@ const LandingPage = () => {
       );
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        console.error('[Login] Server error:', errorData);
+        throw new Error(`HTTP ${response.status}: ${errorData.detail || response.statusText}`);
       }
       
       const data = await response.json();
@@ -149,7 +154,7 @@ const LandingPage = () => {
       }
     } catch (error) {
       console.error('[Login] OAuth error:', error);
-      alert('Error al iniciar sesión con Google. Por favor intenta de nuevo.');
+      alert(`Error al iniciar sesión: ${error.message}\n\nVerifica que tu dominio esté configurado en Google Cloud Console.`);
       setIsLoggingIn(false);
     }
   };
