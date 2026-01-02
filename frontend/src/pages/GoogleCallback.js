@@ -5,8 +5,8 @@ import { Store } from 'lucide-react';
 import { BACKEND_URL } from '../config/api';
 import { useAuth } from '../contexts/AuthContext';
 
-// REDIRECT URI FIJO - Debe coincidir EXACTAMENTE con Google Cloud Console
-const REDIRECT_URI = 'https://galactic-lapulpe.preview.emergentagent.com/auth/callback';
+// REDIRECT URI DINÁMICO - Se construye con el dominio actual
+// Debe coincidir con Google Cloud Console
 
 const GoogleCallback = () => {
   const [searchParams] = useSearchParams();
@@ -22,6 +22,7 @@ const GoogleCallback = () => {
 
       console.log('[GoogleCallback] Starting...');
       console.log('[GoogleCallback] Code:', code ? 'present' : 'missing');
+      console.log('[GoogleCallback] Current domain:', window.location.origin);
 
       if (errorParam) {
         setError('Autenticación cancelada');
@@ -38,20 +39,21 @@ const GoogleCallback = () => {
       try {
         setStatus('Verificando con Google...');
         
+        const redirectUri = `${window.location.origin}/auth/callback`;
         console.log('[GoogleCallback] Backend URL:', BACKEND_URL);
-        console.log('[GoogleCallback] Redirect URI:', REDIRECT_URI);
+        console.log('[GoogleCallback] Redirect URI:', redirectUri);
         
         // Intercambiar código por sesión
         const response = await axios.post(
           `${BACKEND_URL}/api/auth/google/callback`,
           null,
           {
-            params: { code, redirect_uri: REDIRECT_URI },
+            params: { code, redirect_uri: redirectUri },
             timeout: 30000
           }
         );
 
-        console.log('[GoogleCallback] Response received');
+        console.log('[GoogleCallback] Authentication successful');
 
         if (response.data && response.data.session_token) {
           setStatus('¡Bienvenido!');
@@ -79,7 +81,7 @@ const GoogleCallback = () => {
         }
       } catch (err) {
         console.error('[GoogleCallback] Error:', err);
-        const errorMsg = err.response?.data?.detail || 'Error al iniciar sesión';
+        const errorMsg = err.response?.data?.detail || err.message || 'Error al iniciar sesión';
         setError(errorMsg);
         setTimeout(() => navigate('/', { replace: true }), 4000);
       }
