@@ -169,10 +169,10 @@ const Header = ({ user, title, subtitle, onOrderUpdate }) => {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="relative p-2.5 rounded-xl bg-stone-900/50 border border-white/10 hover:border-red-500/40 transition-all backdrop-blur-sm"
+                className="relative p-2.5 rounded-xl bg-stone-800/80 border border-stone-600/50 hover:border-red-500/50 hover:bg-stone-700/80 transition-all backdrop-blur-sm shadow-lg"
                 data-testid="notifications-button"
               >
-                <Bell className="w-5 h-5 text-stone-400" />
+                <Bell className="w-5 h-5 text-white" />
                 {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-red-500 to-red-700 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse shadow-lg shadow-red-500/30">
                     {unreadCount > 9 ? '9+' : unreadCount}
