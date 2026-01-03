@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for La Pulpería
+Backend API Testing for La Pulpería - Global Announcements System
 Tests the specific endpoints mentioned in the review request:
-1. Email Service Configuration
-2. Create Online-Only Pulperia functionality
+1. GET /api/global-announcements - Should return empty array [] initially
+2. GET /api/health - Health check
 """
 
 import requests
