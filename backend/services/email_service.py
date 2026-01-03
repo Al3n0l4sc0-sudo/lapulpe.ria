@@ -218,3 +218,11 @@ async def send_application_accepted(applicant_email: str, job_title: str, pulper
         'job_title': job_title,
         'pulperia_name': pulperia_name
     })
+
+
+async def send_application_rejected(applicant_email: str, job_title: str, pulperia_name: str):
+    """Envía notificación de aplicación rechazada al aplicante"""
+    return await send_email(applicant_email, 'application_rejected', {
+        'job_title': job_title,
+        'pulperia_name': pulperia_name
+    })
