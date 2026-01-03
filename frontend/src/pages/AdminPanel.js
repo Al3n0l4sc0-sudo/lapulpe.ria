@@ -365,7 +365,7 @@ const AdminPanel = () => {
           {[
             { id: 'pulperias', label: 'Pulperías', icon: Store },
             { id: 'anuncios', label: 'Anuncios', icon: Tv },
-            { id: 'badges', label: 'Badges', icon: Award },
+            { id: 'globales', label: 'Globales', icon: Megaphone },
             { id: 'messages', label: 'Mensajes', icon: MessageSquare },
             { id: 'logs', label: 'Historial', icon: Clock }
           ].map(tab => (
