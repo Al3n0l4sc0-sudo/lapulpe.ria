@@ -1,13 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Copy, Check, ExternalLink, ShoppingBag, Store, Bell, MapPin, Sparkles, Rocket } from 'lucide-react';
+import { ArrowRight, Copy, Check, ExternalLink, ShoppingBag, Store, Bell, MapPin, Sparkles } from 'lucide-react';
 import DisclaimerModal from '../components/DisclaimerModal';
 import AnimatedBackground from '../components/AnimatedBackground';
 import { useAuth } from '../contexts/AuthContext';
-
-// ========================================
-// GALACTIC MARKET LANDING PAGE
-// ========================================
 
 // Iconos de redes sociales
 const XIcon = () => (
@@ -22,110 +18,10 @@ const InstagramIcon = () => (
   </svg>
 );
 
-// Modal de "Cómo Funciona" - Galactic Theme
-const HowItWorksModal = ({ onClose }) => (
-  <div className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
-    {/* Nebulosa de fondo */}
-    <div 
-      className="absolute inset-0 opacity-20"
-      style={{
-        background: `
-          radial-gradient(ellipse 50% 40% at 30% 30%, rgba(220, 38, 38, 0.4), transparent),
-          radial-gradient(ellipse 40% 30% at 70% 70%, rgba(59, 130, 246, 0.3), transparent)
-        `
-      }}
-    />
-    
-    <div className="relative galactic-card rounded-3xl max-w-md w-full shadow-2xl overflow-hidden animate-scale-in">
-      {/* Borde superior brillante */}
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-red-500 to-transparent opacity-60" />
-      
-      <div className="px-6 pt-8 pb-4 text-center">
-        <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shadow-lg shadow-red-500/30 animate-float-icon">
-          <Rocket className="w-8 h-8 text-white" />
-        </div>
-        <h2 className="text-2xl font-bold text-white mt-4 font-galactic">¿Cómo funciona?</h2>
-        <p className="text-stone-500 text-sm mt-1">3 simples pasos para explorar</p>
-      </div>
-
-      <div className="px-6 py-4 space-y-4">
-        {/* Paso 1 */}
-        <div className="flex gap-4 items-start group">
-          <div className="relative">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center shadow-lg shadow-red-500/20 group-hover:shadow-red-500/40 transition-shadow">
-              <MapPin className="w-7 h-7 text-white" />
-            </div>
-            <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-red-500 flex items-center justify-center text-white text-xs font-bold shadow-lg">1</div>
-          </div>
-          <div>
-            <h3 className="text-white font-bold text-lg">Explora</h3>
-            <p className="text-stone-400 text-sm mt-1">Encuentra pulperías cercanas en el mapa estelar</p>
-          </div>
-        </div>
-
-        {/* Paso 2 */}
-        <div className="flex gap-4 items-start group">
-          <div className="relative">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40 transition-shadow">
-              <ShoppingBag className="w-7 h-7 text-white" />
-            </div>
-            <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold shadow-lg">2</div>
-          </div>
-          <div>
-            <h3 className="text-white font-bold text-lg">Ordena</h3>
-            <p className="text-stone-400 text-sm mt-1">Agrega productos al carrito y envía tu pedido</p>
-          </div>
-        </div>
-
-        {/* Paso 3 */}
-        <div className="flex gap-4 items-start group">
-          <div className="relative">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center shadow-lg shadow-green-500/20 group-hover:shadow-green-500/40 transition-shadow">
-              <Bell className="w-7 h-7 text-white" />
-            </div>
-            <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-bold shadow-lg">3</div>
-          </div>
-          <div>
-            <h3 className="text-white font-bold text-lg">Recibe</h3>
-            <p className="text-stone-400 text-sm mt-1">Te notificamos cuando tu orden esté lista</p>
-          </div>
-        </div>
-
-        {/* Card pulpería */}
-        <div className="mt-4 bg-gradient-to-br from-amber-950/50 to-amber-900/30 border border-amber-500/20 rounded-2xl p-4">
-          <div className="flex gap-3 items-start">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/20">
-              <Store className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h3 className="text-amber-100 font-bold text-sm">¿Tienes una pulpería?</h3>
-              <p className="text-amber-200/60 text-xs mt-1">Registra tu negocio gratis y únete al mercado galáctico</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-6 pb-6 pt-2">
-        <button
-          onClick={onClose}
-          className="w-full galactic-button text-white py-4 rounded-2xl font-bold text-lg transition-all group relative overflow-hidden"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-          <span className="relative flex items-center justify-center gap-2">
-            <Sparkles className="w-5 h-5" />
-            ¡Empezar Aventura!
-          </span>
-        </button>
-      </div>
-    </div>
-  </div>
-);
-
-// Logo de La Pulpería - Galactic Version
+// Logo de La Pulpería
 const PulperiaLogo = () => (
   <div className="relative">
     <svg viewBox="0 0 100 100" className="w-20 h-20" xmlns="http://www.w3.org/2000/svg">
-      {/* Glow effect */}
       <defs>
         <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
@@ -149,44 +45,35 @@ const PulperiaLogo = () => (
         </linearGradient>
       </defs>
       
-      {/* Techo con gradiente */}
       <rect x="10" y="15" width="80" height="14" rx="3" fill="url(#roofGrad)" filter="url(#glow)"/>
       <rect x="15" y="18" width="70" height="8" rx="2" fill="#B91C1C" opacity="0.7"/>
       
-      {/* Toldo ondulado con sombra */}
       <path d="M10 32 Q22 24 34 32 Q46 40 58 32 Q70 24 82 32 Q88 28 90 32" 
             fill="none" stroke="url(#roofGrad)" strokeWidth="5" strokeLinecap="round" filter="url(#glow)"/>
       
-      {/* Pared con gradiente */}
       <rect x="15" y="38" width="70" height="48" rx="3" fill="url(#wallGrad)"/>
       <rect x="15" y="38" width="70" height="48" rx="3" fill="none" stroke="#B45309" strokeWidth="1.5"/>
       
-      {/* Ventanas con brillo */}
       <rect x="22" y="46" width="18" height="16" rx="2" fill="#1F2937"/>
       <rect x="22" y="46" width="18" height="16" rx="2" fill="none" stroke="#FCD34D" strokeWidth="0.5"/>
       <line x1="31" y1="46" x2="31" y2="62" stroke="#FCD34D" strokeWidth="1.5"/>
       <line x1="22" y1="54" x2="40" y2="54" stroke="#FCD34D" strokeWidth="1.5"/>
-      {/* Brillo ventana */}
       <rect x="23" y="47" width="6" height="6" rx="1" fill="rgba(253, 224, 71, 0.3)"/>
       
       <rect x="60" y="46" width="18" height="16" rx="2" fill="#1F2937"/>
       <rect x="60" y="46" width="18" height="16" rx="2" fill="none" stroke="#FCD34D" strokeWidth="0.5"/>
       <line x1="69" y1="46" x2="69" y2="62" stroke="#FCD34D" strokeWidth="1.5"/>
       <line x1="60" y1="54" x2="78" y2="54" stroke="#FCD34D" strokeWidth="1.5"/>
-      {/* Brillo ventana */}
       <rect x="61" y="47" width="6" height="6" rx="1" fill="rgba(253, 224, 71, 0.3)"/>
       
-      {/* Puerta con gradiente */}
       <path d="M42 86 L42 58 Q50 46 58 58 L58 86 Z" fill="url(#doorGrad)"/>
       <path d="M44 86 L44 60 Q50 50 56 60 L56 86" fill="none" stroke="#D4AF37" strokeWidth="1"/>
       <circle cx="54" cy="72" r="2.5" fill="#FCD34D"/>
       
-      {/* Base con sombra */}
       <rect x="10" y="86" width="80" height="6" rx="2" fill="#78350F"/>
       <rect x="10" y="86" width="80" height="2" rx="1" fill="#92400E"/>
     </svg>
     
-    {/* Sparkle decoration */}
     <div className="absolute -top-1 -right-1">
       <Sparkles className="w-5 h-5 text-amber-400 animate-pulse" />
     </div>
@@ -200,7 +87,6 @@ const LandingPage = () => {
   const hasSeenDisclaimer = localStorage.getItem('disclaimer_seen') === 'true';
   
   const [showDisclaimer, setShowDisclaimer] = useState(!hasSeenDisclaimer);
-  const [showHowItWorks, setShowHowItWorks] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
@@ -227,7 +113,6 @@ const LandingPage = () => {
   const handleDisclaimerClose = () => {
     localStorage.setItem('disclaimer_seen', 'true');
     setShowDisclaimer(false);
-    setShowHowItWorks(true);
   };
 
   const handleCopyLink = () => {
@@ -241,7 +126,7 @@ const LandingPage = () => {
       try {
         await navigator.share({
           title: 'La Pulpería',
-          text: '¡Descubre La Pulpería! El mercado galáctico de Honduras',
+          text: '¡Descubre La Pulpería! Conectando comunidades hondureñas',
           url: window.location.origin
         });
       } catch (e) {
@@ -258,7 +143,7 @@ const LandingPage = () => {
         <AnimatedBackground />
         <div className="text-center relative z-10">
           <div className="w-14 h-14 border-4 border-red-500/30 border-t-red-500 rounded-full animate-spin mx-auto"></div>
-          <p className="text-stone-500 mt-4 font-medium">Viajando por el cosmos...</p>
+          <p className="text-stone-500 mt-4 font-medium">Cargando...</p>
         </div>
       </div>
     );
@@ -269,38 +154,35 @@ const LandingPage = () => {
       {/* Animated Background */}
       <AnimatedBackground />
       
-      {/* Modals */}
+      {/* Disclaimer Modal */}
       {showDisclaimer && <DisclaimerModal onClose={handleDisclaimerClose} />}
-      {showHowItWorks && <HowItWorksModal onClose={() => setShowHowItWorks(false)} />}
 
       {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col">
         {/* Main Content */}
-        <div className="flex-1 flex flex-col items-center justify-center px-6">
-          <div className="text-center">
+        <div className="flex-1 flex flex-col items-center justify-center px-6 py-8">
+          <div className="text-center max-w-md mx-auto">
             {/* Logo y Título */}
-            <div className="flex items-center justify-center gap-4 mb-4 animate-scale-in">
+            <div className="flex items-center justify-center gap-4 mb-6 animate-scale-in">
               <PulperiaLogo />
               <div className="text-left">
                 <h1 className="text-4xl md:text-5xl font-black text-white leading-none">
                   La <span className="gradient-text">Pulpería</span>
                 </h1>
-                <p className="text-stone-500 text-xs mt-1 tracking-widest uppercase font-galactic">Mercado Galáctico</p>
               </div>
             </div>
             
             <p className="text-stone-400 text-lg mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              ¿Qué deseaba, <span className="text-red-400">viajero</span>?
+              ¿Qué deseaba?
             </p>
             
             {/* Login Button */}
             <button
               onClick={handleLogin}
               disabled={isLoggingIn}
-              className="group relative overflow-hidden galactic-button text-white font-bold py-4 px-10 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed animate-scale-in"
+              className="group relative overflow-hidden galactic-button text-white font-bold py-4 px-10 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed animate-scale-in mb-10"
               style={{ animationDelay: '0.3s' }}
             >
-              {/* Shimmer effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
               
               {!isLoggingIn ? (
@@ -321,11 +203,56 @@ const LandingPage = () => {
                 </span>
               )}
             </button>
+
+            {/* Cómo Funciona - Integrado */}
+            <div className="animate-slide-in" style={{ animationDelay: '0.4s' }}>
+              <p className="text-stone-500 text-sm mb-4 uppercase tracking-wider">Cómo funciona</p>
+              
+              <div className="grid grid-cols-3 gap-3">
+                {/* Paso 1 */}
+                <div className="glass rounded-2xl p-4 text-center group hover:bg-white/5 transition-all">
+                  <div className="w-12 h-12 mx-auto rounded-xl bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center shadow-lg shadow-red-500/20 mb-3 group-hover:scale-110 transition-transform">
+                    <MapPin className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-white font-bold text-sm mb-1">Explora</h3>
+                  <p className="text-stone-500 text-xs leading-tight">Encuentra pulperías cerca de ti</p>
+                </div>
+
+                {/* Paso 2 */}
+                <div className="glass rounded-2xl p-4 text-center group hover:bg-white/5 transition-all">
+                  <div className="w-12 h-12 mx-auto rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-lg shadow-blue-500/20 mb-3 group-hover:scale-110 transition-transform">
+                    <ShoppingBag className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-white font-bold text-sm mb-1">Ordena</h3>
+                  <p className="text-stone-500 text-xs leading-tight">Agrega productos y haz tu pedido</p>
+                </div>
+
+                {/* Paso 3 */}
+                <div className="glass rounded-2xl p-4 text-center group hover:bg-white/5 transition-all">
+                  <div className="w-12 h-12 mx-auto rounded-xl bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center shadow-lg shadow-green-500/20 mb-3 group-hover:scale-110 transition-transform">
+                    <Bell className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-white font-bold text-sm mb-1">Recibe</h3>
+                  <p className="text-stone-500 text-xs leading-tight">Te avisamos cuando esté listo</p>
+                </div>
+              </div>
+
+              {/* Card para dueños de pulpería */}
+              <div className="mt-4 glass rounded-2xl p-4 flex items-center gap-3 hover:bg-white/5 transition-all">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/20">
+                  <Store className="w-5 h-5 text-white" />
+                </div>
+                <div className="text-left">
+                  <p className="text-white font-medium text-sm">¿Tienes una pulpería?</p>
+                  <p className="text-stone-500 text-xs">Registra tu negocio gratis</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Bottom Section */}
-        <div className="px-6 pb-8 animate-slide-in" style={{ animationDelay: '0.4s' }}>
+        <div className="px-6 pb-8 animate-slide-in" style={{ animationDelay: '0.5s' }}>
           {/* Social Links */}
           <div className="flex justify-center gap-3 mb-4">
             <a
@@ -375,7 +302,6 @@ const LandingPage = () => {
           <p className="text-center text-stone-600 text-xs mt-4 flex items-center justify-center gap-2">
             <span>🇭🇳</span>
             <span>Conectando comunidades hondureñas</span>
-            <Sparkles className="w-3 h-3 text-amber-500" />
           </p>
         </div>
       </div>
