@@ -102,7 +102,142 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-## Latest Update: 2026-01-03 - Visual UI Improvements
+## Latest Update: 2026-01-03 - Global Announcements System + UI Improvements
+
+### NEW Tasks Implemented:
+1. **Sistema de Anuncios Globales (1000 Lps)** - Anuncios que aparecen a TODOS los usuarios
+2. **Nueva pestaña "Anuncios" en BottomNav** - Reemplaza "Buscar" por "Anuncios" (naranja)
+3. **Página de Anuncios Globales** - Nueva página `/anuncios-globales` con tabs (Globales/Destacados)
+4. **Admin Panel - Pestaña "Globales"** - Crear/eliminar/activar/desactivar anuncios globales
+5. **Barra de búsqueda de productos en MapView** - Estilo Google debajo del mapa
+6. **Z-index del dropdown de notificaciones corregido** - De 9999 a 99999
+7. **Removida pestaña de Badges del Admin** - Ya que ahora son por mérito
+
+### New Backend Endpoints:
+- `GET /api/global-announcements` - Obtener anuncios globales activos (público)
+- `POST /api/admin/global-announcements` - Crear anuncio global (admin)
+- `PUT /api/admin/global-announcements/{id}` - Actualizar anuncio (admin)
+- `DELETE /api/admin/global-announcements/{id}` - Eliminar anuncio (admin)
+- `PUT /api/admin/global-announcements/{id}/toggle` - Activar/desactivar anuncio (admin)
+- `GET /api/admin/global-announcements` - Obtener todos los anuncios (admin)
+
+### New Files Created:
+- `/app/frontend/src/pages/GlobalAnnouncementsPage.js` - Página de anuncios globales
+
+### Files Modified:
+- `/app/backend/server.py` - Sistema de anuncios globales
+- `/app/backend/models/schemas.py` - Modelo GlobalAnnouncement
+- `/app/frontend/src/App.js` - Ruta para anuncios globales
+- `/app/frontend/src/components/BottomNav.js` - Nueva pestaña "Anuncios" (naranja)
+- `/app/frontend/src/components/Header.js` - Z-index corregido en dropdown de notificaciones
+- `/app/frontend/src/pages/AdminPanel.js` - Nueva pestaña "Globales" y dialog para crear anuncios
+- `/app/frontend/src/pages/MapView.js` - Barra de búsqueda de productos estilo Google
+
+### Test Scenarios for New Changes:
+1. Verificar endpoint GET /api/global-announcements funciona
+2. Verificar nueva pestaña "Anuncios" en BottomNav (icono naranja)
+3. Verificar página /anuncios-globales carga correctamente
+4. Verificar Admin Panel tiene pestaña "Globales" (sin "Badges")
+5. Verificar Admin puede crear/eliminar anuncios globales
+6. Verificar barra de búsqueda de productos en MapView
+7. Verificar dropdown de notificaciones aparece delante de todo
+
+backend:
+  - task: "Global Announcements API"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Implementado sistema completo de anuncios globales con CRUD"
+
+frontend:
+  - task: "BottomNav - Pestaña Anuncios"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/BottomNav.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Reemplazado Buscar por Anuncios con icono naranja"
+
+  - task: "GlobalAnnouncementsPage"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/GlobalAnnouncementsPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Nueva página con tabs Globales/Destacados"
+
+  - task: "AdminPanel - Anuncios Globales"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/AdminPanel.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Nueva pestaña Globales para crear/gestionar anuncios"
+
+  - task: "MapView - Barra de búsqueda de productos"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/MapView.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Barra de búsqueda estilo Google debajo del mapa"
+
+  - task: "Header - Z-index notificaciones"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/Header.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Corregido z-index del dropdown de notificaciones de 9999 a 99999"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Global Announcements API"
+    - "BottomNav - Pestaña Anuncios"
+    - "Header - Z-index notificaciones"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    - agent: "main"
+    - message: "Implementado sistema de anuncios globales completo. Backend tiene CRUD, frontend tiene nueva página y admin panel actualizado. Testar el endpoint GET /api/global-announcements y verificar UI"
+
+---
+
+## Previous Update: 2026-01-03 - Visual UI Improvements
 
 ### NEW Tasks Implemented:
 1. **Mini Nebula en Header y BottomNav** - Barras superiores e inferiores con animación de nebulosa sutil
