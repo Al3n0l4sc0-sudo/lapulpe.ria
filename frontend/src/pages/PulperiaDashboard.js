@@ -927,6 +927,56 @@ const PulperiaDashboard = () => {
                 Comparte este link con tus clientes. Al abrirlo, podrán ver tu pulpería e iniciar sesión.
               </p>
             </div>
+            
+            {/* Anuncio Global Section */}
+            {myAdSlot && (
+              <div className="mt-4 pt-4 border-t border-stone-800">
+                <div className="flex items-center gap-2 mb-3">
+                  <Megaphone className="w-4 h-4 text-orange-400" />
+                  <p className="text-sm font-medium text-white">Anuncio Global</p>
+                  <span className="ml-auto text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">
+                    Slot Activo
+                  </span>
+                </div>
+                
+                {myAdSlot.ad ? (
+                  <div className="bg-stone-800 rounded-lg p-3 border border-stone-700">
+                    <div className="flex items-start gap-3">
+                      {myAdSlot.ad.image_url && (
+                        <img src={myAdSlot.ad.image_url} alt="" className="w-16 h-16 rounded-lg object-cover" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-white truncate">{myAdSlot.ad.title || 'Mi Anuncio'}</p>
+                        <p className="text-xs text-stone-400 line-clamp-2">{myAdSlot.ad.description}</p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => navigate('/anuncios')}
+                      className="w-full mt-3 bg-orange-600 hover:bg-orange-500 text-white"
+                    >
+                      Editar Anuncio
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="bg-gradient-to-r from-orange-600/20 to-amber-600/20 rounded-lg p-4 border border-orange-500/30">
+                    <p className="text-orange-300 text-sm mb-3">
+                      ¡Tienes un slot de anuncio global disponible! Crea tu anuncio para que todos los usuarios lo vean.
+                    </p>
+                    <Button
+                      onClick={() => navigate('/anuncios')}
+                      className="w-full bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white"
+                    >
+                      <Megaphone className="w-4 h-4 mr-2" />
+                      Crear Mi Anuncio Global
+                    </Button>
+                  </div>
+                )}
+                
+                <p className="text-xs text-stone-500 mt-2">
+                  Expira: {new Date(myAdSlot.expires_at).toLocaleDateString('es-HN')}
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>
