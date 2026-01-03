@@ -1892,11 +1892,11 @@ const PulperiaDashboard = () => {
                 type="submit" 
                 className="w-full py-5 text-base font-bold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
                 style={{ backgroundColor: pulperiaForm.background_color || '#DC2626' }}
-                disabled={(!editingPulperia && (!pulperiaForm.lat || !pulperiaForm.lng)) || uploadingLogo}
+                disabled={(!editingPulperia && !pulperiaForm.is_online_only && (!pulperiaForm.lat || !pulperiaForm.lng)) || uploadingLogo}
               >
                 {editingPulperia ? 'Guardar Cambios' : 'Crear Mi Pulpería'}
               </Button>
-              {!editingPulperia && (!pulperiaForm.lat || !pulperiaForm.lng) && (
+              {!editingPulperia && !pulperiaForm.is_online_only && (!pulperiaForm.lat || !pulperiaForm.lng) && (
                 <p className="text-center text-xs text-amber-400/60 mt-3">
                   Primero obtén tu ubicación GPS
                 </p>
