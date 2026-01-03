@@ -246,7 +246,7 @@ const UserProfile = () => {
         {/* View Ad Assignment Log */}
         <button
           onClick={() => navigate('/ad-log')}
-          className="w-full p-4 flex items-center gap-4 hover:bg-white/5 rounded-2xl transition-all active:scale-[0.98] group"
+          className="w-full p-4 flex items-center gap-4 hover:bg-white/5 rounded-2xl transition-all active:scale-[0.98] group border border-stone-800/50"
         >
           <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
             <Eye className="w-6 h-6 text-blue-400" />
@@ -262,7 +262,7 @@ const UserProfile = () => {
         <button
           onClick={handleChangeUserType}
           disabled={changingType}
-          className="w-full p-4 flex items-center gap-4 hover:bg-white/5 rounded-2xl transition-all active:scale-[0.98] disabled:opacity-50 group"
+          className="w-full p-4 flex items-center gap-4 hover:bg-white/5 rounded-2xl transition-all active:scale-[0.98] disabled:opacity-50 group border border-stone-800/50"
         >
           <div className="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center group-hover:bg-orange-500/30 transition-colors">
             <ArrowRightLeft className="w-6 h-6 text-orange-400" />
@@ -307,7 +307,7 @@ const UserProfile = () => {
         {/* Logout Button */}
         <button
           onClick={handleLogout}
-          className="w-full p-4 flex items-center gap-4 hover:bg-white/5 rounded-2xl transition-all active:scale-[0.98] group"
+          className="w-full p-4 flex items-center gap-4 hover:bg-white/5 rounded-2xl transition-all active:scale-[0.98] group border border-stone-800/50"
         >
           <div className="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center group-hover:bg-red-500/30 transition-colors">
             <LogOut className="w-6 h-6 text-red-400" />
