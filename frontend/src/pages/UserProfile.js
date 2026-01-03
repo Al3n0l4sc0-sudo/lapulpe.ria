@@ -186,13 +186,21 @@ const UserProfile = () => {
               <img
                 src={user.picture}
                 alt={user.name}
-                className="relative w-24 h-24 rounded-full border-2 border-white/30 shadow-2xl"
+                className="relative w-24 h-24 rounded-full border-2 border-white/30 shadow-2xl object-cover"
               />
             ) : (
               <div className="relative w-24 h-24 bg-gradient-to-br from-red-600 to-red-800 rounded-full flex items-center justify-center border-2 border-white/30">
                 <UserIcon className="w-12 h-12" />
               </div>
             )}
+            {/* Botón para cambiar foto */}
+            <button
+              onClick={() => setShowPictureEditor(true)}
+              className="absolute -bottom-1 -left-1 w-8 h-8 rounded-full bg-stone-800 border-2 border-stone-950 flex items-center justify-center hover:bg-stone-700 transition-colors shadow-lg"
+              title="Cambiar foto"
+            >
+              <Camera className="w-4 h-4 text-white" />
+            </button>
             {/* Indicador de tipo de cuenta */}
             <div className={`absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center ${
               user?.user_type === 'cliente' 
@@ -208,7 +216,7 @@ const UserProfile = () => {
           </div>
           
           {/* Nombre con efecto */}
-          <h1 className="text-2xl font-black mb-1 font-galactic tracking-wide">{user?.name}</h1>
+          <h1 className="text-2xl font-black mb-1 tracking-wide">{user?.name}</h1>
           <p className="text-white/60 text-sm mb-3">{user?.email}</p>
           
           {/* Badge de tipo de cuenta */}
