@@ -24,6 +24,7 @@ const UserProfile = () => {
   const [selectedPulperiaToClose, setSelectedPulperiaToClose] = useState(null);
   const [closeConfirmation, setCloseConfirmation] = useState('');
   const [isClosingStore, setIsClosingStore] = useState(false);
+  const [showPictureEditor, setShowPictureEditor] = useState(false);
 
   useEffect(() => {
     const savedCart = localStorage.getItem('cart');
