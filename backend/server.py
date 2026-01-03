@@ -38,6 +38,19 @@ from models.schemas import (
 # Importar configuración de logros
 from config.achievements import ACHIEVEMENT_DEFINITIONS, AD_PLANS
 
+# ============================================
+# v1.1 - NUEVOS MODELOS
+# ============================================
+
+class ProfilePictureUpdate(BaseModel):
+    picture_url: str
+
+class PriceHistory(BaseModel):
+    product_id: str
+    old_price: float
+    new_price: float
+    changed_at: datetime
+
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ.get('DB_NAME', 'la_pulperia_db')]
