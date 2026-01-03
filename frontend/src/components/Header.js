@@ -158,7 +158,7 @@ const Header = ({ user, title, subtitle, onOrderUpdate }) => {
       <div className="relative px-4 py-3 flex items-center justify-between">
         {/* Title Section */}
         <div className="flex-1 min-w-0">
-          <h1 className="text-lg font-bold text-white truncate font-galactic tracking-wide">{title}</h1>
+          <h1 className="text-lg font-bold text-white truncate">{title}</h1>
           {subtitle && <p className="text-xs text-stone-500 truncate">{subtitle}</p>}
         </div>
 
