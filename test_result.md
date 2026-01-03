@@ -159,6 +159,48 @@
 3. Verificar que al hacer refresh en una página protegida NO redirige al inicio
 4. Verificar que las imágenes de anuncios se muestran en su tamaño real
 
+## La Pulpería v1.1 - Testing Update
+
+### NEW Features Implemented (v1.1):
+1. **Profile Picture Editor** - Users can upload custom profile pictures
+2. **Sales Reports** - Dashboard with sales metrics for pulperia owners
+3. **AI Tips** - Business improvement tips with links to AI tools
+4. **Share Pulperia** - Share button for WhatsApp, Facebook, Twitter
+5. **Custom Map Markers** - Pulperia photos as map markers
+6. **PWA Support** - App can be installed and works offline
+7. **Email Service** - Resend integration for notifications (requires API key)
+8. **Price History** - Track price changes for products
+
+### New Components Created:
+- `/app/frontend/src/components/profile/ProfilePictureEditor.js`
+- `/app/frontend/src/components/dashboard/SalesReports.js`
+- `/app/frontend/src/components/dashboard/AITips.js`
+- `/app/frontend/src/components/SharePulperia.js`
+- `/app/frontend/src/components/PriceHistory.js`
+- `/app/backend/services/email_service.py`
+
+### New Backend Endpoints:
+- `PUT /api/auth/profile-picture` - Update user profile picture
+- `GET /api/pulperias/{id}/reports` - Get sales reports
+- `GET /api/products/{id}/price-history` - Get price history
+
+### Files Modified:
+- `UserProfile.js` - Added profile picture change button
+- `PulperiaDashboard.js` - Added Reports, AI Tips, Share buttons
+- `PulperiaProfile.js` - Added Share button
+- `MapView.js` - Custom markers with pulperia photos
+- `index.css` - Custom marker styles
+- `manifest.json` - PWA configuration
+- `sw.js` - Service worker for offline support
+
+### Test Scenarios for v1.1:
+1. Profile Picture - Click camera icon in profile to change photo
+2. Sales Reports - Dashboard → Reports button (green chart icon)
+3. AI Tips - Dashboard → Tips IA button (purple bot icon)
+4. Share - Dashboard or Pulperia Profile → Share button (blue)
+5. Map Markers - Go to /map and verify pulperia photos show as markers
+6. PWA - Check manifest.json is served correctly
+
 ### Previous Tasks (Still Working):
 1. **Sección de Empleo con colores amarillos** - Página de Jobs actualizada con tema amarillo
 2. **Pulperías Solo en Línea** - Opción para crear pulperías sin dirección física
