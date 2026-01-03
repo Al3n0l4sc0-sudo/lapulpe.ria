@@ -347,7 +347,7 @@ const Header = ({ user, title, subtitle, onOrderUpdate }) => {
           {user && (
             <button
               onClick={handleLogout}
-              className="p-2.5 rounded-xl bg-stone-900 border border-stone-800 hover:bg-stone-800 transition-colors"
+              className="p-2.5 rounded-xl galactic-card hover:border-red-500/40 transition-all"
               title="Cerrar sesión"
             >
               <LogOut className="w-5 h-5 text-stone-400" />
