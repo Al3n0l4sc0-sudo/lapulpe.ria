@@ -248,13 +248,13 @@ const FeaturedAdsPage = () => {
                   </span>
                 </div>
                 
-                {/* Full Image/Video Display */}
-                <div className="relative bg-stone-950">
+                {/* Full Image/Video Display - Tamaño adaptativo */}
+                <div className="relative bg-stone-950 flex items-center justify-center">
                   {ad.video_url ? (
-                    <div className="relative">
+                    <div className="relative w-full">
                       <video 
                         src={ad.video_url}
-                        className="w-full max-h-[500px] object-contain"
+                        className="w-full max-h-[500px] object-contain mx-auto"
                         controls
                         muted
                         loop
@@ -266,16 +266,17 @@ const FeaturedAdsPage = () => {
                     </div>
                   ) : ad.image_url ? (
                     <div 
-                      className="cursor-pointer group"
+                      className="cursor-pointer group flex items-center justify-center p-4"
                       onClick={() => setViewingAd(ad)}
                     >
                       <img 
                         src={ad.image_url}
                         alt={ad.title || ad.pulperia_name}
-                        className="w-full max-h-[500px] object-contain"
+                        className="max-w-full max-h-[500px] object-contain rounded-lg shadow-lg"
+                        style={{ minHeight: '150px' }}
                       />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                        <ZoomIn className="w-10 h-10 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                        <ZoomIn className="w-10 h-10 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
                       </div>
                     </div>
                   ) : (
