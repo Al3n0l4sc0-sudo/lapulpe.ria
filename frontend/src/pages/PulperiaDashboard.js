@@ -363,6 +363,8 @@ const PulperiaDashboard = () => {
         phone: pulperiaForm.phone,
         email: pulperiaForm.email,
         website: pulperiaForm.website,
+        instagram_url: pulperiaForm.instagram_url,
+        facebook_url: pulperiaForm.facebook_url,
         hours: pulperiaForm.hours,
         logo_url: pulperiaForm.logo_url,
         banner_url: pulperiaForm.banner_url,
