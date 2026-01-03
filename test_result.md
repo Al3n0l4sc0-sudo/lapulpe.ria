@@ -102,7 +102,27 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-## Latest Update: 2026-01-03 - Global Announcements System + UI Improvements
+## Latest Update: 2026-01-03 - Email Service + Unified Search + UI Improvements
+
+### NEW Tasks Implemented (Batch 2):
+1. **Email Service Activated** - Integrado Resend para notificaciones automáticas
+   - Nuevo pedido → Email al dueño de pulpería
+   - Pedido aceptado/listo → Email al cliente
+   - Nueva aplicación de trabajo → Email al empleador
+   - Aplicación aceptada/rechazada → Email al aplicante
+2. **Barra de búsqueda unificada** - Toggle para productos/pulperías en MapView
+3. **Imágenes adaptativas** - Se muestran en su tamaño original (max 500px)
+4. **Template de email "application_rejected"** - Para notificar rechazos
+
+### Files Modified (Batch 2):
+- `/app/backend/server.py` - Integración de emails en create_order, update_order_status, apply_to_job, update_application_status
+- `/app/backend/services/email_service.py` - Nuevo template application_rejected
+- `/app/frontend/src/pages/MapView.js` - Barra de búsqueda unificada con toggle
+- `/app/frontend/src/pages/GlobalAnnouncementsPage.js` - Imágenes adaptativas (h-auto max-h-[500px])
+
+---
+
+## Previous Update: 2026-01-03 - Global Announcements System + UI Improvements
 
 ### NEW Tasks Implemented:
 1. **Sistema de Anuncios Globales (1000 Lps)** - Anuncios que aparecen a TODOS los usuarios
