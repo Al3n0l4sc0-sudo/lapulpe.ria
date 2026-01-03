@@ -1401,6 +1401,22 @@ async def create_order(order_data: OrderCreate, authorization: Optional[str] = H
     order = await db.orders.find_one({"order_id": order_id}, {"_id": 0})
     await broadcast_order_update(order, "new_order")
     
+    # Send email notification to pulperia owner
+    try:
+        pulperia = await db.pulperias.find_one({"pulperia_id": order_data.pulperia_id}, {"_id": 0})
+        if pulperia:
+            owner = await db.users.find_one({"user_id": pulperia.get("owner_user_id")}, {"_id": 0})
+            if owner and owner.get("email"):
+                await send_order_notification(
+                    owner_email=owner["email"],
+                    pulperia_name=pulperia.get("name", "Tu Pulpería"),
+                    customer_name=order_data.customer_name,
+                    total=order_data.total
+                )
+                logger.info(f"[EMAIL] Order notification sent to {owner['email']}")
+    except Exception as e:
+        logger.error(f"[EMAIL] Failed to send order notification: {e}")
+    
     return order
 
 @api_router.put("/orders/{order_id}/status")
@@ -1424,6 +1440,26 @@ async def update_order_status(order_id: str, status_update: OrderStatusUpdate, a
     updated_order = await db.orders.find_one({"order_id": order_id}, {"_id": 0})
     event_type = "cancelled" if status_update.status == "cancelled" else "status_changed"
     await broadcast_order_update(updated_order, event_type)
+    
+    # Send email notification to customer based on status
+    try:
+        customer = await db.users.find_one({"user_id": order["customer_user_id"]}, {"_id": 0})
+        if customer and customer.get("email"):
+            if status_update.status == "accepted":
+                await send_order_accepted(
+                    customer_email=customer["email"],
+                    pulperia_name=pulperia.get("name", "La Pulpería")
+                )
+                logger.info(f"[EMAIL] Order accepted notification sent to {customer['email']}")
+            elif status_update.status == "ready":
+                await send_order_ready(
+                    customer_email=customer["email"],
+                    pulperia_name=pulperia.get("name", "La Pulpería"),
+                    address=pulperia.get("address", "")
+                )
+                logger.info(f"[EMAIL] Order ready notification sent to {customer['email']}")
+    except Exception as e:
+        logger.error(f"[EMAIL] Failed to send order status notification: {e}")
     
     return updated_order
 
