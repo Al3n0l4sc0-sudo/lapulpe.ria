@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Copy, Check, ExternalLink, ShoppingBag, Store, Bell, MapPin } from 'lucide-react';
+import { ArrowRight, Copy, Check, ExternalLink, ShoppingBag, Store, Bell, MapPin, Sparkles, Rocket } from 'lucide-react';
 import DisclaimerModal from '../components/DisclaimerModal';
+import AnimatedBackground from '../components/AnimatedBackground';
 import { useAuth } from '../contexts/AuthContext';
 
 // ========================================
-// SOLO EMERGENT AUTH - Sin configuración externa
+// GALACTIC MARKET LANDING PAGE
 // ========================================
 
 // Iconos de redes sociales
@@ -21,98 +22,181 @@ const InstagramIcon = () => (
   </svg>
 );
 
-// Modal de "Cómo Funciona"
+// Modal de "Cómo Funciona" - Galactic Theme
 const HowItWorksModal = ({ onClose }) => (
-  <div className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
-    <div className="bg-stone-900 rounded-3xl border border-stone-700 max-w-md w-full shadow-2xl max-h-[85vh] overflow-y-auto">
-      <div className="px-6 pt-6 pb-4 border-b border-stone-800">
-        <h2 className="text-xl font-bold text-white text-center">¿Cómo funciona?</h2>
-        <p className="text-stone-500 text-sm text-center mt-1">3 simples pasos</p>
+  <div className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
+    {/* Nebulosa de fondo */}
+    <div 
+      className="absolute inset-0 opacity-20"
+      style={{
+        background: `
+          radial-gradient(ellipse 50% 40% at 30% 30%, rgba(220, 38, 38, 0.4), transparent),
+          radial-gradient(ellipse 40% 30% at 70% 70%, rgba(59, 130, 246, 0.3), transparent)
+        `
+      }}
+    />
+    
+    <div className="relative galactic-card rounded-3xl max-w-md w-full shadow-2xl overflow-hidden animate-scale-in">
+      {/* Borde superior brillante */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-red-500 to-transparent opacity-60" />
+      
+      <div className="px-6 pt-8 pb-4 text-center">
+        <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shadow-lg shadow-red-500/30 animate-float-icon">
+          <Rocket className="w-8 h-8 text-white" />
+        </div>
+        <h2 className="text-2xl font-bold text-white mt-4 font-galactic">¿Cómo funciona?</h2>
+        <p className="text-stone-500 text-sm mt-1">3 simples pasos para explorar</p>
       </div>
 
-      <div className="px-6 py-5 space-y-4">
-        <div className="flex gap-4 items-start">
-          <div className="w-12 h-12 bg-red-600 rounded-2xl flex items-center justify-center flex-shrink-0">
-            <MapPin className="w-6 h-6 text-white" />
+      <div className="px-6 py-4 space-y-4">
+        {/* Paso 1 */}
+        <div className="flex gap-4 items-start group">
+          <div className="relative">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center shadow-lg shadow-red-500/20 group-hover:shadow-red-500/40 transition-shadow">
+              <MapPin className="w-7 h-7 text-white" />
+            </div>
+            <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-red-500 flex items-center justify-center text-white text-xs font-bold shadow-lg">1</div>
           </div>
           <div>
-            <h3 className="text-white font-bold">1. Explora</h3>
-            <p className="text-stone-400 text-sm mt-1">Encuentra pulperías cercanas a tu ubicación en el mapa</p>
+            <h3 className="text-white font-bold text-lg">Explora</h3>
+            <p className="text-stone-400 text-sm mt-1">Encuentra pulperías cercanas en el mapa estelar</p>
           </div>
         </div>
 
-        <div className="flex gap-4 items-start">
-          <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center flex-shrink-0">
-            <ShoppingBag className="w-6 h-6 text-white" />
+        {/* Paso 2 */}
+        <div className="flex gap-4 items-start group">
+          <div className="relative">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40 transition-shadow">
+              <ShoppingBag className="w-7 h-7 text-white" />
+            </div>
+            <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold shadow-lg">2</div>
           </div>
           <div>
-            <h3 className="text-white font-bold">2. Ordena</h3>
-            <p className="text-stone-400 text-sm mt-1">Agrega productos al carrito y haz tu pedido</p>
+            <h3 className="text-white font-bold text-lg">Ordena</h3>
+            <p className="text-stone-400 text-sm mt-1">Agrega productos al carrito y envía tu pedido</p>
           </div>
         </div>
 
-        <div className="flex gap-4 items-start">
-          <div className="w-12 h-12 bg-green-600 rounded-2xl flex items-center justify-center flex-shrink-0">
-            <Bell className="w-6 h-6 text-white" />
+        {/* Paso 3 */}
+        <div className="flex gap-4 items-start group">
+          <div className="relative">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center shadow-lg shadow-green-500/20 group-hover:shadow-green-500/40 transition-shadow">
+              <Bell className="w-7 h-7 text-white" />
+            </div>
+            <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-bold shadow-lg">3</div>
           </div>
           <div>
-            <h3 className="text-white font-bold">3. Recibe</h3>
-            <p className="text-stone-400 text-sm mt-1">Te notificamos cuando tu orden esté lista para recoger</p>
+            <h3 className="text-white font-bold text-lg">Recibe</h3>
+            <p className="text-stone-400 text-sm mt-1">Te notificamos cuando tu orden esté lista</p>
           </div>
         </div>
 
-        <div className="bg-stone-800 rounded-2xl p-4 mt-4">
+        {/* Card pulpería */}
+        <div className="mt-4 bg-gradient-to-br from-amber-950/50 to-amber-900/30 border border-amber-500/20 rounded-2xl p-4">
           <div className="flex gap-3 items-start">
-            <div className="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Store className="w-5 h-5 text-white" />
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/20">
+              <Store className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="text-white font-bold text-sm">¿Tienes una pulpería?</h3>
-              <p className="text-stone-400 text-xs mt-1">Registra tu negocio gratis y empieza a recibir pedidos</p>
+              <h3 className="text-amber-100 font-bold text-sm">¿Tienes una pulpería?</h3>
+              <p className="text-amber-200/60 text-xs mt-1">Registra tu negocio gratis y únete al mercado galáctico</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="px-6 pb-6">
+      <div className="px-6 pb-6 pt-2">
         <button
           onClick={onClose}
-          className="w-full bg-red-600 hover:bg-red-500 text-white py-4 rounded-xl font-bold transition-colors"
+          className="w-full galactic-button text-white py-4 rounded-2xl font-bold text-lg transition-all group relative overflow-hidden"
         >
-          ¡Empezar!
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+          <span className="relative flex items-center justify-center gap-2">
+            <Sparkles className="w-5 h-5" />
+            ¡Empezar Aventura!
+          </span>
         </button>
       </div>
     </div>
   </div>
 );
 
-// Logo de La Pulpería
+// Logo de La Pulpería - Galactic Version
 const PulperiaLogo = () => (
-  <svg viewBox="0 0 100 100" className="w-16 h-16" xmlns="http://www.w3.org/2000/svg">
-    <rect x="10" y="15" width="80" height="14" rx="2" fill="#DC2626"/>
-    <rect x="15" y="18" width="70" height="8" rx="1" fill="#B91C1C"/>
-    <path d="M10 32 Q22 26 34 32 Q46 38 58 32 Q70 26 82 32 Q88 29 90 32" 
-          fill="none" stroke="#DC2626" strokeWidth="4" strokeLinecap="round"/>
-    <rect x="15" y="38" width="70" height="48" rx="2" fill="#FEF3C7"/>
-    <rect x="15" y="38" width="70" height="48" rx="2" fill="none" stroke="#B45309" strokeWidth="1.5"/>
-    <rect x="22" y="46" width="18" height="16" rx="1" fill="#1F2937"/>
-    <line x1="31" y1="46" x2="31" y2="62" stroke="#FCD34D" strokeWidth="1.5"/>
-    <line x1="22" y1="54" x2="40" y2="54" stroke="#FCD34D" strokeWidth="1.5"/>
-    <rect x="60" y="46" width="18" height="16" rx="1" fill="#1F2937"/>
-    <line x1="69" y1="46" x2="69" y2="62" stroke="#FCD34D" strokeWidth="1.5"/>
-    <line x1="60" y1="54" x2="78" y2="54" stroke="#FCD34D" strokeWidth="1.5"/>
-    <path d="M42 86 L42 58 Q50 48 58 58 L58 86 Z" fill="#78350F"/>
-    <path d="M44 86 L44 60 Q50 52 56 60 L56 86" fill="none" stroke="#D4AF37" strokeWidth="1"/>
-    <circle cx="54" cy="72" r="2.5" fill="#FCD34D"/>
-    <rect x="10" y="86" width="80" height="6" rx="2" fill="#92400E"/>
-  </svg>
+  <div className="relative">
+    <svg viewBox="0 0 100 100" className="w-20 h-20" xmlns="http://www.w3.org/2000/svg">
+      {/* Glow effect */}
+      <defs>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <linearGradient id="roofGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#DC2626"/>
+          <stop offset="50%" stopColor="#B91C1C"/>
+          <stop offset="100%" stopColor="#7F1D1D"/>
+        </linearGradient>
+        <linearGradient id="wallGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#FEF3C7"/>
+          <stop offset="100%" stopColor="#FDE68A"/>
+        </linearGradient>
+        <linearGradient id="doorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#92400E"/>
+          <stop offset="100%" stopColor="#78350F"/>
+        </linearGradient>
+      </defs>
+      
+      {/* Techo con gradiente */}
+      <rect x="10" y="15" width="80" height="14" rx="3" fill="url(#roofGrad)" filter="url(#glow)"/>
+      <rect x="15" y="18" width="70" height="8" rx="2" fill="#B91C1C" opacity="0.7"/>
+      
+      {/* Toldo ondulado con sombra */}
+      <path d="M10 32 Q22 24 34 32 Q46 40 58 32 Q70 24 82 32 Q88 28 90 32" 
+            fill="none" stroke="url(#roofGrad)" strokeWidth="5" strokeLinecap="round" filter="url(#glow)"/>
+      
+      {/* Pared con gradiente */}
+      <rect x="15" y="38" width="70" height="48" rx="3" fill="url(#wallGrad)"/>
+      <rect x="15" y="38" width="70" height="48" rx="3" fill="none" stroke="#B45309" strokeWidth="1.5"/>
+      
+      {/* Ventanas con brillo */}
+      <rect x="22" y="46" width="18" height="16" rx="2" fill="#1F2937"/>
+      <rect x="22" y="46" width="18" height="16" rx="2" fill="none" stroke="#FCD34D" strokeWidth="0.5"/>
+      <line x1="31" y1="46" x2="31" y2="62" stroke="#FCD34D" strokeWidth="1.5"/>
+      <line x1="22" y1="54" x2="40" y2="54" stroke="#FCD34D" strokeWidth="1.5"/>
+      {/* Brillo ventana */}
+      <rect x="23" y="47" width="6" height="6" rx="1" fill="rgba(253, 224, 71, 0.3)"/>
+      
+      <rect x="60" y="46" width="18" height="16" rx="2" fill="#1F2937"/>
+      <rect x="60" y="46" width="18" height="16" rx="2" fill="none" stroke="#FCD34D" strokeWidth="0.5"/>
+      <line x1="69" y1="46" x2="69" y2="62" stroke="#FCD34D" strokeWidth="1.5"/>
+      <line x1="60" y1="54" x2="78" y2="54" stroke="#FCD34D" strokeWidth="1.5"/>
+      {/* Brillo ventana */}
+      <rect x="61" y="47" width="6" height="6" rx="1" fill="rgba(253, 224, 71, 0.3)"/>
+      
+      {/* Puerta con gradiente */}
+      <path d="M42 86 L42 58 Q50 46 58 58 L58 86 Z" fill="url(#doorGrad)"/>
+      <path d="M44 86 L44 60 Q50 50 56 60 L56 86" fill="none" stroke="#D4AF37" strokeWidth="1"/>
+      <circle cx="54" cy="72" r="2.5" fill="#FCD34D"/>
+      
+      {/* Base con sombra */}
+      <rect x="10" y="86" width="80" height="6" rx="2" fill="#78350F"/>
+      <rect x="10" y="86" width="80" height="2" rx="1" fill="#92400E"/>
+    </svg>
+    
+    {/* Sparkle decoration */}
+    <div className="absolute -top-1 -right-1">
+      <Sparkles className="w-5 h-5 text-amber-400 animate-pulse" />
+    </div>
+  </div>
 );
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const { user, loading, isAuthenticated } = useAuth();
   
-  // Check if disclaimer was already seen (stored in localStorage)
   const hasSeenDisclaimer = localStorage.getItem('disclaimer_seen') === 'true';
   
   const [showDisclaimer, setShowDisclaimer] = useState(!hasSeenDisclaimer);
@@ -120,10 +204,8 @@ const LandingPage = () => {
   const [copied, setCopied] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  // If user is already authenticated, redirect to map
   useEffect(() => {
     if (!loading && isAuthenticated && user) {
-      // User is logged in, redirect to appropriate page
       if (!user.user_type) {
         navigate('/select-type', { replace: true });
       } else {
@@ -136,18 +218,13 @@ const LandingPage = () => {
     if (isLoggingIn) return;
     setIsLoggingIn(true);
     
-    // EMERGENT AUTH - Redirigir con URL de retorno correcta
     const returnUrl = window.location.origin;
     const emergentAuthUrl = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(returnUrl)}`;
-    
-    console.log('[Login] Redirecting to Emergent Auth...');
-    console.log('[Login] Return URL:', returnUrl);
     
     window.location.href = emergentAuthUrl;
   };
 
   const handleDisclaimerClose = () => {
-    // Save that user has seen disclaimer
     localStorage.setItem('disclaimer_seen', 'true');
     setShowDisclaimer(false);
     setShowHowItWorks(true);
@@ -164,7 +241,7 @@ const LandingPage = () => {
       try {
         await navigator.share({
           title: 'La Pulpería',
-          text: '¡Descubre La Pulpería! Conectando comunidades hondureñas',
+          text: '¡Descubre La Pulpería! El mercado galáctico de Honduras',
           url: window.location.origin
         });
       } catch (e) {
@@ -175,20 +252,23 @@ const LandingPage = () => {
     }
   };
 
-  // Show loading while checking auth
   if (loading) {
     return (
-      <div className="min-h-screen bg-stone-950 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-red-500/30 border-t-red-500 rounded-full animate-spin mx-auto"></div>
-          <p className="text-stone-500 mt-4">Cargando...</p>
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <AnimatedBackground />
+        <div className="text-center relative z-10">
+          <div className="w-14 h-14 border-4 border-red-500/30 border-t-red-500 rounded-full animate-spin mx-auto"></div>
+          <p className="text-stone-500 mt-4 font-medium">Viajando por el cosmos...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-transparent relative overflow-hidden">
+    <div className="min-h-screen bg-[#0a0a0f] relative overflow-hidden">
+      {/* Animated Background */}
+      <AnimatedBackground />
+      
       {/* Modals */}
       {showDisclaimer && <DisclaimerModal onClose={handleDisclaimerClose} />}
       {showHowItWorks && <HowItWorksModal onClose={() => setShowHowItWorks(false)} />}
@@ -197,24 +277,34 @@ const LandingPage = () => {
       <div className="relative z-10 min-h-screen flex flex-col">
         {/* Main Content */}
         <div className="flex-1 flex flex-col items-center justify-center px-6">
-          <div className="text-center animate-fade-in">
-            <div className="flex items-center justify-center gap-3 mb-3 animate-scale-in">
+          <div className="text-center">
+            {/* Logo y Título */}
+            <div className="flex items-center justify-center gap-4 mb-4 animate-scale-in">
               <PulperiaLogo />
-              <h1 className="text-4xl md:text-5xl font-bold text-white">
-                La <span className="text-red-500">Pulpería</span>
-              </h1>
+              <div className="text-left">
+                <h1 className="text-4xl md:text-5xl font-black text-white leading-none">
+                  La <span className="gradient-text">Pulpería</span>
+                </h1>
+                <p className="text-stone-500 text-xs mt-1 tracking-widest uppercase font-galactic">Mercado Galáctico</p>
+              </div>
             </div>
             
-            <p className="text-stone-500 text-base mb-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>¿Qué deseaba?</p>
+            <p className="text-stone-400 text-lg mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              ¿Qué deseaba, <span className="text-red-400">viajero</span>?
+            </p>
             
+            {/* Login Button */}
             <button
               onClick={handleLogin}
               disabled={isLoggingIn}
-              className="group inline-flex items-center gap-3 bg-red-600 hover:bg-red-500 text-white font-medium py-3.5 px-8 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-red-500/30 disabled:opacity-50 disabled:cursor-not-allowed animate-scale-in hover-lift"
-              style={{ animationDelay: '0.2s' }}
+              className="group relative overflow-hidden galactic-button text-white font-bold py-4 px-10 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed animate-scale-in"
+              style={{ animationDelay: '0.3s' }}
             >
+              {/* Shimmer effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+              
               {!isLoggingIn ? (
-                <>
+                <span className="relative flex items-center gap-3">
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="#fff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -222,27 +312,27 @@ const LandingPage = () => {
                     <path fill="#fff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                   </svg>
                   Comenzar con Google
-                  <ArrowRight className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-all group-hover:translate-x-1" />
-                </>
+                  <ArrowRight className="w-5 h-5 opacity-50 group-hover:opacity-100 transition-all group-hover:translate-x-1" />
+                </span>
               ) : (
-                <>
+                <span className="relative flex items-center gap-3">
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                   Conectando...
-                </>
+                </span>
               )}
             </button>
           </div>
         </div>
 
-        {/* Bottom Section - Redes y Compartir */}
-        <div className="px-6 pb-8 animate-slide-in" style={{ animationDelay: '0.3s' }}>
+        {/* Bottom Section */}
+        <div className="px-6 pb-8 animate-slide-in" style={{ animationDelay: '0.4s' }}>
           {/* Social Links */}
           <div className="flex justify-center gap-3 mb-4">
             <a
               href="https://x.com/LaPul_periaHN"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 bg-stone-900/80 backdrop-blur-sm hover:bg-stone-800 text-white py-2.5 px-4 rounded-xl transition-all duration-300 border border-stone-800 hover-lift"
+              className="flex items-center gap-2 glass hover:bg-white/10 text-white py-2.5 px-4 rounded-xl transition-all duration-300 hover-lift"
             >
               <XIcon />
               <span className="text-sm font-medium">X</span>
@@ -260,21 +350,21 @@ const LandingPage = () => {
 
           {/* Share Section */}
           <div className="max-w-sm mx-auto">
-            <div className="bg-stone-900/50 backdrop-blur-sm rounded-2xl p-3 border border-stone-800">
+            <div className="glass rounded-2xl p-3">
               <p className="text-stone-500 text-xs text-center mb-2">Comparte La Pulpería</p>
               <div className="flex gap-2">
-                <div className="flex-1 bg-stone-800 rounded-lg px-3 py-2 text-xs text-stone-500 truncate">
+                <div className="flex-1 bg-black/30 rounded-xl px-3 py-2 text-xs text-stone-500 truncate border border-white/5">
                   {window.location.host}
                 </div>
                 <button
                   onClick={handleCopyLink}
-                  className={`px-3 py-2 rounded-lg transition-all duration-300 ${copied ? 'bg-green-600' : 'bg-stone-700 hover:bg-stone-600'} text-white hover-lift`}
+                  className={`px-3 py-2 rounded-xl transition-all duration-300 hover-lift ${copied ? 'bg-green-600' : 'bg-stone-800 hover:bg-stone-700'} text-white`}
                 >
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </button>
                 <button
                   onClick={handleShare}
-                  className="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white transition-all duration-300 hover-lift"
+                  className="px-3 py-2 rounded-xl galactic-button text-white transition-all duration-300 hover-lift"
                 >
                   <ExternalLink className="w-4 h-4" />
                 </button>
@@ -282,7 +372,11 @@ const LandingPage = () => {
             </div>
           </div>
 
-          <p className="text-center text-stone-600 text-xs mt-4">🇭🇳 Conectando comunidades hondureñas</p>
+          <p className="text-center text-stone-600 text-xs mt-4 flex items-center justify-center gap-2">
+            <span>🇭🇳</span>
+            <span>Conectando comunidades hondureñas</span>
+            <Sparkles className="w-3 h-3 text-amber-500" />
+          </p>
         </div>
       </div>
     </div>
