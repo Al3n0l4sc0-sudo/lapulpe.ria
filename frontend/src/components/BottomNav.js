@@ -11,6 +11,7 @@ const BottomNav = ({ user, cartCount = 0, activeTab }) => {
     return location.pathname === path;
   };
 
+  // Items fijos para cada tipo de usuario - siempre 5 items
   const navItems = user?.user_type === 'pulperia' ? [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard', testId: 'nav-dashboard', tab: 'dashboard' },
     { icon: Briefcase, label: 'Chamba', path: '/jobs', testId: 'nav-jobs', tab: 'jobs', isChamba: true },
@@ -19,8 +20,8 @@ const BottomNav = ({ user, cartCount = 0, activeTab }) => {
     { icon: User, label: 'Perfil', path: '/profile', testId: 'nav-profile', tab: 'perfil' },
   ] : [
     { icon: MapPin, label: 'Mapa', path: '/map', testId: 'nav-map', tab: 'mapa' },
-    { icon: Megaphone, label: 'Anuncios', path: '/anuncios-globales', testId: 'nav-anuncios', tab: 'anuncios', isAnuncios: true },
     { icon: Briefcase, label: 'Chamba', path: '/jobs', testId: 'nav-jobs', tab: 'jobs', isChamba: true },
+    { icon: Megaphone, label: 'Anuncios', path: '/anuncios-globales', testId: 'nav-anuncios', tab: 'anuncios', isAnuncios: true },
     { icon: ShoppingCart, label: 'Carrito', path: '/cart', testId: 'nav-cart', tab: 'carrito', badge: cartCount },
     { icon: User, label: 'Perfil', path: '/profile', testId: 'nav-profile', tab: 'perfil' },
   ];
@@ -30,8 +31,9 @@ const BottomNav = ({ user, cartCount = 0, activeTab }) => {
       {/* Mini Nebulosa animada */}
       <MiniNebula variant="bottom" intensity="medium" />
       
-      <div className="relative flex items-center justify-around px-2 py-2">
-            {navItems.map((item) => {
+      {/* Grid fijo de 5 columnas para que los botones no se muevan */}
+      <div className="relative grid grid-cols-5 px-1 py-2">
+        {navItems.map((item, index) => {
           const Icon = item.icon;
           const active = isActive(item.path, item.tab);
           const isChamba = item.isChamba;
@@ -42,7 +44,7 @@ const BottomNav = ({ user, cartCount = 0, activeTab }) => {
               key={item.path}
               onClick={() => navigate(item.path)}
               data-testid={item.testId}
-              className={`relative flex flex-col items-center gap-1 py-2 px-3 rounded-xl transition-all duration-300 ${
+              className={`relative flex flex-col items-center justify-center gap-1 py-2 rounded-xl transition-colors duration-200 ${
                 active 
                   ? isChamba ? 'text-yellow-400' : isAnuncios ? 'text-orange-400' : 'text-red-400' 
                   : 'text-stone-500 hover:text-stone-300'
@@ -50,22 +52,22 @@ const BottomNav = ({ user, cartCount = 0, activeTab }) => {
             >
               {/* Glow effect for Chamba - Yellow - SOLO cuando está activo */}
               {isChamba && active && (
-                <div className="absolute inset-0 rounded-xl blur-md bg-yellow-500/25 animate-pulse-slow" />
+                <div className="absolute inset-2 rounded-xl blur-md bg-yellow-500/25" />
               )}
               
               {/* Glow effect for Anuncios - Orange - SOLO cuando está activo */}
               {isAnuncios && active && (
-                <div className="absolute inset-0 rounded-xl blur-md bg-orange-500/25 animate-pulse-slow" />
+                <div className="absolute inset-2 rounded-xl blur-md bg-orange-500/25" />
               )}
               
               {/* Glow effect for active non-Chamba/non-Anuncios */}
               {active && !isChamba && !isAnuncios && (
-                <div className="absolute inset-0 bg-red-500/15 rounded-xl blur-sm" />
+                <div className="absolute inset-2 bg-red-500/15 rounded-xl blur-sm" />
               )}
               
               <div className="relative">
                 {/* Icono con glow especial */}
-                <Icon className={`w-5 h-5 transition-all ${active ? 'scale-110' : ''} ${
+                <Icon className={`w-5 h-5 transition-transform duration-200 ${active ? 'scale-110' : ''} ${
                   isChamba && active ? 'drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]' : ''
                 } ${
                   isAnuncios && active ? 'drop-shadow-[0_0_8px_rgba(251,146,60,0.6)]' : ''
@@ -89,7 +91,7 @@ const BottomNav = ({ user, cartCount = 0, activeTab }) => {
               
               {/* Active indicator - Yellow for Chamba, Orange for Anuncios, Red for others */}
               {active && (
-                <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full ${
+                <div className={`absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full ${
                   isChamba 
                     ? 'bg-yellow-400 shadow-lg shadow-yellow-400/50' 
                     : isAnuncios
