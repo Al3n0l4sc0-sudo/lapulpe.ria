@@ -413,6 +413,53 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* Glass con nebulosa para barras */
+.glass-nebula {
+  background: rgba(10, 10, 18, 0.85);
+  backdrop-filter: blur(16px);
+}
+
+/* Mini nebula animation para barras */
+@keyframes nebula-mini {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.02); }
+}
+
+@keyframes glow-line {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spin-reverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+.animate-nebula-mini {
+  animation: nebula-mini 4s ease-in-out infinite;
+}
+
+.animate-glow-line {
+  animation: glow-line 2s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+.animate-spin-reverse {
+  animation: spin-reverse 12s linear infinite;
+}
+
+.rounded-inherit {
+  border-radius: inherit;
+}
+
 /* Gradient text */
 .gradient-text {
   background: linear-gradient(135deg, #dc2626 0%, #f87171 50%, #dc2626 100%);
