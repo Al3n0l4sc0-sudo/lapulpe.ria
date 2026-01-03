@@ -318,18 +318,29 @@ const PulperiaProfile = () => {
           <ArrowLeft className="w-5 h-5" />
         </button>
         
-        {/* Favorite Button */}
-        <button 
-          onClick={toggleFavorite}
-          disabled={togglingFavorite}
-          className={`absolute top-4 right-4 backdrop-blur-sm p-2.5 rounded-full transition-all z-10 ${
-            isFavorite 
-              ? 'bg-red-500 text-white' 
-              : 'bg-black/40 text-white hover:bg-black/60'
-          }`}
-        >
-          <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
-        </button>
+        {/* Action buttons */}
+        <div className="absolute top-4 right-4 flex gap-2 z-10">
+          {/* Share Button */}
+          <button 
+            onClick={() => setShowShareDialog(true)}
+            className="backdrop-blur-sm bg-black/40 text-white hover:bg-black/60 p-2.5 rounded-full transition-all"
+          >
+            <Share2 className="w-5 h-5" />
+          </button>
+          
+          {/* Favorite Button */}
+          <button 
+            onClick={toggleFavorite}
+            disabled={togglingFavorite}
+            className={`backdrop-blur-sm p-2.5 rounded-full transition-all ${
+              isFavorite 
+                ? 'bg-red-500 text-white' 
+                : 'bg-black/40 text-white hover:bg-black/60'
+            }`}
+          >
+            <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
+          </button>
+        </div>
         
         {/* Online Only Badge */}
         {isOnlineOnly && (
