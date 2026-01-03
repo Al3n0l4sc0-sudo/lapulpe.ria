@@ -137,6 +137,28 @@
 5. Verificar perfil de usuario con nebulosa y bordes
 6. Verificar que medallas mini NO aparecen junto al logo en PulperiaProfile
 
+## Visual UI Refinements - 2026-01-03T02:25:00
+
+### NEW Changes Implemented:
+1. **Barras sin brillo constante** - MiniNebula simplificado sin animaciones de glow
+2. **Header sin font galáctico** - Cambiado a font normal (font-bold)
+3. **Imágenes de anuncios adaptativas** - Se ajustan al tamaño real de la imagen
+4. **ProtectedRoute mejorado** - Mejor manejo del refresh para no redirigir al inicio
+5. **GalacticLoader en ProtectedRoute** - Loading más bonito durante refresh
+
+### Files Modified:
+- `MiniNebula.js` - Sin animaciones de brillo constante
+- `Header.js` - Font normal en lugar de galáctico
+- `FeaturedAdsPage.js` - Imágenes con tamaño adaptativo
+- `ProtectedRoute.js` - Mejor manejo del token durante refresh
+- `AuthContext.js` - Mejor manejo de errores de red
+
+### Test Scenarios:
+1. Verificar que Header y BottomNav NO tienen brillo constante
+2. Verificar que el título del Header usa font normal
+3. Verificar que al hacer refresh en una página protegida NO redirige al inicio
+4. Verificar que las imágenes de anuncios se muestran en su tamaño real
+
 ### Previous Tasks (Still Working):
 1. **Sección de Empleo con colores amarillos** - Página de Jobs actualizada con tema amarillo
 2. **Pulperías Solo en Línea** - Opción para crear pulperías sin dirección física
