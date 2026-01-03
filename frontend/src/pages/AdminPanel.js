@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { 
   Shield, Store, Crown, Sparkles, Star, Check, X, Clock, Calendar, Search, 
   Ban, MessageSquare, Award, Zap, Flame, Gem, Trophy, Target, Rocket, 
-  Users, ChevronRight, Send, Eye, AlertTriangle, Lock, Unlock, BadgeCheck, Tv, Plus, Trash2
+  Users, ChevronRight, Send, Eye, AlertTriangle, Lock, Unlock, BadgeCheck, Tv, Plus, Trash2, Megaphone, Image as ImageIcon
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
