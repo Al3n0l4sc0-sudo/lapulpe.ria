@@ -325,3 +325,19 @@ class AnnouncementCreate(BaseModel):
 
 class ClosePulperiaRequest(BaseModel):
     confirmation_phrase: str
+
+# ============================================
+# GLOBAL ANNOUNCEMENT MODELS
+# ============================================
+
+class GlobalAnnouncement(BaseModel):
+    announcement_id: str
+    title: str
+    content: str
+    image_url: Optional[str] = None
+    link_url: Optional[str] = None
+    priority: int = 0
+    is_active: bool = True
+    created_at: datetime
+    expires_at: Optional[datetime] = None
+    created_by: str
