@@ -66,6 +66,7 @@ function AppRouter() {
         <Route path="/dashboard" element={<ProtectedRoute><PulperiaDashboard /></ProtectedRoute>} />
         <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+        <Route path="/jobs" element={<ProtectedRoute><JobsServices /></ProtectedRoute>} />
         <Route path="/jobs-services" element={<ProtectedRoute><JobsServices /></ProtectedRoute>} />
         <Route path="/order-history" element={<ProtectedRoute><OrderHistory /></ProtectedRoute>} />
         <Route path="/advertising" element={<ProtectedRoute><Advertising /></ProtectedRoute>} />
