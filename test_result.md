@@ -159,7 +159,7 @@
 - **Total de pruebas**: 9
 - **Exitosas**: 9 (100%)
 - **Fallidas**: 0
-- **Backend URL**: https://domain-explorer-2.preview.emergentagent.com/api
+- **Backend URL**: https://job-market-hub-1.preview.emergentagent.com/api
 
 ### Datos de Prueba Creados:
 - 2 pulperías (1 física, 1 solo en línea)
