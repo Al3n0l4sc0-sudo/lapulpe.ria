@@ -441,9 +441,9 @@ class BackendTester:
             )
     
     def run_all_tests(self):
-        """Run all backend tests for Global Announcements system"""
+        """Run all backend tests for Email Integration and Search Endpoints"""
         print("=" * 60)
-        print("TESTING GLOBAL ANNOUNCEMENTS SYSTEM - La Pulpería")
+        print("TESTING EMAIL INTEGRATION AND SEARCH ENDPOINTS - La Pulpería")
         print("=" * 60)
         print(f"Backend URL: {self.base_url}")
         print(f"Test started at: {datetime.now().isoformat()}")
@@ -454,12 +454,18 @@ class BackendTester:
         
         # Test specific endpoints from review request
         print("🔍 TESTING REVIEW REQUEST REQUIREMENTS:")
-        print("1. GET /api/global-announcements - Should return empty array [] initially")
-        print("2. GET /api/health - Health check")
+        print("1. GET /api/global-announcements - Should return []")
+        print("2. GET /api/products?search=test - Should return products array")
+        print("3. GET /api/pulperias?search=test - Should return pulperias array")
+        print("4. GET /api/health - Should return healthy")
+        print("5. Email service integration verification")
         print()
         
         self.test_global_announcements_endpoint()
+        self.test_products_search_endpoint()
+        self.test_pulperias_search_endpoint()
         self.test_health_endpoint()
+        self.test_email_service_configuration()
         
         # Summary
         print("=" * 60)
