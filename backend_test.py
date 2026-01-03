@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for La Pulpería - Global Announcements System
+Backend API Testing for La Pulpería - Email Integration and Search Endpoints
 Tests the specific endpoints mentioned in the review request:
-1. GET /api/global-announcements - Should return empty array [] initially
-2. GET /api/health - Health check
+1. GET /api/global-announcements - Should return []
+2. GET /api/products?search=test - Should return products array
+3. GET /api/pulperias?search=test - Should return pulperias array
+4. GET /api/health - Should return healthy
 """
 
 import requests
