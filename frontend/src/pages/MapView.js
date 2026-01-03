@@ -20,6 +20,52 @@ L.Icon.Default.mergeOptions({
 
 import { api, BACKEND_URL } from '../config/api';
 
+// Función para crear marcador personalizado con foto de la pulpería
+const createPulperiaIcon = (pulperia, isFeatured = false) => {
+  const logoUrl = pulperia.logo_url || pulperia.image_url;
+  const bgColor = pulperia.background_color || '#DC2626';
+  
+  const borderColor = isFeatured ? '#fbbf24' : '#ffffff';
+  const borderWidth = isFeatured ? '3px' : '2px';
+  const shadow = isFeatured ? '0 0 12px rgba(251, 191, 36, 0.6)' : '0 2px 8px rgba(0,0,0,0.5)';
+  const size = isFeatured ? 48 : 40;
+  
+  const html = logoUrl 
+    ? `<div style="
+        width: ${size}px; 
+        height: ${size}px; 
+        border-radius: 50%; 
+        border: ${borderWidth} solid ${borderColor};
+        overflow: hidden;
+        box-shadow: ${shadow};
+        background: ${bgColor};
+      ">
+        <img src="${logoUrl}" style="width: 100%; height: 100%; object-fit: cover;" />
+      </div>
+      ${isFeatured ? '<div style="position: absolute; top: -8px; right: -8px; font-size: 14px;">⭐</div>' : ''}`
+    : `<div style="
+        width: ${size}px; 
+        height: ${size}px; 
+        border-radius: 50%; 
+        border: ${borderWidth} solid ${borderColor};
+        background: ${bgColor};
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: ${shadow};
+        font-size: 20px;
+      ">🏪</div>
+      ${isFeatured ? '<div style="position: absolute; top: -8px; right: -8px; font-size: 14px;">⭐</div>' : ''}`;
+  
+  return L.divIcon({
+    html,
+    className: 'custom-pulperia-marker',
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+    popupAnchor: [0, -size / 2]
+  });
+};
+
 function LocationMarker({ position }) {
   const map = useMap();
   
