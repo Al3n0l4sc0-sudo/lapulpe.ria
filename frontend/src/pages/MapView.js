@@ -6,6 +6,7 @@ import { MapPin, Store as StoreIcon, Star, Crown, Sparkles, ChevronRight, Maximi
 import BottomNav from '../components/BottomNav';
 import Header from '../components/Header';
 import AnimatedBackground from '../components/AnimatedBackground';
+import GalacticLoader from '../components/GalacticLoader';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -195,11 +196,10 @@ const MapView = () => {
 
   if (loading || !userLocation) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-stone-950">
+      <div className="min-h-screen flex items-center justify-center bg-stone-950 relative overflow-hidden">
         <AnimatedBackground variant="minimal" />
-        <div className="text-center relative z-10">
-          <div className="w-16 h-16 border-4 border-red-400/30 rounded-full animate-spin border-t-red-500 mx-auto"></div>
-          <p className="mt-4 text-stone-500 font-medium">Cargando mapa...</p>
+        <div className="relative z-10">
+          <GalacticLoader size="default" text="Cargando mapa..." />
         </div>
       </div>
     );
