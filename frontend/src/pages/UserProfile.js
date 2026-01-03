@@ -365,7 +365,7 @@ const UserProfile = () => {
 
         {/* Footer */}
         <div className="text-center pt-6">
-          <p className="text-sm text-stone-500 font-medium font-galactic">La Pulpería v2.0</p>
+          <p className="text-sm text-stone-500 font-medium">La Pulpería v1.1</p>
           <p className="text-xs text-stone-600 mt-1">© 2024 - Conectando comunidades hondureñas</p>
         </div>
       </div>
