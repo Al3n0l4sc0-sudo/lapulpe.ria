@@ -41,55 +41,64 @@ class BackendTester:
             print(f"   Response: {response_data}")
         print()
     
-    def test_jobs_endpoint(self):
-        """Test GET /api/jobs endpoint"""
+    def test_global_announcements_endpoint(self):
+        """Test GET /api/global-announcements endpoint - should return empty array initially"""
         try:
-            response = self.session.get(f"{self.base_url}/jobs", timeout=10)
+            response = self.session.get(f"{self.base_url}/global-announcements", timeout=10)
             
             if response.status_code == 200:
-                jobs_data = response.json()
-                if isinstance(jobs_data, list):
+                announcements_data = response.json()
+                if isinstance(announcements_data, list):
                     self.log_test(
-                        "GET /api/jobs - Lista de empleos",
+                        "GET /api/global-announcements - Global announcements endpoint",
                         True,
-                        f"Endpoint funciona correctamente. Retornó {len(jobs_data)} empleos"
+                        f"Endpoint funciona correctamente. Retornó {len(announcements_data)} anuncios globales"
                     )
                     
-                    # Check if jobs have required fields
-                    if jobs_data:
-                        sample_job = jobs_data[0]
-                        required_fields = ['job_id', 'title', 'description', 'category', 'pay_rate', 'location']
-                        missing_fields = [field for field in required_fields if field not in sample_job]
+                    # Check if it returns empty array initially (as expected)
+                    if len(announcements_data) == 0:
+                        self.log_test(
+                            "Global announcements initial state",
+                            True,
+                            "Endpoint retorna array vacío [] inicialmente (comportamiento esperado)"
+                        )
+                    else:
+                        # If there are announcements, validate their structure
+                        sample_announcement = announcements_data[0]
+                        required_fields = ['announcement_id', 'title', 'content', 'is_active', 'created_at']
+                        missing_fields = [field for field in required_fields if field not in sample_announcement]
                         
                         if not missing_fields:
                             self.log_test(
-                                "Jobs data structure validation",
+                                "Global announcements data structure validation",
                                 True,
-                                "Los empleos contienen todos los campos requeridos"
+                                f"Los anuncios globales contienen todos los campos requeridos. {len(announcements_data)} anuncios encontrados"
                             )
                         else:
                             self.log_test(
-                                "Jobs data structure validation",
+                                "Global announcements data structure validation",
                                 False,
-                                f"Campos faltantes en empleos: {missing_fields}",
-                                sample_job
+                                f"Campos faltantes en anuncios globales: {missing_fields}",
+                                sample_announcement
                             )
-                    else:
+                            
+                        # Check if announcements are active
+                        active_announcements = [ann for ann in announcements_data if ann.get('is_active', False)]
                         self.log_test(
-                            "Jobs data content",
+                            "Global announcements active status",
                             True,
-                            "Lista de empleos vacía (normal si no hay empleos creados)"
+                            f"{len(active_announcements)} de {len(announcements_data)} anuncios están activos"
                         )
                 else:
                     self.log_test(
-                        "GET /api/jobs - Lista de empleos",
+                        "GET /api/global-announcements - Global announcements endpoint",
                         False,
-                        f"Respuesta no es una lista. Tipo: {type(jobs_data)}",
-                        jobs_data
+                        f"Respuesta no es una lista. Tipo: {type(announcements_data)}",
+                        announcements_data
                     )
             else:
                 self.log_test(
-                    "GET /api/jobs - Lista de empleos",
+                    "GET /api/global-announcements - Global announcements endpoint",
                     False,
                     f"Status code: {response.status_code}",
                     response.text
@@ -97,7 +106,62 @@ class BackendTester:
                 
         except Exception as e:
             self.log_test(
-                "GET /api/jobs - Lista de empleos",
+                "GET /api/global-announcements - Global announcements endpoint",
+                False,
+                f"Error de conexión: {str(e)}"
+            )
+    
+    def test_health_endpoint(self):
+        """Test GET /api/health endpoint - health check"""
+        try:
+            response = self.session.get(f"{self.base_url}/health", timeout=10)
+            
+            if response.status_code == 200:
+                health_data = response.json()
+                if isinstance(health_data, dict):
+                    # Check if it has the expected structure
+                    if "status" in health_data:
+                        status = health_data.get("status")
+                        service = health_data.get("service", "unknown")
+                        
+                        if status == "healthy":
+                            self.log_test(
+                                "GET /api/health - Health check endpoint",
+                                True,
+                                f"Health check exitoso. Status: {status}, Service: {service}"
+                            )
+                        else:
+                            self.log_test(
+                                "GET /api/health - Health check endpoint",
+                                False,
+                                f"Health check indica problema. Status: {status}",
+                                health_data
+                            )
+                    else:
+                        self.log_test(
+                            "GET /api/health - Health check endpoint",
+                            False,
+                            "Respuesta no contiene campo 'status'",
+                            health_data
+                        )
+                else:
+                    self.log_test(
+                        "GET /api/health - Health check endpoint",
+                        False,
+                        f"Respuesta no es un objeto. Tipo: {type(health_data)}",
+                        health_data
+                    )
+            else:
+                self.log_test(
+                    "GET /api/health - Health check endpoint",
+                    False,
+                    f"Status code: {response.status_code}",
+                    response.text
+                )
+                
+        except Exception as e:
+            self.log_test(
+                "GET /api/health - Health check endpoint",
                 False,
                 f"Error de conexión: {str(e)}"
             )
