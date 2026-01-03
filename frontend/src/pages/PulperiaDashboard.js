@@ -1611,65 +1611,115 @@ const PulperiaDashboard = () => {
               </div>
             </div>
 
-            {/* Sección 3: Ubicación */}
+            {/* Sección 3: Tipo de Negocio - Online o Físico */}
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-stone-400 uppercase tracking-wider flex items-center gap-2">
-                <div className="w-6 h-6 rounded-lg bg-green-500/20 flex items-center justify-center">
-                  <MapPin className="w-3.5 h-3.5 text-green-400" />
+                <div className="w-6 h-6 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                  <Globe className="w-3.5 h-3.5 text-cyan-400" />
                 </div>
-                Ubicación
+                Tipo de Negocio
               </h3>
               
-              <Button
-                type="button"
-                onClick={getCurrentLocation}
-                disabled={gettingLocation}
-                className="w-full bg-stone-800 hover:bg-stone-700 text-white border border-stone-700"
+              {/* Online Only Toggle */}
+              <div 
+                onClick={() => setPulperiaForm({ ...pulperiaForm, is_online_only: !pulperiaForm.is_online_only })}
+                className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                  pulperiaForm.is_online_only 
+                    ? 'bg-cyan-500/10 border-cyan-500' 
+                    : 'bg-stone-800/50 border-stone-700 hover:border-stone-600'
+                }`}
               >
-                {gettingLocation ? (
-                  <span className="flex items-center gap-2">
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                    Obteniendo ubicación...
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4" />
-                    {pulperiaForm.lat ? 'Actualizar Ubicación GPS' : 'Obtener Mi Ubicación'}
-                  </span>
-                )}
-              </Button>
-              
-              {pulperiaForm.lat && pulperiaForm.lng && (
-                <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-3 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
-                    <Check className="w-4 h-4 text-green-400" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                      pulperiaForm.is_online_only ? 'bg-cyan-500' : 'bg-stone-700'
+                    }`}>
+                      <Wifi className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className={`font-bold ${pulperiaForm.is_online_only ? 'text-cyan-400' : 'text-white'}`}>
+                        Solo en Línea
+                      </p>
+                      <p className="text-stone-500 text-xs">Sin tienda física</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-green-400 text-sm font-medium">Ubicación guardada</p>
-                    <p className="text-green-400/60 text-xs">
-                      {parseFloat(pulperiaForm.lat).toFixed(4)}, {parseFloat(pulperiaForm.lng).toFixed(4)}
-                    </p>
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                    pulperiaForm.is_online_only 
+                      ? 'bg-cyan-500 border-cyan-500' 
+                      : 'border-stone-600'
+                  }`}>
+                    {pulperiaForm.is_online_only && <Check className="w-4 h-4 text-white" />}
                   </div>
                 </div>
-              )}
-              
-              {!pulperiaForm.lat && !editingPulperia && (
-                <p className="text-amber-400/80 text-xs flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                  Requerido para crear tu pulpería
-                </p>
-              )}
-              
-              <Input
-                required
-                value={pulperiaForm.address}
-                onChange={(e) => setPulperiaForm({ ...pulperiaForm, address: e.target.value })}
-                placeholder="Dirección completa"
-                className="bg-stone-900 border-stone-700 text-white placeholder:text-stone-600"
-              />
+                {pulperiaForm.is_online_only && (
+                  <p className="text-cyan-400/70 text-xs mt-2 ml-13">
+                    Tu perfil mostrará un indicador de "Solo en línea" en lugar de dirección
+                  </p>
+                )}
+              </div>
             </div>
 
-            {/* Sección 4: Contacto */}
+            {/* Sección 4: Ubicación - Only show if not online-only */}
+            {!pulperiaForm.is_online_only && (
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold text-stone-400 uppercase tracking-wider flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-lg bg-green-500/20 flex items-center justify-center">
+                    <MapPin className="w-3.5 h-3.5 text-green-400" />
+                  </div>
+                  Ubicación Física
+                </h3>
+                
+                <Button
+                  type="button"
+                  onClick={getCurrentLocation}
+                  disabled={gettingLocation}
+                  className="w-full bg-stone-800 hover:bg-stone-700 text-white border border-stone-700"
+                >
+                  {gettingLocation ? (
+                    <span className="flex items-center gap-2">
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                      Obteniendo ubicación...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      {pulperiaForm.lat ? 'Actualizar Ubicación GPS' : 'Obtener Mi Ubicación'}
+                    </span>
+                  )}
+                </Button>
+                
+                {pulperiaForm.lat && pulperiaForm.lng && (
+                  <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-3 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-4 h-4 text-green-400" />
+                    </div>
+                    <div>
+                      <p className="text-green-400 text-sm font-medium">Ubicación guardada</p>
+                      <p className="text-green-400/60 text-xs">
+                        {parseFloat(pulperiaForm.lat).toFixed(4)}, {parseFloat(pulperiaForm.lng).toFixed(4)}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
+                {!pulperiaForm.lat && !editingPulperia && (
+                  <p className="text-amber-400/80 text-xs flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                    Requerido para tiendas físicas
+                  </p>
+                )}
+                
+                <Input
+                  required={!pulperiaForm.is_online_only}
+                  value={pulperiaForm.address}
+                  onChange={(e) => setPulperiaForm({ ...pulperiaForm, address: e.target.value })}
+                  placeholder="Dirección completa"
+                  className="bg-stone-900 border-stone-700 text-white placeholder:text-stone-600"
+                />
+              </div>
+            )}
+
+            {/* Sección 5: Contacto */}
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-stone-400 uppercase tracking-wider flex items-center gap-2">
                 <div className="w-6 h-6 rounded-lg bg-purple-500/20 flex items-center justify-center">
