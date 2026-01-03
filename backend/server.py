@@ -128,7 +128,26 @@ class Job(BaseModel):
     pay_currency: Literal["HNL", "USD"]
     location: str
     contact: str
+    is_active: Optional[bool] = True
     created_at: datetime
+
+class JobApplication(BaseModel):
+    application_id: str
+    job_id: str
+    job_title: str
+    pulperia_id: str
+    pulperia_name: str
+    applicant_user_id: str
+    applicant_name: str
+    applicant_email: str
+    applicant_city: str
+    applicant_age: int
+    cv_url: Optional[str] = None  # PDF or image URL
+    message: Optional[str] = None
+    status: Literal["recibida", "en_revision", "aceptada", "rechazada"] = "recibida"
+    rejection_reason: Optional[str] = None
+    created_at: datetime
+    updated_at: Optional[datetime] = None
 
 class Service(BaseModel):
     service_id: str
