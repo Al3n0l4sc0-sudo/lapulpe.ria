@@ -84,6 +84,7 @@ const PulperiaDashboard = () => {
   const [newOrdersCount, setNewOrdersCount] = useState(0);
   const [announcementForm, setAnnouncementForm] = useState({ content: '', image_url: '', tags: '' });
   const [activeNotificationTab, setActiveNotificationTab] = useState('orders');
+  const [myAdSlot, setMyAdSlot] = useState(null);
   
   // v1.1 - Nuevos estados para reportes, tips y compartir
   const [showReports, setShowReports] = useState(false);
