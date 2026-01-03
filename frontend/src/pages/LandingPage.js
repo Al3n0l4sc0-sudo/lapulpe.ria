@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Copy, Check, ExternalLink, ShoppingBag, Store, Bell, MapPin } from 'lucide-react';
 import DisclaimerModal from '../components/DisclaimerModal';
+import { useAuth } from '../contexts/AuthContext';
 
 // ========================================
 // SOLO EMERGENT AUTH - Sin configuración externa
@@ -107,10 +109,28 @@ const PulperiaLogo = () => (
 );
 
 const LandingPage = () => {
-  const [showDisclaimer, setShowDisclaimer] = useState(true);
+  const navigate = useNavigate();
+  const { user, loading, isAuthenticated } = useAuth();
+  
+  // Check if disclaimer was already seen (stored in localStorage)
+  const hasSeenDisclaimer = localStorage.getItem('disclaimer_seen') === 'true';
+  
+  const [showDisclaimer, setShowDisclaimer] = useState(!hasSeenDisclaimer);
   const [showHowItWorks, setShowHowItWorks] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  // If user is already authenticated, redirect to map
+  useEffect(() => {
+    if (!loading && isAuthenticated && user) {
+      // User is logged in, redirect to appropriate page
+      if (!user.user_type) {
+        navigate('/select-type', { replace: true });
+      } else {
+        navigate('/map', { replace: true });
+      }
+    }
+  }, [loading, isAuthenticated, user, navigate]);
 
   const handleLogin = () => {
     if (isLoggingIn) return;
@@ -127,6 +147,8 @@ const LandingPage = () => {
   };
 
   const handleDisclaimerClose = () => {
+    // Save that user has seen disclaimer
+    localStorage.setItem('disclaimer_seen', 'true');
     setShowDisclaimer(false);
     setShowHowItWorks(true);
   };
@@ -152,6 +174,18 @@ const LandingPage = () => {
       handleCopyLink();
     }
   };
+
+  // Show loading while checking auth
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-stone-950 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-red-500/30 border-t-red-500 rounded-full animate-spin mx-auto"></div>
+          <p className="text-stone-500 mt-4">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-transparent relative overflow-hidden">
