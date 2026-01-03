@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
-import { Store } from 'lucide-react';
+import GalacticLoader from '../components/GalacticLoader';
 
 // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
 const AuthCallback = () => {
@@ -71,28 +71,34 @@ const AuthCallback = () => {
   }, [login, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pulpo-900 via-pulpo-800 to-pulpo-950">
-      <div className="text-center">
-        {/* Animated Logo */}
-        <div className="relative inline-block mb-8">
-          <div className="w-24 h-24 bg-gradient-to-br from-pulpo-500 to-pulpo-700 rounded-3xl flex items-center justify-center shadow-2xl shadow-pulpo-500/40 animate-pulse">
-            <Store className="w-12 h-12 text-white" strokeWidth={2} />
-          </div>
-          {/* Spinning ring */}
-          <div className="absolute -inset-2">
-            <div className="w-full h-full border-4 border-pulpo-300/20 rounded-full animate-spin border-t-pulpo-300"></div>
-          </div>
-        </div>
-        
-        <h2 className="text-2xl font-bold text-white mb-3">Iniciando sesión...</h2>
-        <p className="text-pulpo-100/70">Conectando con Google</p>
-        
-        {/* Progress dots */}
-        <div className="flex justify-center gap-2 mt-6">
-          <div className="w-2 h-2 bg-pulpo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-          <div className="w-2 h-2 bg-pulpo-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-          <div className="w-2 h-2 bg-pulpo-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-stone-950 relative overflow-hidden">
+      {/* Nebulosa de fondo */}
+      <div 
+        className="absolute inset-0 animate-nebula-pulse"
+        style={{
+          background: `
+            radial-gradient(ellipse 100% 80% at 30% 50%, rgba(220, 38, 38, 0.25), transparent 50%),
+            radial-gradient(ellipse 80% 60% at 70% 40%, rgba(250, 204, 21, 0.15), transparent 45%),
+            radial-gradient(ellipse 60% 50% at 50% 70%, rgba(147, 51, 234, 0.1), transparent 40%)
+          `
+        }}
+      />
+      {/* Estrellas */}
+      <div 
+        className="absolute inset-0 animate-twinkle"
+        style={{
+          backgroundImage: `
+            radial-gradient(1.5px 1.5px at 10% 20%, rgba(255,255,255,0.7), transparent),
+            radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.5), transparent),
+            radial-gradient(1.5px 1.5px at 50% 30%, rgba(255,255,255,0.6), transparent),
+            radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.5), transparent),
+            radial-gradient(1.5px 1.5px at 90% 45%, rgba(255,255,255,0.6), transparent)
+          `
+        }}
+      />
+      <div className="relative z-10 text-center">
+        <GalacticLoader size="large" text="Iniciando sesión..." />
+        <p className="text-stone-500 text-sm mt-4">Conectando con Google</p>
       </div>
     </div>
   );
