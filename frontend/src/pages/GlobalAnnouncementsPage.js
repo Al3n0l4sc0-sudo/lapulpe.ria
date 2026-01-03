@@ -216,13 +216,13 @@ const GlobalAnnouncementsPage = ({ user }) => {
                   onClick={() => navigate(ad.link_url || `/p/${ad.pulperia_id}`)}
                   className="w-full bg-stone-800/50 backdrop-blur-sm rounded-2xl border border-stone-700/50 overflow-hidden text-left transition-all hover:border-amber-500/50 hover:scale-[1.01]"
                 >
-                  {/* Image - Adaptive size */}
+                  {/* Image - Fixed aspect ratio */}
                   {ad.image_url && (
-                    <div className="relative bg-stone-900">
+                    <div className="relative bg-stone-900 aspect-video">
                       <img 
                         src={ad.image_url} 
                         alt={ad.title || ad.pulperia_name}
-                        className="w-full h-auto max-h-[500px] object-contain"
+                        className="w-full h-full object-cover"
                       />
                       <div className="absolute bottom-3 left-3 right-3">
                         <span className="bg-amber-500/90 text-black text-xs font-bold px-2 py-1 rounded-full">
