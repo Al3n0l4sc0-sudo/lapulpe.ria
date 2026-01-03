@@ -98,6 +98,7 @@ function AppRouter() {
         <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
         <Route path="/ad-log" element={<AdAssignmentLog />} />
         <Route path="/anuncios" element={<ProtectedRoute><FeaturedAdsPage /></ProtectedRoute>} />
+        <Route path="/anuncios-globales" element={<ProtectedRoute><GlobalAnnouncementsPage /></ProtectedRoute>} />
       </Routes>
     </Suspense>
   );
