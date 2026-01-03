@@ -386,17 +386,18 @@ const PulperiaDashboard = () => {
     setPulperiaForm({
       name: selectedPulperia.name,
       description: selectedPulperia.description || '',
-      address: selectedPulperia.address,
+      address: selectedPulperia.address || '',
       phone: selectedPulperia.phone || '',
       email: selectedPulperia.email || '',
       website: selectedPulperia.website || '',
       hours: selectedPulperia.hours || '',
-      lat: selectedPulperia.location.lat.toString(),
-      lng: selectedPulperia.location.lng.toString(),
+      lat: selectedPulperia.location?.lat?.toString() || '',
+      lng: selectedPulperia.location?.lng?.toString() || '',
       logo_url: selectedPulperia.logo_url || '',
       banner_url: selectedPulperia.banner_url || '',
       title_font: selectedPulperia.title_font || 'default',
-      background_color: selectedPulperia.background_color || '#DC2626'
+      background_color: selectedPulperia.background_color || '#DC2626',
+      is_online_only: selectedPulperia.is_online_only || false
     });
     setEditingPulperia(true);
     setShowPulperiaDialog(true);
