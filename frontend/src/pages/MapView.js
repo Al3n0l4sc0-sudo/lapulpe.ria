@@ -477,6 +477,91 @@ const MapView = () => {
               </MapContainer>
             </div>
           </div>
+          
+          {/* Product Search Bar - Google Style */}
+          <div className="px-4 py-3">
+            <div className="relative">
+              <div className="bg-white rounded-2xl shadow-xl border border-stone-200 overflow-hidden">
+                <div className="flex items-center px-4 py-3">
+                  <Search className="w-5 h-5 text-stone-400 flex-shrink-0" />
+                  <input
+                    type="text"
+                    value={productSearch}
+                    onChange={(e) => setProductSearch(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleProductSearch()}
+                    placeholder="Buscar productos... ej: leche, pan, huevos"
+                    className="flex-1 ml-3 text-stone-900 placeholder:text-stone-400 outline-none text-base bg-transparent"
+                  />
+                  {productSearch && (
+                    <button onClick={clearProductSearch} className="p-1 hover:bg-stone-100 rounded-full">
+                      <X className="w-5 h-5 text-stone-400" />
+                    </button>
+                  )}
+                  <button
+                    onClick={handleProductSearch}
+                    disabled={searchingProducts}
+                    className="ml-2 bg-red-600 hover:bg-red-500 text-white font-medium px-4 py-2 rounded-xl transition-colors disabled:opacity-50"
+                  >
+                    {searchingProducts ? (
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      'Buscar'
+                    )}
+                  </button>
+                </div>
+              </div>
+              
+              {/* Product Results Dropdown */}
+              {showProductResults && productResults.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-stone-200 max-h-80 overflow-y-auto z-50">
+                  <div className="p-3 border-b border-stone-100">
+                    <p className="text-stone-500 text-sm">{productResults.length} productos encontrados</p>
+                  </div>
+                  <div className="divide-y divide-stone-100">
+                    {productResults.map((product) => (
+                      <button
+                        key={product.product_id}
+                        onClick={() => {
+                          navigate(`/pulperia/${product.pulperia_id}`);
+                          clearProductSearch();
+                        }}
+                        className="w-full p-3 flex items-center gap-3 hover:bg-stone-50 transition-colors text-left"
+                      >
+                        {product.image_url ? (
+                          <img src={product.image_url} alt="" className="w-12 h-12 rounded-lg object-cover bg-stone-100" />
+                        ) : (
+                          <div className="w-12 h-12 rounded-lg bg-stone-100 flex items-center justify-center">
+                            <Package className="w-5 h-5 text-stone-400" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-stone-900 truncate">{product.name}</p>
+                          <p className="text-sm text-stone-500 truncate">{product.pulperia_name || 'Pulpería'}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-red-600">L {product.price?.toFixed(0)}</p>
+                          {product.available ? (
+                            <span className="text-xs text-green-600">Disponible</span>
+                          ) : (
+                            <span className="text-xs text-stone-400">Agotado</span>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* No Results */}
+              {showProductResults && productResults.length === 0 && !searchingProducts && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-stone-200 p-6 text-center z-50">
+                  <Package className="w-10 h-10 mx-auto text-stone-300 mb-2" />
+                  <p className="text-stone-500 text-sm">No se encontraron productos</p>
+                  <p className="text-stone-400 text-xs mt-1">Intenta con otro término de búsqueda</p>
+                </div>
+              )}
+            </div>
+          </div>
         </>
       )}
 
