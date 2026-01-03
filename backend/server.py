@@ -763,6 +763,21 @@ async def update_product(product_id: str, product_data: ProductCreate, authoriza
     if pulperia["owner_user_id"] != user.user_id:
         raise HTTPException(status_code=403, detail="No tienes permiso para editar este producto")
     
+    # Track price changes
+    old_price = product.get("price", 0)
+    new_price = product_data.price
+    
+    if old_price != new_price:
+        # Save price history
+        price_history_doc = {
+            "product_id": product_id,
+            "old_price": old_price,
+            "new_price": new_price,
+            "changed_at": datetime.now(timezone.utc),
+            "changed_by": user.user_id
+        }
+        await db.price_history.insert_one(price_history_doc)
+    
     await db.products.update_one(
         {"product_id": product_id},
         {"$set": product_data.model_dump()}
