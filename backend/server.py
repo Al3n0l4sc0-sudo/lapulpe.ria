@@ -2690,6 +2690,30 @@ async def upload_image(file: UploadFile = File(...), authorization: Optional[str
     
     return {"image_url": data_url, "filename": file.filename, "size": len(content)}
 
+@api_router.post("/upload-cv")
+async def upload_cv(file: UploadFile = File(...), authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
+    """Upload a CV (PDF or image) and return its base64 data URL"""
+    await get_current_user(authorization, session_token)
+    
+    # Validate file type - allow PDFs and images
+    allowed_types = ['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'image/webp']
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Tipo de archivo no permitido. Use PDF, JPEG, PNG, GIF o WebP.")
+    
+    # Read file content
+    content = await file.read()
+    
+    # Check file size (max 15MB)
+    max_size = 15 * 1024 * 1024  # 15MB
+    if len(content) > max_size:
+        raise HTTPException(status_code=400, detail="Archivo demasiado grande. Máximo 15MB.")
+    
+    # Convert to base64 data URL
+    base64_content = base64.b64encode(content).decode('utf-8')
+    data_url = f"data:{file.content_type};base64,{base64_content}"
+    
+    return {"cv_url": data_url, "filename": file.filename, "size": len(content)}
+
 @api_router.delete("/admin/clear-orders")
 async def admin_clear_orders(authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
     """Admin: Clear all orders from the system"""
