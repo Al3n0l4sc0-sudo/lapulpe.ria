@@ -574,7 +574,7 @@ async def create_session(request: SessionRequest, response: Response):
     session_doc = {
         "user_id": user_id,
         "session_token": session_token,
-        "expires_at": (datetime.now(timezone.utc) + timedelta(days=7)).isoformat(),
+        "expires_at": (datetime.now(timezone.utc) + timedelta(days=365)).isoformat(),  # 1 year persistent session
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     await db.user_sessions.insert_one(session_doc)
@@ -586,7 +586,7 @@ async def create_session(request: SessionRequest, response: Response):
         httponly=True,
         secure=True,
         samesite="none",
-        max_age=7 * 24 * 60 * 60,
+        max_age=365 * 24 * 60 * 60,  # 1 year
         path="/"
     )
     
