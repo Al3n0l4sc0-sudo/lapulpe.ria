@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { api, BACKEND_URL } from '../config/api';
 import { toast } from 'sonner';
-import { MapPin, Phone, Clock, Plus, Minus, ShoppingCart, ArrowLeft, Star, Send, Camera, Check, X, Briefcase, Mail, Globe, DollarSign, Package, Megaphone, Image, Heart, ZoomIn } from 'lucide-react';
+import { MapPin, Phone, Clock, Plus, Minus, ShoppingCart, ArrowLeft, Star, Send, Camera, Check, X, Briefcase, Mail, Globe, DollarSign, Package, Megaphone, Image, Heart, ZoomIn, Award, Trophy, Wifi } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import AnimatedBackground from '../components/AnimatedBackground';
@@ -17,6 +17,24 @@ const FONT_CLASSES = {
   serif: 'font-serif font-bold',
   script: 'font-serif italic',
   bold: 'font-extrabold tracking-tight'
+};
+
+// Achievement definitions (same as backend)
+const ACHIEVEMENT_INFO = {
+  primera_venta: { name: "Primera Venta", icon: "🛒", color: "from-green-600 to-green-500" },
+  catalogo_inicial: { name: "Catálogo Inicial", icon: "📦", color: "from-blue-600 to-blue-500" },
+  diez_ventas: { name: "10 Ventas", icon: "⭐", color: "from-amber-600 to-amber-500" },
+  catalogo_completo: { name: "Catálogo Completo", icon: "📦", color: "from-blue-600 to-blue-500" },
+  primeras_visitas: { name: "Ganando Visibilidad", icon: "👁", color: "from-purple-600 to-purple-500" },
+  cliente_feliz: { name: "Clientes Felices", icon: "❤️", color: "from-red-600 to-red-500" },
+  cincuenta_ventas: { name: "Vendedor Activo", icon: "📈", color: "from-green-600 to-green-500" },
+  popular: { name: "Pulpería Popular", icon: "👥", color: "from-indigo-600 to-indigo-500" },
+  cien_ventas: { name: "Vendedor Estrella", icon: "🌟", color: "from-amber-600 to-amber-500" },
+  super_catalogo: { name: "Super Catálogo", icon: "📚", color: "from-cyan-600 to-cyan-500" },
+  muy_popular: { name: "Muy Popular", icon: "🔥", color: "from-orange-600 to-orange-500" },
+  verificado: { name: "Verificado", icon: "✓", color: "from-emerald-600 to-emerald-500", legendary: true },
+  top_vendedor: { name: "Top Vendedor", icon: "🏆", color: "from-yellow-500 to-amber-400", legendary: true },
+  leyenda: { name: "Leyenda Local", icon: "👑", color: "from-yellow-400 to-amber-300", legendary: true }
 };
 
 // Modal para ver imagen completa
@@ -55,6 +73,7 @@ const PulperiaProfile = () => {
   const [products, setProducts] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [jobs, setJobs] = useState([]);
+  const [achievements, setAchievements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cart, setCart] = useState([]);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
@@ -67,6 +86,7 @@ const PulperiaProfile = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [togglingFavorite, setTogglingFavorite] = useState(false);
   const [viewingImage, setViewingImage] = useState(null);
+  const [viewingAnnouncement, setViewingAnnouncement] = useState(null);
 
   // Check if favorite
   const checkFavorite = useCallback(async () => {
@@ -100,12 +120,13 @@ const PulperiaProfile = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [userRes, pulperiaRes, productsRes, reviewsRes, jobsRes] = await Promise.all([
+        const [userRes, pulperiaRes, productsRes, reviewsRes, jobsRes, achievementsRes] = await Promise.all([
           api.get(`/api/auth/me`),
           api.get(`/api/pulperias/${id}`),
           api.get(`/api/pulperias/${id}/products`),
           api.get(`/api/pulperias/${id}/reviews`),
-          api.get(`/api/pulperias/${id}/jobs`).catch(() => ({ data: [] }))
+          api.get(`/api/pulperias/${id}/jobs`).catch(() => ({ data: [] })),
+          api.get(`/api/pulperias/${id}/achievements`).catch(() => ({ data: [] }))
         ]);
         
         setUser(userRes.data);
@@ -113,6 +134,7 @@ const PulperiaProfile = () => {
         setProducts(productsRes.data.filter(p => p.available !== false));
         setReviews(reviewsRes.data);
         setJobs(jobsRes.data);
+        setAchievements(achievementsRes.data);
         
         // Fetch announcements
         try {
@@ -124,6 +146,11 @@ const PulperiaProfile = () => {
         
         // Check if favorite
         checkFavorite();
+        
+        // Increment view count
+        try {
+          await api.post(`/api/pulperias/${id}/view`);
+        } catch (e) { /* ignore */ }
         
         const userReview = reviewsRes.data.find(r => r.user_id === userRes.data.user_id);
         setHasReviewed(!!userReview);
@@ -263,6 +290,7 @@ const PulperiaProfile = () => {
   const bgColor = pulperia.background_color || '#DC2626';
   const fontClass = FONT_CLASSES[pulperia.title_font] || FONT_CLASSES.default;
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const isOnlineOnly = pulperia.is_online_only;
 
   return (
     <div className="min-h-screen bg-stone-950 pb-24">
@@ -300,32 +328,65 @@ const PulperiaProfile = () => {
         >
           <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
         </button>
+        
+        {/* Online Only Badge */}
+        {isOnlineOnly && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg z-10">
+            <Wifi className="w-4 h-4" />
+            <span className="text-sm font-bold">Solo en línea</span>
+          </div>
+        )}
       </div>
 
       {/* Profile Photo - Clickeable */}
       <div className="relative px-6 -mt-16">
-        {pulperia.logo_url ? (
-          <button 
-            onClick={() => setShowLogoModal(true)}
-            className="relative group"
-          >
-            <img 
-              src={pulperia.logo_url} 
-              alt={pulperia.name} 
-              className="w-28 h-28 rounded-2xl border-4 border-stone-800 shadow-2xl object-cover cursor-pointer hover:scale-105 transition-transform"
-            />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-2xl transition-colors flex items-center justify-center">
-              <Image className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="flex items-end gap-3">
+          {pulperia.logo_url ? (
+            <button 
+              onClick={() => setShowLogoModal(true)}
+              className="relative group"
+            >
+              <img 
+                src={pulperia.logo_url} 
+                alt={pulperia.name} 
+                className="w-28 h-28 rounded-2xl border-4 border-stone-800 shadow-2xl object-cover cursor-pointer hover:scale-105 transition-transform"
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-2xl transition-colors flex items-center justify-center">
+                <Image className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            </button>
+          ) : (
+            <div 
+              className="w-28 h-28 rounded-2xl border-4 border-stone-800 shadow-2xl flex items-center justify-center"
+              style={{ backgroundColor: bgColor }}
+            >
+              <Package className="w-12 h-12 text-white/70" />
             </div>
-          </button>
-        ) : (
-          <div 
-            className="w-28 h-28 rounded-2xl border-4 border-stone-800 shadow-2xl flex items-center justify-center"
-            style={{ backgroundColor: bgColor }}
-          >
-            <Package className="w-12 h-12 text-white/70" />
-          </div>
-        )}
+          )}
+          
+          {/* Achievements Badges - Mini display next to logo */}
+          {achievements.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-2">
+              {achievements.slice(0, 3).map(ach => {
+                const info = ACHIEVEMENT_INFO[ach.badge_id] || { icon: '🏅', color: 'from-gray-600 to-gray-500' };
+                return (
+                  <div 
+                    key={ach.achievement_id}
+                    className={`w-8 h-8 rounded-lg bg-gradient-to-br ${info.color} flex items-center justify-center shadow-lg ${info.legendary ? 'ring-2 ring-yellow-400' : ''}`}
+                    title={info.name}
+                  >
+                    <span className="text-sm">{info.icon}</span>
+                  </div>
+                );
+              })}
+              {achievements.length > 3 && (
+                <div className="w-8 h-8 rounded-lg bg-stone-800 flex items-center justify-center text-stone-400 text-xs font-bold">
+                  +{achievements.length - 3}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Logo Modal */}
@@ -360,7 +421,12 @@ const PulperiaProfile = () => {
         )}
 
         <div className="flex flex-wrap gap-3 mt-3 text-sm text-stone-400">
-          {pulperia.address && (
+          {isOnlineOnly ? (
+            <div className="flex items-center gap-1.5 text-cyan-400">
+              <Wifi className="w-4 h-4" />
+              <span>Tienda solo en línea</span>
+            </div>
+          ) : pulperia.address && (
             <a 
               href={pulperia.location?.lat && pulperia.location?.lng 
                 ? `https://www.google.com/maps/dir/?api=1&destination=${pulperia.location.lat},${pulperia.location.lng}`
@@ -380,10 +446,10 @@ const PulperiaProfile = () => {
         </div>
       </div>
 
-      {/* Tabs */}
+      {/* Tabs - Now includes Logros */}
       <div className="px-4 mb-4">
         <div className="flex bg-stone-900 rounded-xl p-1 border border-stone-800 overflow-x-auto">
-          {['products', 'anuncios', 'empleos', 'reviews'].map(tab => (
+          {['products', 'anuncios', 'empleos', 'reviews', 'logros'].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -394,7 +460,8 @@ const PulperiaProfile = () => {
               {tab === 'products' ? `Productos` : 
                tab === 'anuncios' ? `Anuncios` :
                tab === 'empleos' ? `Empleos` : 
-               `Reviews`}
+               tab === 'reviews' ? `Reviews` :
+               `Logros`}
             </button>
           ))}
         </div>
@@ -462,12 +529,19 @@ const PulperiaProfile = () => {
                     <DollarSign className="w-4 h-4 text-green-400" />
                     <span className="font-bold text-green-400">L{job.pay_rate}/{job.pay_currency}</span>
                   </div>
+                  {job.location && (
+                    <div className="flex items-center gap-2 mt-2 text-sm">
+                      <MapPin className="w-4 h-4 text-amber-400" />
+                      <span className="text-stone-400">{job.location}</span>
+                    </div>
+                  )}
                 </div>
               ))
             )}
           </div>
         )}
 
+        {/* Anuncios - Redesigned as professional ad cards with full images */}
         {activeTab === 'anuncios' && (
           <div className="space-y-4">
             {announcements.length === 0 ? (
@@ -477,38 +551,51 @@ const PulperiaProfile = () => {
               </div>
             ) : (
               announcements.map(announcement => (
-                <div key={announcement.announcement_id} className="bg-stone-900 rounded-2xl border border-stone-800 overflow-hidden">
-                  {/* Announcement Image */}
+                <div 
+                  key={announcement.announcement_id} 
+                  className="bg-gradient-to-br from-stone-900 to-stone-800 rounded-2xl border border-stone-700 overflow-hidden shadow-xl"
+                >
+                  {/* Ad Banner Style Header */}
+                  <div className="bg-gradient-to-r from-red-600/20 to-orange-600/20 px-4 py-2 flex items-center gap-2 border-b border-stone-700/50">
+                    <Megaphone className="w-4 h-4 text-orange-400" />
+                    <span className="text-orange-400 text-xs font-bold uppercase tracking-wider">Anuncio</span>
+                    <span className="text-stone-500 text-xs ml-auto">
+                      {new Date(announcement.created_at).toLocaleDateString('es-HN')}
+                    </span>
+                  </div>
+                  
+                  {/* Full Image Display */}
                   {announcement.image_url && (
-                    <img 
-                      src={announcement.image_url} 
-                      alt="Anuncio" 
-                      className="w-full h-44 object-cover"
-                    />
+                    <div 
+                      className="cursor-pointer"
+                      onClick={() => setViewingAnnouncement(announcement)}
+                    >
+                      <img 
+                        src={announcement.image_url} 
+                        alt="Anuncio" 
+                        className="w-full object-contain max-h-[400px] bg-stone-950"
+                      />
+                    </div>
                   )}
                   
-                  {/* Announcement Content */}
+                  {/* Content */}
                   <div className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-3 mb-3">
                       {pulperia.logo_url && (
-                        <img src={pulperia.logo_url} alt={pulperia.name} className="w-8 h-8 rounded-full object-cover" />
+                        <img src={pulperia.logo_url} alt={pulperia.name} className="w-10 h-10 rounded-full object-cover border-2 border-stone-600" />
                       )}
                       <div>
-                        <p className="font-bold text-white text-sm">{pulperia.name}</p>
-                        <p className="text-stone-500 text-xs">
-                          {new Date(announcement.created_at).toLocaleDateString('es-HN', { 
-                            day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
-                          })}
-                        </p>
+                        <p className="font-bold text-white">{pulperia.name}</p>
+                        <p className="text-stone-500 text-xs">Publicidad</p>
                       </div>
                     </div>
                     
-                    <p className="text-white">{announcement.content}</p>
+                    <p className="text-white text-base leading-relaxed">{announcement.content}</p>
                     
                     {announcement.tags && announcement.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-3">
+                      <div className="flex flex-wrap gap-2 mt-4">
                         {announcement.tags.map((tag, i) => (
-                          <span key={i} className="text-xs bg-red-900/50 text-red-400 px-2 py-1 rounded-full">
+                          <span key={i} className="text-xs bg-red-900/50 text-red-400 px-2 py-1 rounded-full border border-red-700/50">
                             #{tag}
                           </span>
                         ))}
@@ -548,6 +635,54 @@ const PulperiaProfile = () => {
             )}
           </div>
         )}
+
+        {/* Logros Tab - New */}
+        {activeTab === 'logros' && (
+          <div className="space-y-4">
+            {achievements.length === 0 ? (
+              <div className="text-center py-12 bg-stone-900/50 rounded-2xl border border-stone-800">
+                <Trophy className="w-12 h-12 text-stone-700 mx-auto mb-3" />
+                <p className="text-stone-500">Esta pulpería aún no tiene logros</p>
+                <p className="text-stone-600 text-sm mt-1">Los logros se desbloquean con ventas, productos y clientes felices</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                {achievements.map(ach => {
+                  const info = ACHIEVEMENT_INFO[ach.badge_id] || { name: ach.badge_id, icon: '🏅', color: 'from-gray-600 to-gray-500' };
+                  return (
+                    <div 
+                      key={ach.achievement_id}
+                      className={`bg-gradient-to-br ${info.color} rounded-2xl p-4 shadow-lg ${info.legendary ? 'ring-2 ring-yellow-400 ring-offset-2 ring-offset-stone-950' : ''}`}
+                    >
+                      <div className="text-3xl mb-2">{info.icon}</div>
+                      <h3 className="font-bold text-white">{info.name}</h3>
+                      <p className="text-white/70 text-xs mt-1">
+                        {new Date(ach.unlocked_at).toLocaleDateString('es-HN')}
+                      </p>
+                      {info.legendary && (
+                        <div className="mt-2 bg-yellow-400/20 rounded-full px-2 py-0.5 inline-block">
+                          <span className="text-yellow-300 text-xs font-bold">✨ Legendario</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            
+            {/* Achievement Progress Info */}
+            <div className="bg-stone-900/50 rounded-xl p-4 border border-stone-700 mt-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Award className="w-5 h-5 text-amber-400" />
+                <span className="text-white font-bold">Sistema de Meritocracia</span>
+              </div>
+              <p className="text-stone-400 text-sm">
+                Las pulperías desbloquean logros basados en ventas, productos, visitas y reseñas de clientes. 
+                ¡Los logros legendarios son especialmente difíciles de conseguir!
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Review Dialog */}
@@ -583,6 +718,27 @@ const PulperiaProfile = () => {
           productName={viewingImage.name} 
           onClose={() => setViewingImage(null)} 
         />
+      )}
+
+      {/* Announcement Image Viewer */}
+      {viewingAnnouncement && viewingAnnouncement.image_url && (
+        <div 
+          className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center p-4"
+          onClick={() => setViewingAnnouncement(null)}
+        >
+          <button 
+            onClick={() => setViewingAnnouncement(null)}
+            className="absolute top-4 right-4 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+          >
+            <X className="w-6 h-6 text-white" />
+          </button>
+          <img 
+            src={viewingAnnouncement.image_url} 
+            alt="Anuncio"
+            className="max-w-full max-h-[90vh] object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
       )}
 
       <BottomNav user={user} cartCount={cartCount} />
