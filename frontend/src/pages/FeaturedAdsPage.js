@@ -12,7 +12,9 @@ import {
   CheckCircle,
   AlertCircle,
   Trash2,
-  Play
+  Play,
+  X,
+  ZoomIn
 } from 'lucide-react';
 import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
@@ -31,6 +33,7 @@ const FeaturedAdsPage = () => {
   const [loading, setLoading] = useState(true);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [viewingAd, setViewingAd] = useState(null);
   const navigate = useNavigate();
   
   const [adForm, setAdForm] = useState({
@@ -221,7 +224,7 @@ const FeaturedAdsPage = () => {
           </div>
         )}
         
-        {/* Ads Grid */}
+        {/* Ads Grid - Redesigned to show full images */}
         {ads.length === 0 ? (
           <div className="text-center py-16 bg-stone-900/30 rounded-2xl border border-stone-800">
             <Megaphone className="w-16 h-16 mx-auto text-stone-700 mb-4" />
@@ -229,69 +232,83 @@ const FeaturedAdsPage = () => {
             <p className="text-stone-600 text-sm mt-1">Las pulperías pronto publicarán aquí</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-6">
             {ads.map((ad) => (
               <div 
                 key={ad.ad_id}
-                onClick={() => handleAdClick(ad)}
-                className="bg-stone-900/50 rounded-2xl border border-stone-800 overflow-hidden hover:border-amber-500/50 transition-all cursor-pointer group"
+                className="bg-gradient-to-br from-stone-900 to-stone-800 rounded-2xl border border-stone-700 overflow-hidden shadow-xl hover:border-amber-500/50 transition-all"
               >
-                {/* Media */}
-                <div className="relative aspect-video bg-stone-800">
+                {/* Ad Header */}
+                <div className="bg-gradient-to-r from-amber-600/20 to-orange-600/20 px-4 py-2.5 flex items-center gap-2 border-b border-stone-700/50">
+                  <Megaphone className="w-4 h-4 text-amber-400" />
+                  <span className="text-amber-400 text-xs font-bold uppercase tracking-wider">Anuncio Destacado</span>
+                  <span className="text-amber-400 text-xs ml-1">• 1000 Lps</span>
+                  <span className="text-stone-500 text-xs ml-auto">
+                    Expira: {new Date(ad.expires_at).toLocaleDateString()}
+                  </span>
+                </div>
+                
+                {/* Full Image/Video Display */}
+                <div className="relative bg-stone-950">
                   {ad.video_url ? (
-                    <video 
-                      src={ad.video_url}
-                      className="w-full h-full object-cover"
-                      muted
-                      loop
-                      playsInline
-                      onMouseEnter={(e) => e.target.play()}
-                      onMouseLeave={(e) => e.target.pause()}
-                    />
+                    <div className="relative">
+                      <video 
+                        src={ad.video_url}
+                        className="w-full max-h-[500px] object-contain"
+                        controls
+                        muted
+                        loop
+                        playsInline
+                      />
+                      <div className="absolute top-2 right-2 bg-black/60 rounded-full p-2">
+                        <Play className="w-4 h-4 text-white" fill="white" />
+                      </div>
+                    </div>
                   ) : ad.image_url ? (
-                    <img 
-                      src={ad.image_url}
-                      alt={ad.title || ad.pulperia_name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
+                    <div 
+                      className="cursor-pointer group"
+                      onClick={() => setViewingAd(ad)}
+                    >
+                      <img 
+                        src={ad.image_url}
+                        alt={ad.title || ad.pulperia_name}
+                        className="w-full max-h-[500px] object-contain"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                        <ZoomIn className="w-10 h-10 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    </div>
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <ImageIcon className="w-12 h-12 text-stone-700" />
-                    </div>
-                  )}
-                  
-                  {/* Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="absolute bottom-3 right-3">
-                      <ExternalLink className="w-5 h-5 text-white" />
-                    </div>
-                  </div>
-                  
-                  {/* Video indicator */}
-                  {ad.video_url && (
-                    <div className="absolute top-2 right-2 bg-black/60 rounded-full p-1.5">
-                      <Play className="w-3 h-3 text-white" fill="white" />
+                    <div className="w-full h-48 flex items-center justify-center bg-stone-800">
+                      <ImageIcon className="w-16 h-16 text-stone-700" />
                     </div>
                   )}
                 </div>
                 
-                {/* Info */}
+                {/* Ad Content */}
                 <div className="p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      {ad.title && (
-                        <h3 className="text-white font-bold truncate">{ad.title}</h3>
-                      )}
-                      {ad.description && (
-                        <p className="text-stone-400 text-sm line-clamp-2 mt-1">{ad.description}</p>
-                      )}
+                  {ad.title && (
+                    <h3 className="text-xl font-bold text-white mb-2">{ad.title}</h3>
+                  )}
+                  {ad.description && (
+                    <p className="text-stone-300 text-base leading-relaxed mb-4">{ad.description}</p>
+                  )}
+                  
+                  {/* Action Row */}
+                  <div className="flex items-center justify-between pt-3 border-t border-stone-700">
+                    <div className="flex items-center gap-2">
+                      <span className="text-amber-400 font-bold">{ad.pulperia_name}</span>
                     </div>
-                  </div>
-                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-stone-800">
-                    <span className="text-amber-400 text-sm font-medium">{ad.pulperia_name}</span>
-                    <span className="text-stone-600 text-xs">
-                      Expira: {new Date(ad.expires_at).toLocaleDateString()}
-                    </span>
+                    
+                    {ad.link_url && (
+                      <Button
+                        onClick={() => handleAdClick(ad)}
+                        className="bg-amber-600 hover:bg-amber-500 text-white"
+                      >
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Ver más
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -306,6 +323,12 @@ const FeaturedAdsPage = () => {
             Por solo <span className="text-amber-400 font-bold">1000 Lps/mes</span>, tu anuncio será visible para todos los usuarios de La Pulpería. 
             Contacta al administrador para activar tu espacio publicitario.
           </p>
+          <ul className="text-stone-500 text-sm mt-3 space-y-1">
+            <li>✓ Imagen o video de alta calidad</li>
+            <li>✓ Visible para todos los usuarios</li>
+            <li>✓ Enlace directo a tu pulpería</li>
+            <li>✓ 30 días de exposición</li>
+          </ul>
         </div>
       </div>
       
@@ -343,14 +366,15 @@ const FeaturedAdsPage = () => {
             </div>
             
             <div>
-              <Label className="text-stone-300">Imagen del Anuncio</Label>
+              <Label className="text-stone-300">Imagen del Anuncio (se mostrará completa)</Label>
               <div className="mt-1">
                 <ImageUpload
                   onUpload={(url) => setAdForm({...adForm, image_url: url})}
                   currentImage={adForm.image_url}
-                  aspect="video"
+                  aspect="free"
                 />
               </div>
+              <p className="text-stone-500 text-xs mt-1">Sube una imagen de alta calidad. Se mostrará completa sin recortar.</p>
             </div>
             
             <div>
@@ -403,6 +427,32 @@ const FeaturedAdsPage = () => {
           </div>
         </DialogContent>
       </Dialog>
+      
+      {/* Full Image Viewer */}
+      {viewingAd && viewingAd.image_url && (
+        <div 
+          className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center p-4"
+          onClick={() => setViewingAd(null)}
+        >
+          <button 
+            onClick={() => setViewingAd(null)}
+            className="absolute top-4 right-4 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
+          >
+            <X className="w-6 h-6 text-white" />
+          </button>
+          <img 
+            src={viewingAd.image_url} 
+            alt={viewingAd.title || 'Anuncio'}
+            className="max-w-full max-h-[90vh] object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+          {viewingAd.title && (
+            <p className="absolute bottom-6 left-0 right-0 text-center text-white font-medium text-lg">
+              {viewingAd.title}
+            </p>
+          )}
+        </div>
+      )}
       
       <BottomNav activeTab="anuncios" />
     </div>
