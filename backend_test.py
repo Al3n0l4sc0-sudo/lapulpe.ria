@@ -282,6 +282,12 @@ class BackendTester:
                 )
                 
         except Exception as e:
+            self.log_test(
+                "GET /api/pulperias?search=test - Pulperias search endpoint",
+                False,
+                f"Error de conexión: {str(e)}"
+            )
+    
     def test_health_endpoint(self):
         """Test GET /api/health endpoint - health check"""
         try:
