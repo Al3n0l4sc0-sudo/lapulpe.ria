@@ -1,20 +1,48 @@
 {
   "short_name": "La Pulpería",
-  "name": "La Pulpería - Tu tienda de barrio digital",
-  "description": "Conectando pulperías hondureñas con sus comunidades",
+  "name": "La Pulpería - Marketplace de Pulperías",
+  "description": "Conectando pulperías hondureñas con sus clientes",
   "icons": [
     {
       "src": "favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
-  "theme_color": "#DC2626",
-  "background_color": "#0c0a09",
-  "orientation": "portrait-primary",
+  "theme_color": "#0a0a0a",
+  "background_color": "#0a0a0a",
+  "orientation": "portrait",
   "scope": "/",
   "lang": "es-HN",
-  "categories": ["shopping", "food", "lifestyle"]
+  "categories": ["shopping", "business", "food"],
+  "shortcuts": [
+    {
+      "name": "Ver Mapa",
+      "short_name": "Mapa",
+      "description": "Ver pulperías cercanas",
+      "url": "/map",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Buscar Chambas",
+      "short_name": "Chamba",
+      "description": "Buscar empleos",
+      "url": "/jobs",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    }
+  ]
 }
