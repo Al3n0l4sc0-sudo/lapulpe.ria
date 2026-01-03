@@ -1,16 +1,36 @@
-import { Rocket, Shield, Clock, MapPin, Sparkles } from 'lucide-react';
+import { Shield, Clock, MapPin, X } from 'lucide-react';
 
-// Disclaimer Modal - Galactic Market Theme
+// Disclaimer Modal - Estilo con nebulosa de fondo
 const DisclaimerModal = ({ onClose }) => {
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
-      {/* Fondo con nebulosa sutil */}
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+      {/* Fondo con nebulosa realista */}
       <div 
-        className="absolute inset-0 opacity-30"
+        className="absolute inset-0 bg-black/90"
         style={{
           background: `
-            radial-gradient(ellipse 60% 40% at 30% 20%, rgba(220, 38, 38, 0.3), transparent),
-            radial-gradient(ellipse 50% 35% at 70% 80%, rgba(147, 51, 234, 0.2), transparent)
+            linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.85)),
+            radial-gradient(ellipse 80% 50% at 20% 30%, rgba(220, 38, 38, 0.3), transparent 60%),
+            radial-gradient(ellipse 60% 40% at 80% 70%, rgba(185, 28, 28, 0.2), transparent 50%),
+            radial-gradient(ellipse 50% 35% at 50% 50%, rgba(250, 204, 21, 0.15), transparent 45%),
+            radial-gradient(ellipse 40% 30% at 30% 80%, rgba(147, 51, 234, 0.12), transparent 40%),
+            radial-gradient(ellipse 35% 25% at 70% 20%, rgba(249, 115, 22, 0.1), transparent 35%)
+          `
+        }}
+      />
+      
+      {/* Estrellas de fondo */}
+      <div 
+        className="absolute inset-0 opacity-60"
+        style={{
+          backgroundImage: `
+            radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.6), transparent),
+            radial-gradient(1px 1px at 30% 80%, rgba(255,255,255,0.5), transparent),
+            radial-gradient(1.5px 1.5px at 50% 30%, rgba(255,255,255,0.7), transparent),
+            radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,0.5), transparent),
+            radial-gradient(1px 1px at 90% 10%, rgba(255,255,255,0.6), transparent),
+            radial-gradient(1.5px 1.5px at 15% 70%, rgba(255,255,255,0.5), transparent),
+            radial-gradient(1px 1px at 85% 85%, rgba(255,255,255,0.4), transparent)
           `
         }}
       />
@@ -19,26 +39,20 @@ const DisclaimerModal = ({ onClose }) => {
         {/* Borde brillante superior */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-red-500 to-transparent opacity-60" />
         
+        {/* Botón cerrar */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors z-10"
+        >
+          <X className="w-5 h-5 text-stone-400" />
+        </button>
+        
         {/* Header */}
-        <div className="relative px-6 pt-8 pb-6 text-center">
-          {/* Icono animado */}
-          <div className="relative inline-block">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-red-500 via-red-600 to-red-800 flex items-center justify-center shadow-lg shadow-red-500/30 animate-float-icon">
-              <Rocket className="w-10 h-10 text-white" />
-            </div>
-            {/* Brillo */}
-            <div className="absolute -top-1 -right-1 w-4 h-4">
-              <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
-            </div>
-          </div>
-          
-          <h2 className="text-2xl font-bold text-white mt-5 font-galactic tracking-wide">
-            Bienvenido al
+        <div className="relative px-6 pt-8 pb-4 text-center">
+          <h2 className="text-2xl font-bold text-white">
+            Aviso Legal
           </h2>
-          <h1 className="text-3xl font-black gradient-text mt-1">
-            Mercado Galáctico
-          </h1>
-          <p className="text-stone-500 text-sm mt-2">Antes de explorar el universo</p>
+          <p className="text-stone-500 text-sm mt-1">Antes de continuar</p>
         </div>
 
         {/* Content */}
@@ -73,7 +87,7 @@ const DisclaimerModal = ({ onClose }) => {
                   Dale tiempo si está lenta
                 </p>
                 <p className="text-blue-200/60 text-xs mt-1.5 leading-relaxed">
-                  Comprueba tu conexión o sigue esperando mientras viajamos por el cosmos.
+                  Comprueba tu conexión o sigue esperando un momento.
                 </p>
               </div>
             </div>
@@ -91,7 +105,7 @@ const DisclaimerModal = ({ onClose }) => {
                   ¿No hay tiendas cerca?
                 </p>
                 <p className="text-purple-200/60 text-xs mt-1.5 leading-relaxed">
-                  Es porque no hay registradas en tu sector. <span className="text-purple-400 font-medium">¡Invita a tu pulpería favorita!</span>
+                  Es porque no hay registradas en tu zona. <span className="text-purple-400 font-medium">¡Invita a tu pulpería favorita!</span>
                 </p>
               </div>
             </div>
@@ -106,8 +120,7 @@ const DisclaimerModal = ({ onClose }) => {
           >
             {/* Shimmer effect */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-            <span className="relative flex items-center justify-center gap-2">
-              <Rocket className="w-5 h-5" />
+            <span className="relative">
               Entendido, continuar
             </span>
           </button>
