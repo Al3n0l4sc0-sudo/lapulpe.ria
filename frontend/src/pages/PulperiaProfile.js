@@ -491,23 +491,28 @@ const PulperiaProfile = () => {
                       <Package className="w-10 h-10 text-stone-700" />
                     )}
                   </div>
-                  <div className="p-3">
-                    <h3 className="font-medium text-white text-sm truncate">{product.name}</h3>
-                    <p className="text-red-400 font-bold text-lg mt-1">L{product.price.toFixed(0)}</p>
+                  <div className="p-4">
+                    <h3 className="font-semibold text-white truncate">{product.name}</h3>
+                    <div className="flex items-center justify-between mt-2">
+                      <p className="gradient-text font-bold text-xl">L{product.price.toFixed(0)}</p>
+                      {product.category && (
+                        <span className="text-xs text-stone-500 bg-stone-800/50 px-2 py-1 rounded-full">{product.category}</span>
+                      )}
+                    </div>
                     
                     {qty > 0 ? (
-                      <div className="flex items-center justify-between mt-2 bg-stone-800 rounded-xl border border-stone-700">
-                        <button onClick={() => removeFromCart(product.product_id)} className="p-2 hover:bg-stone-700 rounded-l-xl transition-colors">
-                          <Minus className="w-4 h-4 text-stone-400" />
+                      <div className="flex items-center justify-between mt-3 bg-gradient-to-r from-stone-800/80 to-stone-900/80 rounded-xl border border-red-500/20">
+                        <button onClick={() => removeFromCart(product.product_id)} className="p-2.5 hover:bg-red-500/20 rounded-l-xl transition-colors">
+                          <Minus className="w-4 h-4 text-red-400" />
                         </button>
-                        <span className="font-bold text-white text-sm">{qty}</span>
-                        <button onClick={() => addToCart(product)} className="p-2 hover:bg-stone-700 rounded-r-xl transition-colors">
-                          <Plus className="w-4 h-4 text-stone-400" />
+                        <span className="font-bold text-white">{qty}</span>
+                        <button onClick={() => addToCart(product)} className="p-2.5 hover:bg-red-500/20 rounded-r-xl transition-colors">
+                          <Plus className="w-4 h-4 text-red-400" />
                         </button>
                       </div>
                     ) : (
-                      <button onClick={() => addToCart(product)} className="w-full mt-2 bg-red-600 hover:bg-red-500 text-white py-2 rounded-xl text-sm font-medium transition-all">
-                        Agregar
+                      <button onClick={() => addToCart(product)} className="w-full mt-3 galactic-button text-white py-2.5 rounded-xl text-sm font-bold transition-all">
+                        Agregar al Carrito
                       </button>
                     )}
                   </div>
@@ -523,7 +528,7 @@ const PulperiaProfile = () => {
               <p className="text-center text-stone-600 py-8">No hay empleos disponibles</p>
             ) : (
               jobs.map(job => (
-                <div key={job.job_id} className="bg-stone-900 rounded-xl p-4 border border-stone-800">
+                <div key={job.job_id} className="galactic-card rounded-xl p-4">
                   <h3 className="font-medium text-white">{job.title}</h3>
                   <p className="text-stone-500 text-sm mt-1">{job.description}</p>
                   <div className="flex items-center gap-2 mt-2 text-sm">
