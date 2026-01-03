@@ -169,7 +169,7 @@ const Header = ({ user, title, subtitle, onOrderUpdate }) => {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="relative p-2.5 rounded-xl galactic-card hover:border-red-500/40 transition-all"
+                className="relative p-2.5 rounded-xl bg-stone-900/50 border border-white/10 hover:border-red-500/40 transition-all backdrop-blur-sm"
                 data-testid="notifications-button"
               >
                 <Bell className="w-5 h-5 text-stone-400" />
@@ -348,7 +348,7 @@ const Header = ({ user, title, subtitle, onOrderUpdate }) => {
           {user && (
             <button
               onClick={handleLogout}
-              className="p-2.5 rounded-xl galactic-card hover:border-red-500/40 transition-all"
+              className="p-2.5 rounded-xl bg-stone-900/50 border border-white/10 hover:border-red-500/40 transition-all backdrop-blur-sm"
               title="Cerrar sesión"
             >
               <LogOut className="w-5 h-5 text-stone-400" />
