@@ -28,7 +28,7 @@
 
 ```
 https://lapulperiastore.net/auth/callback
-https://galactic-lapulpe.preview.emergentagent.com/auth/callback
+https://domain-explorer-2.preview.emergentagent.com/auth/callback
 ```
 
 ⚠️ **IMPORTANTE:**
@@ -42,7 +42,7 @@ https://galactic-lapulpe.preview.emergentagent.com/auth/callback
 
 ```
 https://lapulperiastore.net
-https://galactic-lapulpe.preview.emergentagent.com
+https://domain-explorer-2.preview.emergentagent.com
 ```
 
 ⚠️ **IMPORTANTE:**
@@ -63,13 +63,13 @@ Después de guardar, tu configuración debe verse así:
 ### ✅ URIs de redirección autorizados:
 ```
 ✓ https://lapulperiastore.net/auth/callback
-✓ https://galactic-lapulpe.preview.emergentagent.com/auth/callback
+✓ https://domain-explorer-2.preview.emergentagent.com/auth/callback
 ```
 
 ### ✅ Orígenes JavaScript autorizados:
 ```
 ✓ https://lapulperiastore.net
-✓ https://galactic-lapulpe.preview.emergentagent.com
+✓ https://domain-explorer-2.preview.emergentagent.com
 ```
 
 ## 🧪 PROBAR EL LOGIN
@@ -84,7 +84,7 @@ Después de guardar, tu configuración debe verse así:
 
 ### Opción B: Dominio de Preview (para pruebas)
 
-1. Ir a: `https://galactic-lapulpe.preview.emergentagent.com`
+1. Ir a: `https://domain-explorer-2.preview.emergentagent.com`
 2. Click en "Comenzar con Google"
 3. Autorizar la aplicación
 4. ✅ Deberías ser redirigido correctamente
@@ -206,7 +206,7 @@ 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
 
 **Dominios configurados:**
 - Producción: `https://lapulperiastore.net`
-- Preview/Testing: `https://galactic-lapulpe.preview.emergentagent.com`
+- Preview/Testing: `https://domain-explorer-2.preview.emergentagent.com`
 
 ## ✅ CHECKLIST FINAL
 

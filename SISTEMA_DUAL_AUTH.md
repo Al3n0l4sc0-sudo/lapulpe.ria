@@ -21,7 +21,7 @@ Tu aplicación ahora tiene un **sistema inteligente de doble autenticación** qu
 
 ### ¡Puedes iniciar sesión AHORA MISMO!
 
-1. **Ir a:** https://galactic-lapulpe.preview.emergentagent.com
+1. **Ir a:** https://domain-explorer-2.preview.emergentagent.com
 2. **Click en:** "Comenzar con Google"
 3. **Verás:** "⚡ Emergent Auth" (indicador debajo del botón)
 4. **Autorizar** con tu cuenta de Google
@@ -101,7 +101,7 @@ Usuario → Click "Comenzar con Google"
 
 ### Probar Emergent Auth (AHORA):
 ```bash
-1. Abrir: https://galactic-lapulpe.preview.emergentagent.com
+1. Abrir: https://domain-explorer-2.preview.emergentagent.com
 2. Abrir consola del navegador (F12)
 3. Click en "Comenzar con Google"
 4. Verificar en consola:
@@ -216,4 +216,4 @@ TTL: 3600
 
 **¡Puedes iniciar sesión AHORA MISMO usando el preview domain!** 🚀✨
 
-**URL para probar:** https://galactic-lapulpe.preview.emergentagent.com
+**URL para probar:** https://domain-explorer-2.preview.emergentagent.com

@@ -30,7 +30,7 @@ Agregar **EXACTAMENTE** estas URLs:
 ```
 https://lapulperiahn.shop/auth/callback
 https://www.lapulperiahn.shop/auth/callback
-https://galactic-lapulpe.preview.emergentagent.com/auth/callback
+https://domain-explorer-2.preview.emergentagent.com/auth/callback
 ```
 
 ### Orígenes JavaScript autorizados
@@ -40,7 +40,7 @@ Agregar **EXACTAMENTE** estas URLs:
 ```
 https://lapulperiahn.shop
 https://www.lapulperiahn.shop
-https://galactic-lapulpe.preview.emergentagent.com
+https://domain-explorer-2.preview.emergentagent.com
 ```
 
 ⚠️ **IMPORTANTE:**
@@ -89,7 +89,7 @@ TTL: 3600
 
 ### Probar AHORA (Preview Domain)
 
-1. **Ir a:** https://galactic-lapulpe.preview.emergentagent.com
+1. **Ir a:** https://domain-explorer-2.preview.emergentagent.com
 2. **Verificar** que veas: "⚡ Emergent Auth" debajo del botón
 3. **Click** en "Comenzar con Google"
 4. ✅ **Debería funcionar** con Emergent OAuth
@@ -200,8 +200,8 @@ curl "http://localhost:8001/api/auth/google/url?redirect_uri=https://lapulperiah
 **Causa:** Preview URL no está en Google Cloud Console
 
 **Solución:**
-1. Agregar `https://galactic-lapulpe.preview.emergentagent.com` a orígenes
-2. Agregar `https://galactic-lapulpe.preview.emergentagent.com/auth/callback` a redirects
+1. Agregar `https://domain-explorer-2.preview.emergentagent.com` a orígenes
+2. Agregar `https://domain-explorer-2.preview.emergentagent.com/auth/callback` a redirects
 3. Esperar 2-3 minutos
 
 ## 🎉 Próximos Pasos

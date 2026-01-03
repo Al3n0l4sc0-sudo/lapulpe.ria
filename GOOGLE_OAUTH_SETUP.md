@@ -12,13 +12,13 @@
 **URIs de redirección autorizados:**
 ```
 https://lapulperiastore.net/auth/callback
-https://galactic-lapulpe.preview.emergentagent.com/auth/callback
+https://domain-explorer-2.preview.emergentagent.com/auth/callback
 ```
 
 **Orígenes JavaScript autorizados:**
 ```
 https://lapulperiastore.net
-https://galactic-lapulpe.preview.emergentagent.com
+https://domain-explorer-2.preview.emergentagent.com
 ```
 
 ## 🏪 Base de Datos Poblada
@@ -204,7 +204,7 @@ CORS_ORIGINS=*
 
 **Frontend (.env):**
 ```env
-REACT_APP_BACKEND_URL=https://galactic-lapulpe.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://domain-explorer-2.preview.emergentagent.com
 REACT_APP_DOMAIN=lapulperiastore.net
 WDS_SOCKET_PORT=443
 ```
