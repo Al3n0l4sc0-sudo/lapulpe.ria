@@ -629,122 +629,32 @@ const AdminPanel = () => {
           </div>
         )}
 
-        {/* Anuncios Tab - Combina Globales y Slots de Pulperías */}
+        {/* Anuncios Tab - Solo gestión de slots */}
         {activeTab === 'anuncios' && (
-          <div className="space-y-6">
-            {/* SECCIÓN 1: Anuncios Globales */}
-            <div className="space-y-4">
-              <div className="bg-gradient-to-r from-orange-600/20 to-amber-600/20 backdrop-blur-sm rounded-2xl p-4 border border-orange-500/30">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-orange-400 flex items-center gap-2">
-                    <Megaphone className="w-5 h-5" />
-                    Anuncios Globales (1000 Lps)
-                  </h3>
-                  <Button
-                    onClick={() => setShowGlobalAnnouncementDialog(true)}
-                    className="bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white"
-                  >
-                    <Plus className="w-4 h-4 mr-1" />
-                    Crear Anuncio
-                  </Button>
+          <div className="space-y-4">
+            {/* Header explicativo */}
+            <div className="bg-gradient-to-r from-orange-600/20 to-amber-600/20 backdrop-blur-sm rounded-2xl p-4 border border-orange-500/30">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-500 rounded-xl flex items-center justify-center">
+                  <Megaphone className="w-6 h-6 text-white" />
                 </div>
-                <p className="text-stone-400 text-sm">
-                  Los anuncios globales aparecen para TODOS los usuarios de la app
-                </p>
+                <div>
+                  <h3 className="font-bold text-white text-lg">Anuncios Globales</h3>
+                  <p className="text-orange-300 text-sm">1000 Lps por slot</p>
+                </div>
               </div>
-              
-              {/* Active Global Announcements */}
-              <div className="bg-stone-800/50 backdrop-blur-sm rounded-2xl p-4 border border-stone-700/50">
-                <h3 className="font-bold text-white mb-4">Anuncios Globales Activos</h3>
-                
-                {globalAnnouncements.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Megaphone className="w-12 h-12 mx-auto text-stone-600 mb-3" />
-                    <p className="text-stone-500">No hay anuncios globales</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {globalAnnouncements.map(announcement => (
-                      <div 
-                        key={announcement.announcement_id} 
-                        className={`bg-stone-900/50 rounded-xl p-4 border transition-all ${
-                          announcement.is_active ? 'border-green-500/30' : 'border-stone-700/50 opacity-60'
-                        }`}
-                      >
-                        <div className="flex justify-between items-start mb-2">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              {announcement.priority > 5 && (
-                                <span className="bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full text-xs font-bold">
-                                  DESTACADO
-                                </span>
-                              )}
-                              <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
-                                announcement.is_active 
-                                  ? 'bg-green-500/20 text-green-400' 
-                                  : 'bg-stone-500/20 text-stone-400'
-                              }`}>
-                                {announcement.is_active ? 'Activo' : 'Inactivo'}
-                              </span>
-                            </div>
-                            <h4 className="font-bold text-white">{announcement.title}</h4>
-                            <p className="text-stone-400 text-sm line-clamp-2">{announcement.content}</p>
-                            <div className="flex items-center gap-3 mt-2 text-xs text-stone-500">
-                              <span>Creado: {new Date(announcement.created_at).toLocaleDateString('es-HN')}</span>
-                              {announcement.expires_at && (
-                                <span>Expira: {new Date(announcement.expires_at).toLocaleDateString('es-HN')}</span>
-                              )}
-                            </div>
-                          </div>
-                          {announcement.image_url && (
-                            <img 
-                              src={announcement.image_url} 
-                              alt="" 
-                              className="w-16 h-16 rounded-lg object-cover ml-3"
-                            />
-                          )}
-                        </div>
-                        
-                        <div className="flex gap-2 mt-3">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleToggleGlobalAnnouncement(announcement.announcement_id)}
-                            className={announcement.is_active ? 'text-orange-400 hover:bg-orange-900/20' : 'text-green-400 hover:bg-green-900/20'}
-                          >
-                            {announcement.is_active ? 'Desactivar' : 'Activar'}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteGlobalAnnouncement(announcement.announcement_id)}
-                            className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-                          >
-                            <Trash2 className="w-4 h-4 mr-1" />
-                            Eliminar
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <p className="text-stone-400 text-sm">
+                Habilita slots a las pulperías para que puedan crear su anuncio global. 
+                Los anuncios aparecerán para TODOS los usuarios de la app.
+              </p>
             </div>
-
-            {/* Separador */}
-            <div className="border-t border-stone-700/50 my-4" />
-
-            {/* SECCIÓN 2: Slots de Anuncios para Pulperías */}
-            <div className="space-y-4">
-              <div className="bg-amber-900/20 backdrop-blur-sm rounded-2xl p-4 border border-amber-500/30">
-                <h3 className="font-bold text-amber-400 mb-4 flex items-center gap-2">
-                  <Tv className="w-5 h-5" />
-                  Slots de Anuncios Activos (1000 Lps/mes)
-                </h3>
-                <p className="text-stone-400 text-sm mb-4">
-                  Habilita a las pulperías para que puedan subir sus anuncios destacados
-                </p>
-              </div>
+            
+            {/* Slots Activos */}
+            <div className="bg-stone-800/50 backdrop-blur-sm rounded-2xl p-4 border border-stone-700/50">
+              <h3 className="font-bold text-white mb-4 flex items-center gap-2">
+                <Tv className="w-5 h-5 text-amber-400" />
+                Slots Activos ({featuredAdSlots.length})
+              </h3>
               
               {featuredAdSlots.length === 0 ? (
                 <div className="text-center py-8">
