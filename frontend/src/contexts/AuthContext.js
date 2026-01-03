@@ -43,11 +43,13 @@ export const AuthProvider = ({ children }) => {
       return response.data;
     } catch (error) {
       console.log('[Auth] Session check failed:', error.message);
-      // Only clear token on 401 errors
+      // Only clear token on 401 errors (unauthorized)
       if (error.response?.status === 401) {
         localStorage.removeItem('session_token');
+        setUser(null);
       }
-      setUser(null);
+      // For other errors (network, timeout, etc.) keep the user state 
+      // and don't clear the token - the session might still be valid
       return null;
     } finally {
       setLoading(false);
@@ -99,7 +101,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  // Logout
+  // Logout - only clears session when user explicitly logs out
   const logout = useCallback(async () => {
     const token = localStorage.getItem('session_token');
     
@@ -116,6 +118,7 @@ export const AuthProvider = ({ children }) => {
       console.error('[Auth] Logout error:', error);
     } finally {
       localStorage.removeItem('session_token');
+      // Don't clear disclaimer_seen - user shouldn't see it again
       setUser(null);
       toast.success('Sesión cerrada');
     }
@@ -140,7 +143,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // Check auth on mount
+  // Check auth on mount - but preserve session across refreshes
   useEffect(() => {
     const hasSessionInUrl = window.location.hash.includes('session_id=');
     const isCallbackPage = window.location.pathname === '/auth/callback';
@@ -151,6 +154,22 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   }, [checkAuth]);
+
+  // Also handle visibility change to re-check auth when tab becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && !isLoggingIn.current) {
+        // Only check auth if we have a token stored
+        const token = localStorage.getItem('session_token');
+        if (token && !user) {
+          checkAuth();
+        }
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [checkAuth, user]);
 
   const value = {
     user,
