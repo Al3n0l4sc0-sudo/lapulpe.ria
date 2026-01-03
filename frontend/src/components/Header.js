@@ -151,53 +151,37 @@ const Header = ({ user, title, subtitle, onOrderUpdate }) => {
   );
 
   return (
-    <header className="sticky top-0 z-50 glass-nebula border-b border-white/10 overflow-hidden">
-      {/* Mini Nebulosa animada */}
-      <MiniNebula variant="header" intensity="medium" />
-      
-      <div className="relative px-4 py-3 flex items-center justify-between">
-        {/* Title Section */}
-        <div className="flex-1 min-w-0">
-          <h1 className="text-lg font-bold text-white truncate">{title}</h1>
-          {subtitle && <p className="text-xs text-stone-500 truncate">{subtitle}</p>}
-        </div>
+    <>
+      <header className="sticky top-0 z-[100] glass-nebula border-b border-white/10 overflow-hidden">
+        {/* Mini Nebulosa animada */}
+        <MiniNebula variant="header" intensity="medium" />
+        
+        <div className="relative px-4 py-3 flex items-center justify-between">
+          {/* Title Section */}
+          <div className="flex-1 min-w-0">
+            <h1 className="text-lg font-bold text-white truncate">{title}</h1>
+            {subtitle && <p className="text-xs text-stone-500 truncate">{subtitle}</p>}
+          </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-2">
-          {/* Notifications */}
-          {user && (
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="relative p-2.5 rounded-xl bg-stone-800/80 border border-stone-600/50 hover:border-red-500/50 hover:bg-stone-700/80 transition-all backdrop-blur-sm shadow-lg"
-                data-testid="notifications-button"
-              >
-                <Bell className="w-5 h-5 text-white" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-red-500 to-red-700 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse shadow-lg shadow-red-500/30">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                )}
-              </button>
-
-              {/* Dropdown */}
-              {showDropdown && (
-                <div 
-                  className="fixed inset-x-4 top-16 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96 galactic-card rounded-2xl shadow-2xl shadow-black/50 overflow-hidden"
-                  style={{ zIndex: 99999 }}
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            {/* Notifications */}
+            {user && (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setShowDropdown(!showDropdown)}
+                  className="relative p-2.5 rounded-xl bg-stone-800/80 border border-stone-600/50 hover:border-red-500/50 hover:bg-stone-700/80 transition-all backdrop-blur-sm shadow-lg"
+                  data-testid="notifications-button"
                 >
-                  {/* Header */}
-                  <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between bg-gradient-to-r from-stone-900/50 to-transparent">
-                    <h3 className="font-bold text-white font-galactic">Notificaciones</h3>
-                    <button 
-                      onClick={() => setShowDropdown(false)}
-                      className="p-1 hover:bg-white/5 rounded-lg transition-colors sm:hidden"
-                    >
-                      <X className="w-5 h-5 text-stone-400" />
-                    </button>
-                  </div>
-
-                  {/* Content */}
+                  <Bell className="w-5 h-5 text-white" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-red-500 to-red-700 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse shadow-lg shadow-red-500/30">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+              </div>
+            )}
                   <div className="max-h-[60vh] overflow-y-auto">
                     {/* Enable Notifications Banner */}
                     {notificationPermission !== 'granted' && (
