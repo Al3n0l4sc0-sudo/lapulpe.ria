@@ -369,9 +369,10 @@ const FeaturedAdsPage = () => {
               <Label className="text-stone-300">Imagen del Anuncio (se mostrará completa)</Label>
               <div className="mt-1">
                 <ImageUpload
-                  onUpload={(url) => setAdForm({...adForm, image_url: url})}
-                  currentImage={adForm.image_url}
-                  aspect="free"
+                  onChange={(url) => setAdForm({...adForm, image_url: url})}
+                  value={adForm.image_url}
+                  aspectRatio="banner"
+                  placeholder="Seleccionar imagen de anuncio"
                 />
               </div>
               <p className="text-stone-500 text-xs mt-1">Sube una imagen de alta calidad. Se mostrará completa sin recortar.</p>
