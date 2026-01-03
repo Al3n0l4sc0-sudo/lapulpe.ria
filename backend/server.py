@@ -2523,6 +2523,160 @@ async def admin_clear_data(keep_products: bool = True, authorization: Optional[s
     return {"message": "Datos limpiados", "deleted": deleted}
 
 # ============================================
+# GLOBAL ANNOUNCEMENTS SYSTEM (1000 Lps)
+# Anuncios que aparecen a TODOS los usuarios
+# ============================================
+
+class GlobalAnnouncementCreate(BaseModel):
+    title: str
+    content: str
+    image_url: Optional[str] = None
+    link_url: Optional[str] = None
+    priority: int = 0  # Mayor = más importante
+    expires_days: Optional[int] = 30  # Días hasta expiración
+
+@api_router.get("/global-announcements")
+async def get_global_announcements():
+    """Get all active global announcements - visible to everyone"""
+    now = datetime.now(timezone.utc)
+    
+    # Get active, non-expired announcements sorted by priority
+    announcements = await db.global_announcements.find({
+        "is_active": True,
+        "$or": [
+            {"expires_at": {"$gt": now.isoformat()}},
+            {"expires_at": None}
+        ]
+    }, {"_id": 0}).sort([("priority", -1), ("created_at", -1)]).to_list(50)
+    
+    return announcements
+
+@api_router.post("/admin/global-announcements")
+async def create_global_announcement(
+    data: GlobalAnnouncementCreate,
+    authorization: Optional[str] = Header(None), 
+    session_token: Optional[str] = Cookie(None)
+):
+    """Admin: Create a global announcement (1000 Lps)"""
+    admin = await get_admin_user(authorization, session_token)
+    
+    now = datetime.now(timezone.utc)
+    expires_at = None
+    if data.expires_days:
+        expires_at = (now + timedelta(days=data.expires_days)).isoformat()
+    
+    announcement_id = f"global_ann_{uuid.uuid4().hex[:12]}"
+    announcement_doc = {
+        "announcement_id": announcement_id,
+        "title": data.title,
+        "content": data.content,
+        "image_url": data.image_url,
+        "link_url": data.link_url,
+        "priority": data.priority,
+        "is_active": True,
+        "created_at": now.isoformat(),
+        "expires_at": expires_at,
+        "created_by": admin.user_id
+    }
+    
+    await db.global_announcements.insert_one(announcement_doc)
+    
+    logger.info(f"[GLOBAL ANN] Admin created announcement: {data.title}")
+    
+    return {
+        "message": "Anuncio global creado exitosamente",
+        "announcement": {k: v for k, v in announcement_doc.items() if k != "_id"}
+    }
+
+@api_router.put("/admin/global-announcements/{announcement_id}")
+async def update_global_announcement(
+    announcement_id: str,
+    data: GlobalAnnouncementCreate,
+    authorization: Optional[str] = Header(None), 
+    session_token: Optional[str] = Cookie(None)
+):
+    """Admin: Update a global announcement"""
+    await get_admin_user(authorization, session_token)
+    
+    announcement = await db.global_announcements.find_one({"announcement_id": announcement_id})
+    if not announcement:
+        raise HTTPException(status_code=404, detail="Anuncio no encontrado")
+    
+    now = datetime.now(timezone.utc)
+    expires_at = None
+    if data.expires_days:
+        expires_at = (now + timedelta(days=data.expires_days)).isoformat()
+    
+    update_data = {
+        "title": data.title,
+        "content": data.content,
+        "image_url": data.image_url,
+        "link_url": data.link_url,
+        "priority": data.priority,
+        "expires_at": expires_at,
+        "updated_at": now.isoformat()
+    }
+    
+    await db.global_announcements.update_one(
+        {"announcement_id": announcement_id},
+        {"$set": update_data}
+    )
+    
+    return {"message": "Anuncio actualizado"}
+
+@api_router.delete("/admin/global-announcements/{announcement_id}")
+async def delete_global_announcement(
+    announcement_id: str,
+    authorization: Optional[str] = Header(None), 
+    session_token: Optional[str] = Cookie(None)
+):
+    """Admin: Delete a global announcement"""
+    await get_admin_user(authorization, session_token)
+    
+    result = await db.global_announcements.delete_one({"announcement_id": announcement_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Anuncio no encontrado")
+    
+    return {"message": "Anuncio eliminado"}
+
+@api_router.put("/admin/global-announcements/{announcement_id}/toggle")
+async def toggle_global_announcement(
+    announcement_id: str,
+    authorization: Optional[str] = Header(None), 
+    session_token: Optional[str] = Cookie(None)
+):
+    """Admin: Toggle active status of a global announcement"""
+    await get_admin_user(authorization, session_token)
+    
+    announcement = await db.global_announcements.find_one({"announcement_id": announcement_id})
+    if not announcement:
+        raise HTTPException(status_code=404, detail="Anuncio no encontrado")
+    
+    new_status = not announcement.get("is_active", True)
+    
+    await db.global_announcements.update_one(
+        {"announcement_id": announcement_id},
+        {"$set": {"is_active": new_status}}
+    )
+    
+    return {"message": f"Anuncio {'activado' if new_status else 'desactivado'}", "is_active": new_status}
+
+@api_router.get("/admin/global-announcements")
+async def admin_get_all_global_announcements(
+    authorization: Optional[str] = Header(None), 
+    session_token: Optional[str] = Cookie(None)
+):
+    """Admin: Get all global announcements (including inactive)"""
+    await get_admin_user(authorization, session_token)
+    
+    announcements = await db.global_announcements.find(
+        {}, {"_id": 0}
+    ).sort([("priority", -1), ("created_at", -1)]).to_list(100)
+    
+    return announcements
+
+# ============================================
 # CORS MIDDLEWARE
 # ============================================
 
