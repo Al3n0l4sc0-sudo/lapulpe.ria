@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { MapPin, Store as StoreIcon, Star, Crown, Sparkles, ChevronRight, Maximize2, Minimize2, Heart, Map, List, Search, Package, X } from 'lucide-react';
+import { MapPin, Store as StoreIcon, Star, Crown, Sparkles, ChevronRight, Maximize2, Minimize2, Heart, Map, List, Search, Package, X, Store } from 'lucide-react';
 import BottomNav from '../components/BottomNav';
 import Header from '../components/Header';
 import AnimatedBackground from '../components/AnimatedBackground';
