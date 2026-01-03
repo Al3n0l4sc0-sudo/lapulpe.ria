@@ -406,26 +406,42 @@ const MapView = () => {
                 <LocationMarker position={userLocation} />
                 <MapResizer isExpanded={isMapFullscreen} />
                 
-                {pulperias.map((pulperia) => (
-                  pulperia.location && (
+                {pulperias.map((pulperia) => {
+                  if (!pulperia.location) return null;
+                  const isFeatured = featuredPulperias.some(f => f.pulperia_id === pulperia.pulperia_id);
+                  return (
                     <Marker
                       key={pulperia.pulperia_id}
                       position={[pulperia.location.lat, pulperia.location.lng]}
+                      icon={createPulperiaIcon(pulperia, isFeatured)}
                     >
                       <Popup>
                         <div className="p-1">
-                          <h3 className="font-bold">{pulperia.name}</h3>
+                          <div className="flex items-center gap-2 mb-2">
+                            {pulperia.logo_url && (
+                              <img src={pulperia.logo_url} alt="" className="w-8 h-8 rounded-lg object-cover" />
+                            )}
+                            <div>
+                              <h3 className="font-bold text-sm">{pulperia.name}</h3>
+                              {pulperia.rating > 0 && (
+                                <div className="flex items-center gap-1 text-xs text-amber-500">
+                                  <Star className="w-3 h-3 fill-current" />
+                                  {pulperia.rating.toFixed(1)}
+                                </div>
+                              )}
+                            </div>
+                          </div>
                           <button
                             onClick={() => navigate(`/pulperia/${pulperia.pulperia_id}`)}
-                            className="mt-2 w-full bg-red-600 text-white text-xs font-bold py-1.5 px-3 rounded-lg"
+                            className="w-full bg-red-600 text-white text-xs font-bold py-1.5 px-3 rounded-lg hover:bg-red-700"
                           >
                             Ver Pulpería
                           </button>
                         </div>
                       </Popup>
                     </Marker>
-                  )
-                ))}
+                  );
+                })}
               </MapContainer>
             </div>
           </div>
