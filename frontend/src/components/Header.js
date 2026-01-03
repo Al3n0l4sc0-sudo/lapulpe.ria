@@ -4,6 +4,7 @@ import { api, BACKEND_URL } from '../config/api';
 import { Bell, LogOut, User, Store, CheckCircle2, Clock, XCircle, Package, Sparkles, ChevronRight, X, ShoppingBag, BellRing, Truck, AlertCircle, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { requestNotificationPermission } from '../hooks/useNotifications';
+import MiniNebula from './MiniNebula';
 
 const Header = ({ user, title, subtitle, onOrderUpdate }) => {
   const navigate = useNavigate();
@@ -150,11 +151,11 @@ const Header = ({ user, title, subtitle, onOrderUpdate }) => {
   );
 
   return (
-    <header className="sticky top-0 z-50 glass border-b border-white/5">
-      {/* Línea de brillo superior */}
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-red-500/30 to-transparent" />
+    <header className="sticky top-0 z-50 glass-nebula border-b border-white/10 overflow-hidden">
+      {/* Mini Nebulosa animada */}
+      <MiniNebula variant="header" intensity="medium" />
       
-      <div className="px-4 py-3 flex items-center justify-between">
+      <div className="relative px-4 py-3 flex items-center justify-between">
         {/* Title Section */}
         <div className="flex-1 min-w-0">
           <h1 className="text-lg font-bold text-white truncate font-galactic tracking-wide">{title}</h1>
