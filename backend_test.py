@@ -493,6 +493,32 @@ class BackendTester:
                 f"Error testing online-only pulperia creation: {str(e)}"
             )
     
+    def test_backend_health(self):
+        """Test basic backend connectivity"""
+        try:
+            # Try to access the root API endpoint
+            response = self.session.get(f"{self.base_url.replace('/api', '')}/docs", timeout=5)
+            
+            if response.status_code == 200:
+                self.log_test(
+                    "Backend connectivity",
+                    True,
+                    "Backend está accesible y respondiendo"
+                )
+            else:
+                self.log_test(
+                    "Backend connectivity",
+                    False,
+                    f"Backend responde con status code: {response.status_code}"
+                )
+                
+        except Exception as e:
+            self.log_test(
+                "Backend connectivity",
+                False,
+                f"No se puede conectar al backend: {str(e)}"
+            )
+    
     def run_all_tests(self):
         """Run all backend tests"""
         print("=" * 60)
