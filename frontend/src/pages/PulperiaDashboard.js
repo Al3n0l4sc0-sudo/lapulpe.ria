@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api, BACKEND_URL } from '../config/api';
 import { toast } from 'sonner';
-import { Store as StoreIcon, Package, Plus, Edit, Trash2, Bell, Briefcase, Palette, Type, Megaphone, Image, MessageSquare, Shield, Clock, MapPin, Phone, Check, Share2, Copy, ExternalLink, Award, RefreshCw } from 'lucide-react';
+import { Store as StoreIcon, Package, Plus, Edit, Trash2, Bell, Briefcase, Palette, Type, Megaphone, Image, MessageSquare, Shield, Clock, MapPin, Phone, Check, Share2, Copy, ExternalLink, Award, RefreshCw, Wifi, Globe } from 'lucide-react';
 import BottomNav from '../components/BottomNav';
 import Header from '../components/Header';
 import ImageUpload from '../components/ImageUpload';
@@ -16,7 +16,6 @@ import { Button } from '../components/ui/button';
 import useWebSocket from '../hooks/useWebSocket';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useAuth } from '../contexts/AuthContext';
-
 
 // Font options
 const FONT_OPTIONS = [
