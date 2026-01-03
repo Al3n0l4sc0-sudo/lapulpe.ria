@@ -1,4 +1,4 @@
-# 🏪 La Pulpería v1.0
+# 🏪 La Pulpería v1.1
 ## Documentación Completa de Funcionalidades
 
 ---
@@ -8,10 +8,25 @@
 **La Pulpería** es una plataforma digital que conecta pulperías hondureñas con sus clientes locales. Permite a las tiendas de barrio tener presencia online, gestionar sus productos, recibir pedidos y contratar personal.
 
 **Stack Tecnológico:**
-- Frontend: React + Tailwind CSS + Shadcn UI
+- Frontend: React + Tailwind CSS + Shadcn UI + PWA
 - Backend: FastAPI (Python)
 - Base de Datos: MongoDB
 - Autenticación: Google OAuth (Emergent Auth)
+- Emails: Resend API
+
+---
+
+## 🆕 NOVEDADES v1.1
+
+### Nuevas Funcionalidades:
+1. **📊 Reportes de Ventas** - Dashboard con métricas de ventas, productos más vendidos, horas pico
+2. **🤖 Tips con IA** - Guía para mejorar negocios con herramientas de IA (logos, consejos, fotos)
+3. **🔗 Compartir Pulpería** - Botón para compartir en WhatsApp, Facebook, Twitter
+4. **🖼️ Cambiar Foto de Perfil** - Los usuarios pueden subir su propia foto
+5. **📴 Modo Offline (PWA)** - La app se puede instalar y funciona sin conexión
+6. **📧 Notificaciones por Email** - Emails automáticos para pedidos y aplicaciones
+7. **🗺️ Marcadores con Foto** - El mapa muestra las fotos de las pulperías como marcadores
+8. **📈 Historial de Precios** - Ver si un producto subió o bajó de precio
 
 ---
 
