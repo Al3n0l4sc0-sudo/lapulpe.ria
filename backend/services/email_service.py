@@ -110,6 +110,25 @@ EMAIL_TEMPLATES = {
             <p style="color: #57534e; font-size: 12px; text-align: center; margin-top: 20px;">Este email fue enviado por La Pulpería</p>
         </div>
         '''
+    },
+    'application_rejected': {
+        'subject': '📋 Actualización sobre tu aplicación - {job_title}',
+        'html': '''
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1c1917; color: #fff; padding: 20px; border-radius: 12px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h1 style="color: #dc2626; margin: 0;">🏪 La Pulpería</h1>
+            </div>
+            <div style="background: #450a0a; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #dc2626;">
+                <h2 style="color: #f87171; margin: 0 0 10px 0;">📋 Actualización de tu Aplicación</h2>
+                <p style="color: #a8a29e; margin: 0;">Lamentablemente, tu aplicación para <strong style="color: #fff;">{job_title}</strong> no fue seleccionada en esta ocasión.</p>
+            </div>
+            <p style="color: #a8a29e;">No te desanimes, sigue buscando oportunidades en <strong style="color: #fff;">La Pulpería</strong>. ¡Hay muchas chambas esperándote!</p>
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="{app_url}/jobs" style="display: inline-block; background: #f59e0b; color: #000; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">Ver más Chambas</a>
+            </div>
+            <p style="color: #57534e; font-size: 12px; text-align: center; margin-top: 20px;">Este email fue enviado por La Pulpería</p>
+        </div>
+        '''
     }
 }
 
