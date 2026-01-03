@@ -150,11 +150,14 @@ const Header = ({ user, title, subtitle, onOrderUpdate }) => {
   );
 
   return (
-    <header className="sticky top-0 z-50 bg-stone-950/95 backdrop-blur-md border-b border-stone-800/50">
+    <header className="sticky top-0 z-50 glass border-b border-white/5">
+      {/* Línea de brillo superior */}
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-red-500/30 to-transparent" />
+      
       <div className="px-4 py-3 flex items-center justify-between">
         {/* Title Section */}
         <div className="flex-1 min-w-0">
-          <h1 className="text-lg font-bold text-white truncate">{title}</h1>
+          <h1 className="text-lg font-bold text-white truncate font-galactic tracking-wide">{title}</h1>
           {subtitle && <p className="text-xs text-stone-500 truncate">{subtitle}</p>}
         </div>
 
@@ -165,12 +168,12 @@ const Header = ({ user, title, subtitle, onOrderUpdate }) => {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="relative p-2.5 rounded-xl bg-stone-900 border border-stone-800 hover:bg-stone-800 transition-colors"
+                className="relative p-2.5 rounded-xl galactic-card hover:border-red-500/40 transition-all"
                 data-testid="notifications-button"
               >
                 <Bell className="w-5 h-5 text-stone-400" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-red-500 to-red-700 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse shadow-lg shadow-red-500/30">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
@@ -179,15 +182,15 @@ const Header = ({ user, title, subtitle, onOrderUpdate }) => {
               {/* Dropdown */}
               {showDropdown && (
                 <div 
-                  className="fixed inset-x-4 top-16 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96 bg-stone-900 rounded-2xl border border-stone-700 shadow-2xl shadow-black/50 overflow-hidden"
+                  className="fixed inset-x-4 top-16 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96 galactic-card rounded-2xl shadow-2xl shadow-black/50 overflow-hidden"
                   style={{ zIndex: 9999 }}
                 >
                   {/* Header */}
-                  <div className="px-4 py-3 border-b border-stone-800 flex items-center justify-between bg-stone-900">
-                    <h3 className="font-bold text-white">Notificaciones</h3>
+                  <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between bg-gradient-to-r from-stone-900/50 to-transparent">
+                    <h3 className="font-bold text-white font-galactic">Notificaciones</h3>
                     <button 
                       onClick={() => setShowDropdown(false)}
-                      className="p-1 hover:bg-stone-800 rounded-lg transition-colors sm:hidden"
+                      className="p-1 hover:bg-white/5 rounded-lg transition-colors sm:hidden"
                     >
                       <X className="w-5 h-5 text-stone-400" />
                     </button>
