@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { api, BACKEND_URL } from '../config/api';
+import { api } from '../config/api';
 import { toast } from 'sonner';
 import { 
   Briefcase, Search, Plus, MapPin, DollarSign, Trash2, Users, Wrench, Send, 
-  FileText, Phone, Eye, X, Check, Sparkles, Building2, Clock, ChevronRight, Store
+  FileText, Phone, Eye, X, Check, Building2, Clock, Store, Upload, 
+  Calendar, User, CheckCircle, XCircle, AlertCircle, ChevronDown, ChevronUp,
+  Inbox, ClipboardList
 } from 'lucide-react';
 import BottomNav from '../components/BottomNav';
 import Header from '../components/Header';
@@ -20,22 +22,34 @@ const CATEGORIES = {
   services: ['Jardinería', 'Limpieza', 'Plomería', 'Electricidad', 'Paseo de mascotas', 'Reparaciones', 'Otro']
 };
 
+const STATUS_CONFIG = {
+  recibida: { label: 'Recibida', color: 'bg-blue-500', icon: Inbox },
+  en_revision: { label: 'En Revisión', color: 'bg-amber-500', icon: ClipboardList },
+  aceptada: { label: 'Aceptada', color: 'bg-green-500', icon: CheckCircle },
+  rechazada: { label: 'No Seleccionada', color: 'bg-red-500', icon: XCircle }
+};
+
 const JobsServices = () => {
   const [user, setUser] = useState(null);
   const [jobs, setJobs] = useState([]);
   const [services, setServices] = useState([]);
+  const [myJobs, setMyJobs] = useState([]);
+  const [myApplications, setMyApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showJobDialog, setShowJobDialog] = useState(false);
   const [showServiceDialog, setShowServiceDialog] = useState(false);
   const [showApplyDialog, setShowApplyDialog] = useState(false);
   const [showApplicationsDialog, setShowApplicationsDialog] = useState(false);
   const [showJobDetailDialog, setShowJobDetailDialog] = useState(false);
+  const [showMyJobsDialog, setShowMyJobsDialog] = useState(false);
+  const [showMyApplicationsDialog, setShowMyApplicationsDialog] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
   const [applications, setApplications] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [cart, setCart] = useState([]);
   const [activeTab, setActiveTab] = useState('jobs');
+  const [userPulperias, setUserPulperias] = useState([]);
   
   const [jobForm, setJobForm] = useState({
     title: '',
@@ -44,7 +58,8 @@ const JobsServices = () => {
     pay_rate: '',
     pay_currency: 'HNL',
     location: '',
-    contact: ''
+    contact: '',
+    pulperia_id: ''
   });
   
   const [serviceForm, setServiceForm] = useState({
@@ -59,7 +74,8 @@ const JobsServices = () => {
   });
 
   const [applyForm, setApplyForm] = useState({
-    contact: '',
+    city: '',
+    age: '',
     cv_url: '',
     message: ''
   });
@@ -83,6 +99,32 @@ const JobsServices = () => {
       setJobs(jobsRes.data);
       setServices(servicesRes.data);
       
+      // Get user's pulperias if they are a pulperia owner
+      if (userRes.data.user_type === 'pulperia') {
+        try {
+          const pulperiasRes = await api.get(`/api/user/pulperias`);
+          setUserPulperias(pulperiasRes.data);
+        } catch (e) {
+          console.log('No pulperias found');
+        }
+        
+        // Get my jobs
+        try {
+          const myJobsRes = await api.get(`/api/my-jobs`);
+          setMyJobs(myJobsRes.data);
+        } catch (e) {
+          console.log('No my-jobs found');
+        }
+      }
+      
+      // Get my applications
+      try {
+        const myAppsRes = await api.get(`/api/my-job-applications`);
+        setMyApplications(myAppsRes.data);
+      } catch (e) {
+        console.log('No applications found');
+      }
+      
       const savedCart = localStorage.getItem('cart');
       if (savedCart) {
         setCart(JSON.parse(savedCart));
@@ -102,7 +144,8 @@ const JobsServices = () => {
       await api.post(`/api/jobs`,
         {
           ...jobForm,
-          pay_rate: parseFloat(jobForm.pay_rate)
+          pay_rate: parseFloat(jobForm.pay_rate),
+          pulperia_id: jobForm.pulperia_id || null
         },
         { withCredentials: true }
       );
@@ -116,7 +159,8 @@ const JobsServices = () => {
         pay_rate: '',
         pay_currency: 'HNL',
         location: '',
-        contact: ''
+        contact: '',
+        pulperia_id: ''
       });
       await fetchData();
     } catch (error) {
@@ -163,8 +207,8 @@ const JobsServices = () => {
     setUploadingImages(true);
     const imagePromises = files.map(file => {
       return new Promise((resolve, reject) => {
-        if (file.size > 5 * 1024 * 1024) {
-          toast.error(`${file.name} supera 5MB`);
+        if (file.size > 15 * 1024 * 1024) {
+          toast.error(`${file.name} supera 15MB`);
           resolve(null);
           return;
         }
@@ -192,8 +236,8 @@ const JobsServices = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('El archivo no debe superar 10MB');
+    if (file.size > 15 * 1024 * 1024) {
+      toast.error('El archivo no debe superar 15MB');
       return;
     }
 
@@ -243,16 +287,34 @@ const JobsServices = () => {
     
     if (!selectedJob) return;
     
+    // Validate age
+    const age = parseInt(applyForm.age);
+    if (isNaN(age) || age < 18) {
+      toast.error('Debes ser mayor de 18 años para aplicar');
+      return;
+    }
+    
+    if (!applyForm.city.trim()) {
+      toast.error('Por favor ingresa tu ciudad');
+      return;
+    }
+    
     try {
       await api.post(`/api/jobs/${selectedJob.job_id}/apply`,
-        applyForm,
+        {
+          city: applyForm.city,
+          age: age,
+          cv_url: applyForm.cv_url || null,
+          message: applyForm.message || null
+        },
         { withCredentials: true }
       );
       
       toast.success('¡Aplicación enviada exitosamente!');
       setShowApplyDialog(false);
       setSelectedJob(null);
-      setApplyForm({ contact: '', cv_url: '', message: '' });
+      setApplyForm({ city: '', age: '', cv_url: '', message: '' });
+      await fetchData();
     } catch (error) {
       console.error('Error applying to job:', error);
       const msg = error.response?.data?.detail;
@@ -271,6 +333,28 @@ const JobsServices = () => {
     } catch (error) {
       console.error('Error fetching applications:', error);
       toast.error('Error al cargar aplicaciones');
+    }
+  };
+
+  const handleUpdateApplicationStatus = async (applicationId, status, reason = null) => {
+    try {
+      let url = `/api/job-applications/${applicationId}/status?status=${status}`;
+      if (reason) {
+        url += `&rejection_reason=${encodeURIComponent(reason)}`;
+      }
+      
+      await api.put(url);
+      toast.success(`Aplicación ${status === 'aceptada' ? 'aceptada' : status === 'rechazada' ? 'rechazada' : 'actualizada'}`);
+      
+      // Refresh applications
+      if (selectedJob) {
+        const response = await api.get(`/api/jobs/${selectedJob.job_id}/applications`);
+        setApplications(response.data);
+      }
+      await fetchData();
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast.error('Error al actualizar');
     }
   };
 
@@ -308,6 +392,11 @@ const JobsServices = () => {
     return filtered;
   };
 
+  // Check if user already applied to a job
+  const hasApplied = (jobId) => {
+    return myApplications.some(app => app.job_id === jobId);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-stone-950">
@@ -321,6 +410,7 @@ const JobsServices = () => {
   }
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const pendingApplicationsCount = myJobs.reduce((sum, job) => sum + (job.pending_applications || 0), 0);
 
   return (
     <div className="min-h-screen bg-stone-950 pb-24">
@@ -335,12 +425,47 @@ const JobsServices = () => {
       
       {/* Search Section */}
       <div className="relative z-10 px-4 py-4">
-        {/* Disclaimer */}
-        <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 mb-4">
-          <p className="text-amber-400/70 text-xs">
-            <span className="text-amber-400 font-medium">Aviso:</span> Las ofertas son publicadas por pulperías locales y particulares. Verifica antes de aplicar.
-          </p>
-        </div>
+        {/* Quick Actions for Pulperia Owners */}
+        {user?.user_type === 'pulperia' && myJobs.length > 0 && (
+          <button
+            onClick={() => setShowMyJobsDialog(true)}
+            className="w-full mb-4 bg-gradient-to-r from-amber-900/50 to-amber-800/50 border border-amber-500/30 rounded-xl p-4 flex items-center justify-between hover:border-amber-500/50 transition-all"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
+                <ClipboardList className="w-5 h-5 text-amber-400" />
+              </div>
+              <div className="text-left">
+                <p className="text-white font-bold">Mis Ofertas de Empleo</p>
+                <p className="text-amber-400/70 text-sm">{myJobs.length} ofertas publicadas</p>
+              </div>
+            </div>
+            {pendingApplicationsCount > 0 && (
+              <div className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
+                {pendingApplicationsCount} nuevas
+              </div>
+            )}
+          </button>
+        )}
+
+        {/* My Applications Button */}
+        {myApplications.length > 0 && (
+          <button
+            onClick={() => setShowMyApplicationsDialog(true)}
+            className="w-full mb-4 bg-stone-800/50 border border-stone-700 rounded-xl p-4 flex items-center justify-between hover:border-amber-500/50 transition-all"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-stone-700 flex items-center justify-center">
+                <FileText className="w-5 h-5 text-stone-400" />
+              </div>
+              <div className="text-left">
+                <p className="text-white font-medium">Mis Aplicaciones</p>
+                <p className="text-stone-500 text-sm">{myApplications.length} aplicaciones enviadas</p>
+              </div>
+            </div>
+            <ChevronDown className="w-5 h-5 text-stone-500" />
+          </button>
+        )}
 
         {/* Tabs - Yellow Theme */}
         <div className="flex gap-2 mb-4">
@@ -428,7 +553,7 @@ const JobsServices = () => {
           {activeTab === 'jobs' ? 'Publicar Empleo' : 'Ofrecer Servicio'}
         </button>
 
-        {/* Jobs List - Redesigned */}
+        {/* Jobs List */}
         {activeTab === 'jobs' && (
           <div className="space-y-4">
             {filterJobs().length === 0 ? (
@@ -438,125 +563,137 @@ const JobsServices = () => {
                 <p className="text-stone-600 text-sm mt-1">¡Sé el primero en publicar!</p>
               </div>
             ) : (
-              filterJobs().map(job => (
-                <div 
-                  key={job.job_id} 
-                  className="bg-stone-900/50 backdrop-blur-sm rounded-2xl border border-stone-800 overflow-hidden hover:border-amber-500/50 transition-all group"
-                >
-                  {/* Job Header with Pulperia Info */}
-                  <div className="p-4 border-b border-stone-800/50">
-                    <div className="flex items-start gap-3">
-                      {/* Pulperia Logo */}
-                      {job.pulperia_logo ? (
-                        <img 
-                          src={job.pulperia_logo} 
-                          alt={job.pulperia_name}
-                          className="w-12 h-12 rounded-xl object-cover border border-stone-700"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-600 to-amber-500 flex items-center justify-center">
-                          <Store className="w-6 h-6 text-white" />
+              filterJobs().map(job => {
+                const alreadyApplied = hasApplied(job.job_id);
+                
+                return (
+                  <div 
+                    key={job.job_id} 
+                    className="bg-stone-900/50 backdrop-blur-sm rounded-2xl border border-stone-800 overflow-hidden hover:border-amber-500/50 transition-all group"
+                  >
+                    {/* Job Header with Pulperia Info */}
+                    <div className="p-4 border-b border-stone-800/50">
+                      <div className="flex items-start gap-3">
+                        {/* Pulperia Logo */}
+                        {job.pulperia_logo ? (
+                          <img 
+                            src={job.pulperia_logo} 
+                            alt={job.pulperia_name}
+                            className="w-12 h-12 rounded-xl object-cover border border-stone-700"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-600 to-amber-500 flex items-center justify-center">
+                            <Store className="w-6 h-6 text-white" />
+                          </div>
+                        )}
+                        
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-bold text-white text-lg truncate">{job.title}</h3>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-amber-400 text-sm font-medium">{job.pulperia_name || job.employer_name}</span>
+                            <span className="text-stone-600">•</span>
+                            <span className="text-stone-500 text-sm">{job.category}</span>
+                          </div>
                         </div>
-                      )}
-                      
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-white text-lg truncate">{job.title}</h3>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-amber-400 text-sm font-medium">{job.pulperia_name || job.employer_name}</span>
-                          <span className="text-stone-600">•</span>
-                          <span className="text-stone-500 text-sm">{job.category}</span>
-                        </div>
-                      </div>
-                      
-                      {/* Delete Button (if owner) */}
-                      {user && job.employer_user_id === user.user_id && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteJob(job.job_id);
-                          }}
-                          className="p-2 text-stone-500 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-all"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {/* Job Details */}
-                  <div className="p-4">
-                    <p className="text-stone-400 text-sm line-clamp-2 mb-4">{job.description}</p>
-                    
-                    {/* Info Grid */}
-                    <div className="grid grid-cols-2 gap-3 mb-4">
-                      {/* Pay Rate */}
-                      <div className="bg-stone-800/50 rounded-xl p-3 border border-stone-700/50">
-                        <div className="flex items-center gap-2">
-                          <DollarSign className="w-4 h-4 text-green-400" />
-                          <span className="text-green-400 font-bold">
-                            {job.pay_currency === 'HNL' ? 'L' : '$'}{job.pay_rate}
-                          </span>
-                        </div>
-                        <p className="text-stone-500 text-xs mt-1">por hora</p>
-                      </div>
-                      
-                      {/* Location - Address where job is offered */}
-                      <div className="bg-stone-800/50 rounded-xl p-3 border border-stone-700/50">
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-amber-400" />
-                          <span className="text-white text-sm truncate">{job.location || 'No especificada'}</span>
-                        </div>
-                        <p className="text-stone-500 text-xs mt-1">ubicación</p>
+                        
+                        {/* Delete Button (if owner) */}
+                        {user && job.employer_user_id === user.user_id && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteJob(job.job_id);
+                            }}
+                            className="p-2 text-stone-500 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-all"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        )}
                       </div>
                     </div>
                     
-                    {/* Actions */}
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleViewJobDetail(job)}
-                        className="flex-1 bg-stone-800 hover:bg-stone-700 text-white py-2.5 rounded-xl font-medium transition-all flex items-center justify-center gap-2 border border-stone-700"
-                      >
-                        <Eye className="w-4 h-4" />
-                        Ver más
-                      </button>
+                    {/* Job Details */}
+                    <div className="p-4">
+                      <p className="text-stone-400 text-sm line-clamp-2 mb-4">{job.description}</p>
                       
-                      {user && job.employer_user_id === user.user_id ? (
+                      {/* Info Grid */}
+                      <div className="grid grid-cols-2 gap-3 mb-4">
+                        {/* Pay Rate */}
+                        <div className="bg-stone-800/50 rounded-xl p-3 border border-stone-700/50">
+                          <div className="flex items-center gap-2">
+                            <DollarSign className="w-4 h-4 text-green-400" />
+                            <span className="text-green-400 font-bold">
+                              {job.pay_currency === 'HNL' ? 'L' : '$'}{job.pay_rate}
+                            </span>
+                          </div>
+                          <p className="text-stone-500 text-xs mt-1">por hora</p>
+                        </div>
+                        
+                        {/* Location */}
+                        <div className="bg-stone-800/50 rounded-xl p-3 border border-stone-700/50">
+                          <div className="flex items-center gap-2">
+                            <MapPin className="w-4 h-4 text-amber-400" />
+                            <span className="text-white text-sm truncate">{job.location || 'No especificada'}</span>
+                          </div>
+                          <p className="text-stone-500 text-xs mt-1">ubicación</p>
+                        </div>
+                      </div>
+                      
+                      {/* Actions */}
+                      <div className="flex gap-2">
                         <button
-                          onClick={() => handleViewApplications(job)}
-                          className="flex-1 bg-gradient-to-r from-amber-600 to-amber-500 text-white py-2.5 rounded-xl font-medium transition-all flex items-center justify-center gap-2"
+                          onClick={() => handleViewJobDetail(job)}
+                          className="flex-1 bg-stone-800 hover:bg-stone-700 text-white py-2.5 rounded-xl font-medium transition-all flex items-center justify-center gap-2 border border-stone-700"
                         >
-                          <Users className="w-4 h-4" />
-                          Ver Aplicantes
+                          <Eye className="w-4 h-4" />
+                          Ver más
                         </button>
-                      ) : (
-                        <button
-                          onClick={() => {
-                            setSelectedJob(job);
-                            setShowApplyDialog(true);
-                          }}
-                          className="flex-1 bg-gradient-to-r from-amber-600 to-amber-500 text-white py-2.5 rounded-xl font-medium transition-all flex items-center justify-center gap-2"
-                        >
-                          <Send className="w-4 h-4" />
-                          Aplicar
-                        </button>
-                      )}
+                        
+                        {user && job.employer_user_id === user.user_id ? (
+                          <button
+                            onClick={() => handleViewApplications(job)}
+                            className="flex-1 bg-gradient-to-r from-amber-600 to-amber-500 text-white py-2.5 rounded-xl font-medium transition-all flex items-center justify-center gap-2"
+                          >
+                            <Users className="w-4 h-4" />
+                            Ver Aplicantes
+                          </button>
+                        ) : alreadyApplied ? (
+                          <button
+                            disabled
+                            className="flex-1 bg-stone-700 text-stone-400 py-2.5 rounded-xl font-medium flex items-center justify-center gap-2 cursor-not-allowed"
+                          >
+                            <Check className="w-4 h-4" />
+                            Ya Aplicaste
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setSelectedJob(job);
+                              setShowApplyDialog(true);
+                            }}
+                            className="flex-1 bg-gradient-to-r from-amber-600 to-amber-500 text-white py-2.5 rounded-xl font-medium transition-all flex items-center justify-center gap-2"
+                          >
+                            <Send className="w-4 h-4" />
+                            Aplicar
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Time Posted */}
+                    <div className="px-4 pb-3">
+                      <p className="text-stone-600 text-xs flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        Publicado: {new Date(job.created_at).toLocaleDateString('es-HN')}
+                      </p>
                     </div>
                   </div>
-                  
-                  {/* Time Posted */}
-                  <div className="px-4 pb-3">
-                    <p className="text-stone-600 text-xs flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      Publicado: {new Date(job.created_at).toLocaleDateString('es-HN')}
-                    </p>
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         )}
 
-        {/* Services List - Redesigned */}
+        {/* Services List */}
         {activeTab === 'services' && (
           <div className="space-y-4">
             {filterServices().length === 0 ? (
@@ -630,9 +767,9 @@ const JobsServices = () => {
         )}
       </div>
 
-      {/* Create Job Dialog - Yellow Theme */}
+      {/* Create Job Dialog */}
       <Dialog open={showJobDialog} onOpenChange={setShowJobDialog}>
-        <DialogContent className="max-w-md bg-stone-900 border-stone-700">
+        <DialogContent className="max-w-md bg-stone-900 border-stone-700 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-white">
               <div className="w-10 h-10 bg-gradient-to-br from-amber-600 to-amber-500 rounded-xl flex items-center justify-center">
@@ -642,6 +779,23 @@ const JobsServices = () => {
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreateJob} className="space-y-4">
+            {/* Pulperia Selection */}
+            {userPulperias.length > 0 && (
+              <div>
+                <Label className="text-white">Publicar como</Label>
+                <select
+                  value={jobForm.pulperia_id}
+                  onChange={(e) => setJobForm({ ...jobForm, pulperia_id: e.target.value })}
+                  className="w-full bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-white"
+                >
+                  <option value="">Como persona individual</option>
+                  {userPulperias.map(p => (
+                    <option key={p.pulperia_id} value={p.pulperia_id}>{p.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            
             <div>
               <Label className="text-white">Título del puesto *</Label>
               <Input
@@ -712,7 +866,6 @@ const JobsServices = () => {
                 placeholder="Dirección exacta donde se ofrecerá el empleo"
                 className="bg-stone-800 border-stone-700 text-white placeholder:text-stone-500"
               />
-              <p className="text-stone-500 text-xs mt-1">Esta dirección aparecerá públicamente en la oferta</p>
             </div>
             
             <div>
@@ -797,7 +950,7 @@ const JobsServices = () => {
               </div>
               
               {/* Apply Button */}
-              {user && selectedJob.employer_user_id !== user.user_id && (
+              {user && selectedJob.employer_user_id !== user.user_id && !hasApplied(selectedJob.job_id) && (
                 <Button 
                   onClick={() => {
                     setShowJobDetailDialog(false);
@@ -809,14 +962,310 @@ const JobsServices = () => {
                   Aplicar a este empleo
                 </Button>
               )}
+              
+              {hasApplied(selectedJob.job_id) && (
+                <div className="bg-green-900/30 rounded-xl p-3 border border-green-700/50 text-center">
+                  <Check className="w-6 h-6 text-green-400 mx-auto mb-1" />
+                  <p className="text-green-400 font-medium">Ya aplicaste a este empleo</p>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>
       </Dialog>
 
-      {/* Create Service Dialog - Yellow Theme */}
-      <Dialog open={showServiceDialog} onOpenChange={setShowServiceDialog}>
+      {/* Apply to Job Dialog */}
+      <Dialog open={showApplyDialog} onOpenChange={setShowApplyDialog}>
         <DialogContent className="max-w-md bg-stone-900 border-stone-700">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-white">
+              <div className="w-10 h-10 bg-gradient-to-br from-amber-600 to-amber-500 rounded-xl flex items-center justify-center">
+                <Send className="w-5 h-5 text-white" />
+              </div>
+              Aplicar a: {selectedJob?.title}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleApplyToJob} className="space-y-4">
+            <div className="bg-amber-900/20 border border-amber-500/30 rounded-xl p-3 text-amber-400 text-sm">
+              <AlertCircle className="w-4 h-4 inline mr-2" />
+              Debes ser mayor de 18 años para aplicar
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-white">Ciudad *</Label>
+                <Input
+                  required
+                  value={applyForm.city}
+                  onChange={(e) => setApplyForm({ ...applyForm, city: e.target.value })}
+                  placeholder="Tu ciudad"
+                  className="bg-stone-800 border-stone-700 text-white placeholder:text-stone-500"
+                />
+              </div>
+              <div>
+                <Label className="text-white">Edad *</Label>
+                <Input
+                  required
+                  type="number"
+                  min="18"
+                  value={applyForm.age}
+                  onChange={(e) => setApplyForm({ ...applyForm, age: e.target.value })}
+                  placeholder="18+"
+                  className="bg-stone-800 border-stone-700 text-white placeholder:text-stone-500"
+                />
+              </div>
+            </div>
+            
+            <div>
+              <Label className="text-white">Subir CV (PDF o imagen) - Opcional</Label>
+              <Input
+                type="file"
+                accept=".pdf,image/*"
+                onChange={handleCVUpload}
+                disabled={uploadingCV}
+                className="cursor-pointer bg-stone-800 border-stone-700 text-white"
+              />
+              {applyForm.cv_url && (
+                <p className="text-sm text-emerald-400 mt-1 flex items-center gap-1">
+                  <FileText className="w-4 h-4" />
+                  CV cargado ✓
+                </p>
+              )}
+              {uploadingCV && <p className="text-sm text-stone-500 mt-1">Cargando...</p>}
+            </div>
+            
+            <div>
+              <Label className="text-white">Mensaje para el empleador (opcional)</Label>
+              <Textarea
+                value={applyForm.message}
+                onChange={(e) => setApplyForm({ ...applyForm, message: e.target.value })}
+                placeholder="Preséntate brevemente, menciona tu experiencia..."
+                rows={4}
+                className="bg-stone-800 border-stone-700 text-white placeholder:text-stone-500"
+              />
+            </div>
+            
+            <Button type="submit" className="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white shadow-lg shadow-amber-900/30" disabled={uploadingCV}>
+              <Send className="w-4 h-4 mr-2" />
+              Enviar Aplicación
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Applications Dialog (for employers) */}
+      <Dialog open={showApplicationsDialog} onOpenChange={setShowApplicationsDialog}>
+        <DialogContent className="max-w-lg bg-stone-900 border-stone-700 max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-white">
+              <Users className="w-5 h-5 text-amber-400" />
+              Aplicaciones: {selectedJob?.title}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {applications.length === 0 ? (
+            <div className="text-center py-8">
+              <Users className="w-12 h-12 mx-auto text-stone-600 mb-3" />
+              <p className="text-stone-500">Aún no hay aplicaciones</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {applications.map(app => {
+                const statusConfig = STATUS_CONFIG[app.status] || STATUS_CONFIG.recibida;
+                const StatusIcon = statusConfig.icon;
+                
+                return (
+                  <div key={app.application_id} className="bg-stone-800/50 rounded-xl p-4 border border-stone-700">
+                    {/* Status Badge */}
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex items-center gap-2">
+                        <StatusIcon className={`w-4 h-4 ${app.status === 'aceptada' ? 'text-green-400' : app.status === 'rechazada' ? 'text-red-400' : 'text-amber-400'}`} />
+                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${statusConfig.color} text-white`}>
+                          {statusConfig.label}
+                        </span>
+                      </div>
+                      <span className="text-xs text-stone-500">
+                        {new Date(app.created_at).toLocaleDateString('es-HN')}
+                      </span>
+                    </div>
+                    
+                    {/* Applicant Info */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <User className="w-4 h-4 text-stone-500" />
+                        <span className="font-bold text-white">{app.applicant_name}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-stone-400">
+                        <MapPin className="w-3 h-3" />
+                        {app.applicant_city} • {app.applicant_age} años
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-stone-400">
+                        <Phone className="w-3 h-3" />
+                        {app.applicant_email}
+                      </div>
+                    </div>
+                    
+                    {/* Message */}
+                    {app.message && (
+                      <div className="mt-3 bg-stone-900/50 rounded-lg p-3 border border-stone-700">
+                        <p className="text-stone-400 text-sm">"{app.message}"</p>
+                      </div>
+                    )}
+                    
+                    {/* CV Link */}
+                    {app.cv_url && (
+                      <a 
+                        href={app.cv_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 mt-3 text-sm text-amber-400 hover:text-amber-300"
+                      >
+                        <FileText className="w-4 h-4" />
+                        Ver CV
+                      </a>
+                    )}
+                    
+                    {/* Action Buttons */}
+                    {app.status === 'recibida' && (
+                      <div className="flex gap-2 mt-4">
+                        <button
+                          onClick={() => handleUpdateApplicationStatus(app.application_id, 'aceptada')}
+                          className="flex-1 bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg font-medium flex items-center justify-center gap-2"
+                        >
+                          <CheckCircle className="w-4 h-4" />
+                          Aceptar
+                        </button>
+                        <button
+                          onClick={() => handleUpdateApplicationStatus(app.application_id, 'rechazada')}
+                          className="flex-1 bg-red-600 hover:bg-red-500 text-white py-2 rounded-lg font-medium flex items-center justify-center gap-2"
+                        >
+                          <XCircle className="w-4 h-4" />
+                          Rechazar
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* My Jobs Dialog (for employers) */}
+      <Dialog open={showMyJobsDialog} onOpenChange={setShowMyJobsDialog}>
+        <DialogContent className="max-w-lg bg-stone-900 border-stone-700 max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-white">
+              <ClipboardList className="w-5 h-5 text-amber-400" />
+              Mis Ofertas de Empleo
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {myJobs.map(job => (
+              <div key={job.job_id} className="bg-stone-800/50 rounded-xl p-4 border border-stone-700">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-bold text-white">{job.title}</h3>
+                    <p className="text-stone-500 text-sm">{job.category} • {job.location}</p>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteJob(job.job_id)}
+                    className="p-2 text-stone-500 hover:text-red-400 rounded-lg"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+                
+                <div className="flex items-center gap-4 mt-3">
+                  <div className="flex items-center gap-1 text-sm">
+                    <Users className="w-4 h-4 text-stone-500" />
+                    <span className="text-white">{job.application_count || 0} aplicaciones</span>
+                  </div>
+                  {job.pending_applications > 0 && (
+                    <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full">
+                      {job.pending_applications} nuevas
+                    </span>
+                  )}
+                </div>
+                
+                <button
+                  onClick={() => {
+                    setShowMyJobsDialog(false);
+                    handleViewApplications(job);
+                  }}
+                  className="w-full mt-3 bg-amber-600 hover:bg-amber-500 text-white py-2 rounded-lg font-medium"
+                >
+                  Ver Aplicaciones
+                </button>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* My Applications Dialog (for applicants) */}
+      <Dialog open={showMyApplicationsDialog} onOpenChange={setShowMyApplicationsDialog}>
+        <DialogContent className="max-w-lg bg-stone-900 border-stone-700 max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-white">
+              <FileText className="w-5 h-5 text-amber-400" />
+              Mis Aplicaciones
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {myApplications.map(app => {
+              const statusConfig = STATUS_CONFIG[app.status] || STATUS_CONFIG.recibida;
+              const StatusIcon = statusConfig.icon;
+              
+              return (
+                <div key={app.application_id} className={`rounded-xl p-4 border ${
+                  app.status === 'aceptada' ? 'bg-green-900/20 border-green-700/50' :
+                  app.status === 'rechazada' ? 'bg-red-900/20 border-red-700/50' :
+                  'bg-stone-800/50 border-stone-700'
+                }`}>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-bold text-white">{app.job_title}</h3>
+                      <p className="text-amber-400 text-sm">{app.pulperia_name}</p>
+                    </div>
+                    <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full ${statusConfig.color} text-white text-xs font-bold`}>
+                      <StatusIcon className="w-3 h-3" />
+                      {statusConfig.label}
+                    </div>
+                  </div>
+                  
+                  <p className="text-stone-500 text-xs mt-2">
+                    Aplicado: {new Date(app.created_at).toLocaleDateString('es-HN')}
+                  </p>
+                  
+                  {app.status === 'aceptada' && (
+                    <div className="mt-3 bg-green-900/30 rounded-lg p-3 border border-green-700/50">
+                      <p className="text-green-400 text-sm font-medium">
+                        🎉 ¡Felicidades! Tu aplicación fue aceptada. El empleador se pondrá en contacto contigo.
+                      </p>
+                    </div>
+                  )}
+                  
+                  {app.status === 'rechazada' && (
+                    <div className="mt-3 bg-red-900/30 rounded-lg p-3 border border-red-700/50">
+                      <p className="text-red-400 text-sm">
+                        Tu aplicación no fue seleccionada en esta ocasión. ¡Te animamos a seguir aplicando a otras ofertas!
+                      </p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Service Dialog */}
+      <Dialog open={showServiceDialog} onOpenChange={setShowServiceDialog}>
+        <DialogContent className="max-w-md bg-stone-900 border-stone-700 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-white">
               <div className="w-10 h-10 bg-gradient-to-br from-amber-600 to-amber-500 rounded-xl flex items-center justify-center">
@@ -910,7 +1359,7 @@ const JobsServices = () => {
             </div>
             
             <div>
-              <Label className="text-white">Fotos de tu trabajo (máx. 5)</Label>
+              <Label className="text-white">Fotos de tu trabajo (máx. 5, hasta 15MB cada una)</Label>
               <Input
                 type="file"
                 accept="image/*"
@@ -933,122 +1382,6 @@ const JobsServices = () => {
               Publicar Servicio
             </Button>
           </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Apply to Job Dialog - Yellow Theme */}
-      <Dialog open={showApplyDialog} onOpenChange={setShowApplyDialog}>
-        <DialogContent className="max-w-md bg-stone-900 border-stone-700">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-white">
-              <div className="w-10 h-10 bg-gradient-to-br from-amber-600 to-amber-500 rounded-xl flex items-center justify-center">
-                <Send className="w-5 h-5 text-white" />
-              </div>
-              Aplicar a: {selectedJob?.title}
-            </DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleApplyToJob} className="space-y-4">
-            <div>
-              <Label className="text-white">Tu contacto (teléfono o email) *</Label>
-              <Input
-                required
-                value={applyForm.contact}
-                onChange={(e) => setApplyForm({ ...applyForm, contact: e.target.value })}
-                placeholder="+504 9999-9999 o email@ejemplo.com"
-                className="bg-stone-800 border-stone-700 text-white placeholder:text-stone-500"
-              />
-            </div>
-            
-            <div>
-              <Label className="text-white">Subir CV/Hoja de Vida (opcional)</Label>
-              <Input
-                type="file"
-                accept=".pdf,.doc,.docx,image/*"
-                onChange={handleCVUpload}
-                disabled={uploadingCV}
-                className="cursor-pointer bg-stone-800 border-stone-700 text-white"
-              />
-              {applyForm.cv_url && (
-                <p className="text-sm text-emerald-400 mt-1 flex items-center gap-1">
-                  <FileText className="w-4 h-4" />
-                  CV cargado ✓
-                </p>
-              )}
-              {uploadingCV && <p className="text-sm text-stone-500 mt-1">Cargando...</p>}
-            </div>
-            
-            <div>
-              <Label className="text-white">Mensaje para el empleador</Label>
-              <Textarea
-                value={applyForm.message}
-                onChange={(e) => setApplyForm({ ...applyForm, message: e.target.value })}
-                placeholder="Preséntate brevemente..."
-                rows={4}
-                className="bg-stone-800 border-stone-700 text-white placeholder:text-stone-500"
-              />
-            </div>
-            
-            <Button type="submit" className="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white shadow-lg shadow-amber-900/30" disabled={uploadingCV}>
-              <Send className="w-4 h-4 mr-2" />
-              Enviar Aplicación
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* View Applications Dialog */}
-      <Dialog open={showApplicationsDialog} onOpenChange={setShowApplicationsDialog}>
-        <DialogContent className="max-w-lg bg-stone-900 border-stone-700">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-white">
-              <Users className="w-5 h-5 text-amber-400" />
-              Aplicaciones: {selectedJob?.title}
-            </DialogTitle>
-          </DialogHeader>
-          
-          {applications.length === 0 ? (
-            <div className="text-center py-8">
-              <Users className="w-12 h-12 mx-auto text-stone-600 mb-3" />
-              <p className="text-stone-500">Aún no hay aplicaciones</p>
-            </div>
-          ) : (
-            <div className="space-y-3 max-h-96 overflow-y-auto">
-              {applications.map(app => (
-                <div key={app.application_id} className="bg-stone-800/50 rounded-xl p-4 border border-stone-700">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-bold text-white">{app.applicant_name}</p>
-                      <p className="text-sm text-stone-400 flex items-center gap-1 mt-1">
-                        <Phone className="w-3 h-3" />
-                        {app.contact}
-                      </p>
-                    </div>
-                    <span className="text-xs text-stone-500">
-                      {new Date(app.created_at).toLocaleDateString('es-HN')}
-                    </span>
-                  </div>
-                  
-                  {app.message && (
-                    <p className="text-sm text-stone-400 mt-3 bg-stone-900/50 rounded-lg p-3 border border-stone-700">
-                      &quot;{app.message}&quot;
-                    </p>
-                  )}
-                  
-                  {app.cv_url && (
-                    <a 
-                      href={app.cv_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 mt-3 text-sm text-amber-400 hover:text-amber-300"
-                    >
-                      <FileText className="w-4 h-4" />
-                      Ver CV
-                    </a>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
         </DialogContent>
       </Dialog>
 
