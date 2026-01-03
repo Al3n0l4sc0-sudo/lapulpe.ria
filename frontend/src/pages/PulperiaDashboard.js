@@ -944,6 +944,31 @@ const PulperiaDashboard = () => {
                 </div>
               </div>
             )}
+
+            {/* v1.1 - Acciones Especiales */}
+            <div className="grid grid-cols-3 gap-2 mb-4">
+              <button
+                onClick={() => setShowReports(true)}
+                className="flex flex-col items-center gap-1 p-3 bg-green-900/20 border border-green-800/30 rounded-xl hover:bg-green-900/30 transition-colors"
+              >
+                <BarChart3 className="w-5 h-5 text-green-400" />
+                <span className="text-xs text-green-400 font-medium">Reportes</span>
+              </button>
+              <button
+                onClick={() => setShowAITips(true)}
+                className="flex flex-col items-center gap-1 p-3 bg-purple-900/20 border border-purple-800/30 rounded-xl hover:bg-purple-900/30 transition-colors"
+              >
+                <Bot className="w-5 h-5 text-purple-400" />
+                <span className="text-xs text-purple-400 font-medium">Tips IA</span>
+              </button>
+              <button
+                onClick={() => setShowShareDialog(true)}
+                className="flex flex-col items-center gap-1 p-3 bg-blue-900/20 border border-blue-800/30 rounded-xl hover:bg-blue-900/30 transition-colors"
+              >
+                <Share2 className="w-5 h-5 text-blue-400" />
+                <span className="text-xs text-blue-400 font-medium">Compartir</span>
+              </button>
+            </div>
             
             {/* Unlocked Achievements */}
             {achievements.length > 0 ? (
