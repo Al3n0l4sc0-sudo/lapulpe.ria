@@ -402,6 +402,8 @@ const PulperiaDashboard = () => {
       phone: selectedPulperia.phone || '',
       email: selectedPulperia.email || '',
       website: selectedPulperia.website || '',
+      instagram_url: selectedPulperia.instagram_url || '',
+      facebook_url: selectedPulperia.facebook_url || '',
       hours: selectedPulperia.hours || '',
       lat: selectedPulperia.location?.lat?.toString() || '',
       lng: selectedPulperia.location?.lng?.toString() || '',
