@@ -88,6 +88,7 @@ const PulperiaProfile = () => {
   const [togglingFavorite, setTogglingFavorite] = useState(false);
   const [viewingImage, setViewingImage] = useState(null);
   const [viewingAnnouncement, setViewingAnnouncement] = useState(null);
+  const [showShareDialog, setShowShareDialog] = useState(false);
 
   // Check if favorite
   const checkFavorite = useCallback(async () => {
