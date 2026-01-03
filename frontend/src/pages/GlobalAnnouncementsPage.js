@@ -3,7 +3,7 @@ import { api } from '../config/api';
 import { useNavigate } from 'react-router-dom';
 import { 
   Megaphone, Calendar, ExternalLink, ChevronRight, Sparkles, 
-  Store, Clock, ArrowRight, Star, Gift, Zap, Image as ImageIcon
+  Store, Clock, ArrowRight, Star, Gift, Zap
 } from 'lucide-react';
 import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
@@ -15,7 +15,6 @@ const GlobalAnnouncementsPage = ({ user }) => {
   const [globalAnnouncements, setGlobalAnnouncements] = useState([]);
   const [featuredAds, setFeaturedAds] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('global');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,6 +47,12 @@ const GlobalAnnouncementsPage = ({ user }) => {
   };
 
   const cartCount = JSON.parse(localStorage.getItem('cart') || '[]').length;
+  
+  // Combinar todos los anuncios
+  const allAnnouncements = [
+    ...globalAnnouncements.map(a => ({ ...a, type: 'global' })),
+    ...featuredAds.map(a => ({ ...a, type: 'featured' }))
+  ];
 
   if (loading) {
     return (
@@ -82,152 +87,105 @@ const GlobalAnnouncementsPage = ({ user }) => {
           </div>
         </div>
 
-        {/* All Announcements - No Tabs */}
+        {/* All Announcements */}
         <div className="space-y-4">
-              </span>
-            )}
-          </button>
-        </div>
-
-        {/* Global Announcements Tab */}
-        {activeTab === 'global' && (
-          <div className="space-y-4">
-            {globalAnnouncements.length === 0 ? (
-              <div className="bg-stone-800/50 backdrop-blur-sm rounded-2xl border border-stone-700/50 p-8 text-center">
-                <Megaphone className="w-12 h-12 mx-auto text-stone-600 mb-3" />
-                <h3 className="text-white font-bold mb-2">Sin anuncios globales</h3>
-                <p className="text-stone-500 text-sm">No hay anuncios activos en este momento</p>
-              </div>
-            ) : (
-              globalAnnouncements.map((announcement, index) => (
-                <div 
-                  key={announcement.announcement_id}
-                  className={`bg-stone-800/50 backdrop-blur-sm rounded-2xl border overflow-hidden transition-all hover:border-orange-500/50 ${
-                    announcement.priority > 5 ? 'border-orange-500/30' : 'border-stone-700/50'
-                  }`}
-                >
-                  {/* Priority Badge */}
-                  {announcement.priority > 5 && (
-                    <div className="bg-gradient-to-r from-orange-600 to-amber-500 px-4 py-1.5 flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-white" />
-                      <span className="text-white text-xs font-bold">DESTACADO</span>
-                    </div>
+          {allAnnouncements.length === 0 ? (
+            <div className="bg-stone-800/50 backdrop-blur-sm rounded-2xl border border-stone-700/50 p-8 text-center">
+              <Megaphone className="w-12 h-12 mx-auto text-stone-600 mb-3" />
+              <h3 className="text-white font-bold mb-2">Sin anuncios</h3>
+              <p className="text-stone-500 text-sm">No hay anuncios activos en este momento</p>
+            </div>
+          ) : (
+            allAnnouncements.map((item, index) => (
+              <div 
+                key={item.announcement_id || item.ad_id || index}
+                className={`bg-stone-800/50 backdrop-blur-sm rounded-2xl border overflow-hidden transition-all hover:border-orange-500/50 ${
+                  item.type === 'global' && item.priority > 5 ? 'border-orange-500/30' : 'border-stone-700/50'
+                }`}
+              >
+                {/* Priority Badge for Global */}
+                {item.type === 'global' && item.priority > 5 && (
+                  <div className="bg-gradient-to-r from-orange-600 to-amber-500 px-4 py-1.5 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-white" />
+                    <span className="text-white text-xs font-bold">DESTACADO</span>
+                  </div>
+                )}
+                
+                {/* Sponsored Badge for Featured */}
+                {item.type === 'featured' && (
+                  <div className="bg-gradient-to-r from-amber-600 to-yellow-500 px-4 py-1.5 flex items-center gap-2">
+                    <Star className="w-4 h-4 text-white" />
+                    <span className="text-white text-xs font-bold">PATROCINADO</span>
+                  </div>
+                )}
+                
+                {/* Image - Fixed aspect ratio */}
+                {(item.image_url) && (
+                  <div className="relative bg-stone-900 aspect-video">
+                    <img 
+                      src={item.image_url} 
+                      alt={item.title || item.pulperia_name || 'Anuncio'}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                
+                {/* Content */}
+                <div className="p-4">
+                  <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                    {item.type === 'global' && item.priority > 5 && (
+                      <Zap className="w-5 h-5 text-amber-400" />
+                    )}
+                    {item.title || item.pulperia_name}
+                  </h3>
+                  
+                  {(item.content || item.description) && (
+                    <p className="text-stone-400 text-sm mb-4 whitespace-pre-wrap">
+                      {item.content || item.description}
+                    </p>
                   )}
                   
-                  {/* Content */}
-                  <div className="p-4">
-                    {/* Image - Fixed aspect ratio */}
-                    {announcement.image_url && (
-                      <div className="relative mb-4 rounded-xl overflow-hidden bg-stone-900 aspect-video">
-                        <img 
-                          src={announcement.image_url} 
-                          alt={announcement.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
+                  {/* Footer */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs text-stone-500">
+                      <Calendar className="w-3 h-3" />
+                      {formatDate(item.created_at)}
+                      {item.type === 'featured' && item.pulperia_name && (
+                        <>
+                          <span className="mx-1">•</span>
+                          <Store className="w-3 h-3" />
+                          {item.pulperia_name}
+                        </>
+                      )}
+                    </div>
+                    
+                    {item.link_url && (
+                      <a 
+                        href={item.link_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-orange-400 text-sm font-medium hover:text-orange-300 transition-colors"
+                      >
+                        Ver más
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
                     )}
                     
-                    {/* Title & Content */}
-                    <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
-                      {announcement.priority > 5 && (
-                        <Zap className="w-5 h-5 text-amber-400" />
-                      )}
-                      {announcement.title}
-                    </h3>
-                    <p className="text-stone-400 text-sm mb-4 whitespace-pre-wrap">
-                      {announcement.content}
-                    </p>
-                    
-                    {/* Footer */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-xs text-stone-500">
-                        <Calendar className="w-3 h-3" />
-                        {formatDate(announcement.created_at)}
-                        {announcement.expires_at && (
-                          <>
-                            <span className="mx-1">•</span>
-                            <Clock className="w-3 h-3" />
-                            Expira: {formatDate(announcement.expires_at)}
-                          </>
-                        )}
-                      </div>
-                      
-                      {announcement.link_url && (
-                        <a 
-                          href={announcement.link_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-orange-400 text-sm font-medium hover:text-orange-300 transition-colors"
-                        >
-                          Ver más
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      )}
-                    </div>
+                    {item.type === 'featured' && item.pulperia_id && (
+                      <button
+                        onClick={() => navigate(`/pulperia/${item.pulperia_id}`)}
+                        className="flex items-center gap-1 text-orange-400 text-sm font-medium hover:text-orange-300 transition-colors"
+                      >
+                        Ver tienda
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
-              ))
-            )}
-          </div>
-        )}
-
-        {/* Featured Ads Tab */}
-        {activeTab === 'featured' && (
-          <div className="space-y-4">
-            {featuredAds.length === 0 ? (
-              <div className="bg-stone-800/50 backdrop-blur-sm rounded-2xl border border-stone-700/50 p-8 text-center">
-                <Star className="w-12 h-12 mx-auto text-stone-600 mb-3" />
-                <h3 className="text-white font-bold mb-2">Sin anuncios destacados</h3>
-                <p className="text-stone-500 text-sm">Las pulperías pueden promocionarse aquí</p>
               </div>
-            ) : (
-              featuredAds.map((ad) => (
-                <button 
-                  key={ad.ad_id}
-                  onClick={() => navigate(ad.link_url || `/p/${ad.pulperia_id}`)}
-                  className="w-full bg-stone-800/50 backdrop-blur-sm rounded-2xl border border-stone-700/50 overflow-hidden text-left transition-all hover:border-amber-500/50 hover:scale-[1.01]"
-                >
-                  {/* Image - Fixed aspect ratio */}
-                  {ad.image_url && (
-                    <div className="relative bg-stone-900 aspect-video">
-                      <img 
-                        src={ad.image_url} 
-                        alt={ad.title || ad.pulperia_name}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute bottom-3 left-3 right-3">
-                        <span className="bg-amber-500/90 text-black text-xs font-bold px-2 py-1 rounded-full">
-                          PATROCINADO
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Content */}
-                  <div className="p-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-white font-bold truncate">
-                          {ad.title || ad.pulperia_name}
-                        </h3>
-                        {ad.description && (
-                          <p className="text-stone-400 text-sm line-clamp-2 mt-1">
-                            {ad.description}
-                          </p>
-                        )}
-                        <div className="flex items-center gap-2 mt-2">
-                          <Store className="w-3 h-3 text-stone-500" />
-                          <span className="text-stone-500 text-xs">{ad.pulperia_name}</span>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-stone-600 flex-shrink-0" />
-                    </div>
-                  </div>
-                </button>
-              ))
-            )}
-          </div>
-        )}
+            ))
+          )}
+        </div>
 
         {/* Quick Access Section */}
         <div className="mt-8">
