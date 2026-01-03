@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { MapPin, Search, ShoppingCart, User, LayoutDashboard, History, Megaphone, Store } from 'lucide-react';
+import { MapPin, Search, ShoppingCart, User, LayoutDashboard, History, Megaphone, Store, Briefcase } from 'lucide-react';
 
 const BottomNav = ({ user, cartCount = 0, activeTab }) => {
   const navigate = useNavigate();
@@ -12,13 +12,13 @@ const BottomNav = ({ user, cartCount = 0, activeTab }) => {
 
   const navItems = user?.user_type === 'pulperia' ? [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard', testId: 'nav-dashboard', tab: 'dashboard' },
+    { icon: Briefcase, label: 'Chamba', path: '/jobs', testId: 'nav-jobs', tab: 'jobs' },
     { icon: History, label: 'Historial', path: '/order-history', testId: 'nav-history', tab: 'historial' },
-    { icon: Megaphone, label: 'Anuncios', path: '/anuncios', testId: 'nav-anuncios', tab: 'anuncios' },
     { icon: User, label: 'Perfil', path: '/profile', testId: 'nav-profile', tab: 'perfil' },
   ] : [
     { icon: MapPin, label: 'Mapa', path: '/map', testId: 'nav-map', tab: 'mapa' },
     { icon: Search, label: 'Buscar', path: '/search', testId: 'nav-search', tab: 'buscar' },
-    { icon: Megaphone, label: 'Anuncios', path: '/anuncios', testId: 'nav-anuncios', tab: 'anuncios' },
+    { icon: Briefcase, label: 'Chamba', path: '/jobs', testId: 'nav-jobs', tab: 'jobs' },
     { icon: ShoppingCart, label: 'Carrito', path: '/cart', testId: 'nav-cart', tab: 'carrito', badge: cartCount },
     { icon: User, label: 'Perfil', path: '/profile', testId: 'nav-profile', tab: 'perfil' },
   ];
