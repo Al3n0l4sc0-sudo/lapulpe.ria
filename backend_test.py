@@ -492,6 +492,57 @@ class BackendTester:
                 False,
                 f"Error testing online-only pulperia creation: {str(e)}"
             )
+    
+    def run_all_tests(self):
+        """Run all backend tests"""
+        print("=" * 60)
+        print("TESTING BACKEND APIs - La Pulpería")
+        print("=" * 60)
+        print(f"Backend URL: {self.base_url}")
+        print(f"Test started at: {datetime.now().isoformat()}")
+        print()
+        
+        # Test backend connectivity first
+        self.test_backend_health()
+        
+        # Test specific requirements from review request
+        print("🔍 TESTING REVIEW REQUEST REQUIREMENTS:")
+        print("1. Email Service Configuration")
+        print("2. Create Online-Only Pulperia functionality")
+        print()
+        
+        self.test_email_service_configuration()
+        self.test_create_online_only_pulperia()
+        
+        # Test other endpoints for completeness
+        print("🔍 TESTING OTHER ENDPOINTS:")
+        self.test_jobs_endpoint()
+        self.test_pulperias_endpoint()
+        self.test_featured_ads_endpoint()
+        
+        # Summary
+        print("=" * 60)
+        print("TEST SUMMARY")
+        print("=" * 60)
+        
+        total_tests = len(self.test_results)
+        passed_tests = len([t for t in self.test_results if t['success']])
+        failed_tests = total_tests - passed_tests
+        
+        print(f"Total tests: {total_tests}")
+        print(f"Passed: {passed_tests}")
+        print(f"Failed: {failed_tests}")
+        print(f"Success rate: {(passed_tests/total_tests)*100:.1f}%")
+        
+        if failed_tests > 0:
+            print("\nFAILED TESTS:")
+            for test in self.test_results:
+                if not test['success']:
+                    print(f"❌ {test['test']}: {test['details']}")
+        
+        print(f"\nTest completed at: {datetime.now().isoformat()}")
+        
+        return failed_tests == 0
         """Test basic backend connectivity"""
         try:
             # Try to access the root API endpoint
