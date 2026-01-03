@@ -10,6 +10,7 @@ import {
 import BottomNav from '../components/BottomNav';
 import Header from '../components/Header';
 import AnimatedBackground from '../components/AnimatedBackground';
+import GalacticLoader from '../components/GalacticLoader';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -399,11 +400,10 @@ const JobsServices = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-stone-950">
+      <div className="min-h-screen flex items-center justify-center bg-stone-950 relative overflow-hidden">
         <AnimatedBackground color="yellow" />
-        <div className="text-center relative z-10">
-          <div className="w-16 h-16 border-4 border-amber-400/30 rounded-full animate-spin border-t-amber-500 mx-auto"></div>
-          <p className="mt-4 text-stone-500 font-medium">Cargando...</p>
+        <div className="relative z-10">
+          <GalacticLoader size="default" text="Cargando chambas..." />
         </div>
       </div>
     );
