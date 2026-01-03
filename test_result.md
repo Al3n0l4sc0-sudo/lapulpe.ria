@@ -145,15 +145,18 @@
 backend:
   - task: "Global Announcements API"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
         - agent: "main"
         - comment: "Implementado sistema completo de anuncios globales con CRUD"
+        - working: true
+        - agent: "testing"
+        - comment: "✅ TESTING COMPLETED - Global Announcements API funciona perfectamente. GET /api/global-announcements retorna array vacío [] inicialmente como se esperaba. GET /api/health retorna status healthy correctamente. Ambos endpoints probados con curl y backend_test.py con 100% éxito. Sistema listo para uso."
 
 frontend:
   - task: "BottomNav - Pestaña Anuncios"
