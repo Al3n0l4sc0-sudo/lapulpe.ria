@@ -470,13 +470,14 @@ const PulperiaProfile = () => {
       {/* Content */}
       <div className="px-4">
         {activeTab === 'products' && (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             {products.map(product => {
               const qty = getCartQuantity(product.product_id);
               return (
-                <div key={product.product_id} className="bg-stone-900 rounded-2xl border border-stone-800 overflow-hidden hover:border-stone-700 transition-all group">
+                <div key={product.product_id} className="product-card-galactic group">
+                  {/* Imagen del producto - Más grande */}
                   <div 
-                    className="h-36 bg-stone-800 flex items-center justify-center overflow-hidden relative cursor-pointer"
+                    className="product-image-container h-44 bg-gradient-to-br from-stone-900 to-stone-950 flex items-center justify-center cursor-pointer"
                     onClick={() => product.image_url && setViewingImage({ url: product.image_url, name: product.name })}
                   >
                     {product.image_url ? (
