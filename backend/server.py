@@ -57,8 +57,8 @@ class Pulperia(BaseModel):
     owner_user_id: str
     name: str
     description: Optional[str] = None
-    address: str
-    location: dict
+    address: Optional[str] = None  # Optional for online-only stores
+    location: Optional[dict] = None  # Optional for online-only stores
     phone: Optional[str] = None
     email: Optional[str] = None
     website: Optional[str] = None
@@ -69,6 +69,7 @@ class Pulperia(BaseModel):
     review_count: Optional[int] = 0
     title_font: Optional[str] = "default"
     background_color: Optional[str] = "#DC2626"
+    is_online_only: Optional[bool] = False  # True for online-only stores
     created_at: datetime
 
 class Product(BaseModel):
@@ -335,8 +336,8 @@ class SessionRequest(BaseModel):
 class PulperiaCreate(BaseModel):
     name: str
     description: Optional[str] = None
-    address: str
-    location: dict
+    address: Optional[str] = None  # Optional for online-only stores
+    location: Optional[dict] = None  # Optional for online-only stores
     phone: Optional[str] = None
     email: Optional[str] = None
     website: Optional[str] = None
@@ -349,6 +350,7 @@ class PulperiaCreate(BaseModel):
     badge: Optional[str] = None
     is_suspended: Optional[bool] = False
     suspension_reason: Optional[str] = None
+    is_online_only: Optional[bool] = False  # True for online-only stores
 
 class ProductCreate(BaseModel):
     name: str
