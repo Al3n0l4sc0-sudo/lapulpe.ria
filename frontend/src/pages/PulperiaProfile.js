@@ -363,29 +363,6 @@ const PulperiaProfile = () => {
               <Package className="w-12 h-12 text-white/70" />
             </div>
           )}
-          
-          {/* Achievements Badges - Mini display next to logo */}
-          {achievements.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-2">
-              {achievements.slice(0, 3).map(ach => {
-                const info = ACHIEVEMENT_INFO[ach.badge_id] || { icon: '🏅', color: 'from-gray-600 to-gray-500' };
-                return (
-                  <div 
-                    key={ach.achievement_id}
-                    className={`w-8 h-8 rounded-lg bg-gradient-to-br ${info.color} flex items-center justify-center shadow-lg ${info.legendary ? 'ring-2 ring-yellow-400' : ''}`}
-                    title={info.name}
-                  >
-                    <span className="text-sm">{info.icon}</span>
-                  </div>
-                );
-              })}
-              {achievements.length > 3 && (
-                <div className="w-8 h-8 rounded-lg bg-stone-800 flex items-center justify-center text-stone-400 text-xs font-bold">
-                  +{achievements.length - 3}
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
 
