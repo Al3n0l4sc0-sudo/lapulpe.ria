@@ -341,6 +341,160 @@ const Header = ({ user, title, subtitle, onOrderUpdate }) => {
         </div>
       </div>
     </header>
+    
+    {/* Notifications Dropdown - Outside header to avoid z-index issues */}
+    {showDropdown && user && (
+      <div 
+        className="fixed inset-0 z-[9999]"
+        onClick={() => setShowDropdown(false)}
+      >
+        <div 
+          className="fixed right-4 top-16 w-[calc(100%-2rem)] max-w-md bg-stone-900 rounded-2xl shadow-2xl shadow-black/70 border border-stone-700/50 overflow-hidden"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="px-4 py-3 border-b border-stone-700/50 flex items-center justify-between bg-gradient-to-r from-stone-800 to-stone-900">
+            <h3 className="font-bold text-white">Notificaciones</h3>
+            <button 
+              onClick={() => setShowDropdown(false)}
+              className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5 text-stone-400" />
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="max-h-[70vh] overflow-y-auto">
+            {/* Enable notifications banner */}
+            {notificationPermission !== 'granted' && (
+              <div className="p-3 bg-amber-500/10 border-b border-amber-500/20">
+                <div className="flex items-center gap-3">
+                  <BellRing className="w-5 h-5 text-amber-400 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-amber-200">Activa las notificaciones</p>
+                    <p className="text-xs text-amber-400/70">Recibe alertas de nuevos pedidos</p>
+                  </div>
+                  <button
+                    onClick={handleEnableNotifications}
+                    className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded-lg transition-colors"
+                  >
+                    Activar
+                  </button>
+                </div>
+              </div>
+            )}
+            
+            {loading ? (
+              <div className="p-8 text-center">
+                <div className="w-6 h-6 border-2 border-red-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+              </div>
+            ) : activeNotifications.length === 0 ? (
+              <div className="p-8 text-center">
+                <Bell className="w-10 h-10 mx-auto text-stone-700 mb-2" />
+                <p className="text-stone-500 text-sm">No hay notificaciones</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-stone-800">
+                {activeNotifications.map((notification) => {
+                  const status = getStatusConfig(notification.status);
+                  const StatusIcon = status.icon;
+                  const isSelected = selectedOrder?.order_id === notification.order_id;
+                  
+                  return (
+                    <div 
+                      key={notification.notification_id || notification.order_id}
+                      className={`p-3 transition-all ${isSelected ? 'bg-stone-800' : 'hover:bg-stone-800/50'}`}
+                    >
+                      <button
+                        onClick={() => setSelectedOrder(isSelected ? null : notification)}
+                        className="w-full text-left"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`w-10 h-10 rounded-xl ${status.bg} flex items-center justify-center flex-shrink-0`}>
+                            <StatusIcon className={`w-5 h-5 ${status.color}`} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-white text-sm truncate">
+                                {notification.customer_name || 'Cliente'}
+                              </span>
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${status.bg} ${status.color}`}>
+                                {status.text}
+                              </span>
+                            </div>
+                            <p className="text-xs text-stone-500 mt-0.5">
+                              {notification.items?.length || 0} productos • L {notification.total?.toFixed(2)}
+                            </p>
+                          </div>
+                          <ChevronRight className={`w-4 h-4 text-stone-600 transition-transform ${isSelected ? 'rotate-90' : ''}`} />
+                        </div>
+                      </button>
+                      
+                      {/* Expanded Order Details */}
+                      {isSelected && (
+                        <div className="mt-3 pt-3 border-t border-stone-700/50">
+                          <div className="space-y-2 mb-3">
+                            {notification.items?.map((item, idx) => (
+                              <div key={idx} className="flex justify-between text-sm">
+                                <span className="text-stone-400">{item.quantity}x {item.name}</span>
+                                <span className="text-stone-300">L {(item.price * item.quantity).toFixed(2)}</span>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          {/* Action Buttons */}
+                          <div className="grid grid-cols-2 gap-2">
+                            {notification.status === 'pending' && (
+                              <button
+                                onClick={() => handleUpdateOrderStatus(notification.order_id, 'accepted')}
+                                disabled={updatingStatus}
+                                className="py-2.5 px-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                              >
+                                <Sparkles className="w-4 h-4" />
+                                Aceptar
+                              </button>
+                            )}
+                            {(notification.status === 'pending' || notification.status === 'accepted') && (
+                              <button
+                                onClick={() => handleUpdateOrderStatus(notification.order_id, 'ready')}
+                                disabled={updatingStatus}
+                                className="py-2.5 px-3 bg-green-600 hover:bg-green-500 text-white text-sm font-medium rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                              >
+                                <CheckCircle className="w-4 h-4" />
+                                Lista
+                              </button>
+                            )}
+                            {notification.status === 'ready' && (
+                              <button
+                                onClick={() => handleUpdateOrderStatus(notification.order_id, 'completed')}
+                                disabled={updatingStatus}
+                                className="py-2.5 px-3 bg-stone-600 hover:bg-stone-500 text-white text-sm font-medium rounded-xl transition-colors disabled:opacity-50 col-span-2 flex items-center justify-center gap-2"
+                              >
+                                <CheckCircle className="w-4 h-4" />
+                                Marcar Completada
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleUpdateOrderStatus(notification.order_id, 'cancelled')}
+                              disabled={updatingStatus}
+                              className="py-2.5 px-3 bg-red-600/20 hover:bg-red-600/30 text-red-400 text-sm font-medium rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                            >
+                              <XCircle className="w-4 h-4" />
+                              Cancelar
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
 
