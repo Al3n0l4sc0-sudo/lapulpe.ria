@@ -191,7 +191,8 @@ const PulperiaDashboard = () => {
     logo_url: '',
     banner_url: '',
     title_font: 'default',
-    background_color: '#DC2626'
+    background_color: '#DC2626',
+    is_online_only: false
   });
   const [gettingLocation, setGettingLocation] = useState(false);
   const [editingPulperia, setEditingPulperia] = useState(false);
