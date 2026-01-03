@@ -240,6 +240,63 @@ const AdminPanel = () => {
     }
   };
 
+  // Global Announcements Functions
+  const handleCreateGlobalAnnouncement = async () => {
+    if (!globalAnnTitle.trim() || !globalAnnContent.trim()) {
+      toast.error('Título y contenido son requeridos');
+      return;
+    }
+    
+    try {
+      await api.post('/api/admin/global-announcements', {
+        title: globalAnnTitle,
+        content: globalAnnContent,
+        image_url: globalAnnImageUrl || null,
+        link_url: globalAnnLinkUrl || null,
+        priority: globalAnnPriority,
+        expires_days: globalAnnExpiresDays
+      });
+      
+      toast.success('¡Anuncio global creado!');
+      setShowGlobalAnnouncementDialog(false);
+      resetGlobalAnnouncementForm();
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Error al crear anuncio');
+    }
+  };
+
+  const handleDeleteGlobalAnnouncement = async (announcementId) => {
+    if (!confirm('¿Seguro que quieres eliminar este anuncio global?')) return;
+    
+    try {
+      await api.delete(`/api/admin/global-announcements/${announcementId}`);
+      toast.success('Anuncio eliminado');
+      fetchData();
+    } catch (error) {
+      toast.error('Error al eliminar anuncio');
+    }
+  };
+
+  const handleToggleGlobalAnnouncement = async (announcementId) => {
+    try {
+      await api.put(`/api/admin/global-announcements/${announcementId}/toggle`);
+      toast.success('Estado actualizado');
+      fetchData();
+    } catch (error) {
+      toast.error('Error al actualizar estado');
+    }
+  };
+
+  const resetGlobalAnnouncementForm = () => {
+    setGlobalAnnTitle('');
+    setGlobalAnnContent('');
+    setGlobalAnnImageUrl('');
+    setGlobalAnnLinkUrl('');
+    setGlobalAnnPriority(0);
+    setGlobalAnnExpiresDays(30);
+  };
+
   const hasActiveAdSlot = (pulperiaId) => {
     const now = new Date();
     return featuredAdSlots.some(slot => 
