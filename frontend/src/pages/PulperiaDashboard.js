@@ -328,15 +328,18 @@ const PulperiaDashboard = () => {
   const handleCreatePulperia = async (e) => {
     e.preventDefault();
     
-    if (!editingPulperia && (!pulperiaForm.lat || !pulperiaForm.lng)) {
-      toast.error('Por favor obtén tu ubicación antes de crear la pulpería');
+    // Only require location if not online-only
+    if (!editingPulperia && !pulperiaForm.is_online_only && (!pulperiaForm.lat || !pulperiaForm.lng)) {
+      toast.error('Por favor obtén tu ubicación o marca la opción "Solo en línea"');
       return;
     }
     
     if (editingPulperia) {
       await updatePulperia();
     } else {
-      await createPulperia(parseFloat(pulperiaForm.lat), parseFloat(pulperiaForm.lng));
+      const lat = pulperiaForm.is_online_only ? 0 : parseFloat(pulperiaForm.lat);
+      const lng = pulperiaForm.is_online_only ? 0 : parseFloat(pulperiaForm.lng);
+      await createPulperia(lat, lng);
     }
   };
 
