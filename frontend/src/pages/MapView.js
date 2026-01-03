@@ -357,26 +357,6 @@ const MapView = () => {
                 ))}
               </div>
             </div>
-            
-            {/* Search Bar */}
-            <div className="flex gap-2">
-              <input
-                data-testid="search-input"
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                placeholder="Buscar pulpería..."
-                className="flex-1 bg-stone-900 text-white border border-stone-800 focus:ring-2 focus:ring-red-500 focus:border-transparent rounded-xl py-3 px-4 placeholder:text-stone-600"
-              />
-              <button
-                data-testid="search-button"
-                onClick={handleSearch}
-                className="bg-red-600 hover:bg-red-500 text-white font-medium px-5 rounded-xl transition-colors"
-              >
-                Buscar
-              </button>
-            </div>
           </div>
 
           {/* Featured Pulperias */}
