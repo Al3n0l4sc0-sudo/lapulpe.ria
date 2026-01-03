@@ -47,9 +47,11 @@ export const AuthProvider = ({ children }) => {
       if (error.response?.status === 401) {
         localStorage.removeItem('session_token');
         setUser(null);
+      } else {
+        // For network errors, timeout, etc. - try to use cached user data
+        // or keep the token and let the user retry
+        console.log('[Auth] Network error, keeping session token for retry');
       }
-      // For other errors (network, timeout, etc.) keep the user state 
-      // and don't clear the token - the session might still be valid
       return null;
     } finally {
       setLoading(false);
