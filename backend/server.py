@@ -1893,6 +1893,191 @@ async def delete_job(job_id: str, authorization: Optional[str] = Header(None), s
     return {"message": "Empleo eliminado"}
 
 # ============================================
+# JOB APPLICATIONS ENDPOINTS
+# ============================================
+
+class JobApplicationCreate(BaseModel):
+    city: str
+    age: int
+    cv_url: Optional[str] = None
+    message: Optional[str] = None
+
+@api_router.post("/jobs/{job_id}/apply")
+async def apply_to_job(job_id: str, application_data: JobApplicationCreate, authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
+    """Apply to a job posting"""
+    user = await get_current_user(authorization, session_token)
+    
+    # Validate age
+    if application_data.age < 18:
+        raise HTTPException(status_code=400, detail="Debes ser mayor de 18 años para aplicar")
+    
+    # Get job details
+    job = await db.jobs.find_one({"job_id": job_id}, {"_id": 0})
+    if not job:
+        raise HTTPException(status_code=404, detail="Empleo no encontrado")
+    
+    # Check if user is trying to apply to their own job
+    if job["employer_user_id"] == user.user_id:
+        raise HTTPException(status_code=400, detail="No puedes aplicar a tu propio empleo")
+    
+    # Check if already applied
+    existing = await db.job_applications.find_one({
+        "job_id": job_id,
+        "applicant_user_id": user.user_id
+    })
+    if existing:
+        raise HTTPException(status_code=400, detail="Ya has aplicado a este empleo")
+    
+    application_id = f"app_{uuid.uuid4().hex[:12]}"
+    application_doc = {
+        "application_id": application_id,
+        "job_id": job_id,
+        "job_title": job["title"],
+        "pulperia_id": job.get("pulperia_id"),
+        "pulperia_name": job.get("pulperia_name"),
+        "employer_user_id": job["employer_user_id"],
+        "applicant_user_id": user.user_id,
+        "applicant_name": user.name,
+        "applicant_email": user.email,
+        "applicant_city": application_data.city,
+        "applicant_age": application_data.age,
+        "cv_url": application_data.cv_url,
+        "message": application_data.message,
+        "status": "recibida",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.job_applications.insert_one(application_doc)
+    
+    # Send notification to employer
+    await send_ws_notification(
+        job["employer_user_id"],
+        f"📋 Nueva aplicación de {user.name} para: {job['title']}",
+        "job_application"
+    )
+    
+    return await db.job_applications.find_one({"application_id": application_id}, {"_id": 0})
+
+@api_router.get("/jobs/{job_id}/applications")
+async def get_job_applications(job_id: str, authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
+    """Get all applications for a job (employer only)"""
+    user = await get_current_user(authorization, session_token)
+    
+    job = await db.jobs.find_one({"job_id": job_id}, {"_id": 0})
+    if not job:
+        raise HTTPException(status_code=404, detail="Empleo no encontrado")
+    
+    if job["employer_user_id"] != user.user_id:
+        raise HTTPException(status_code=403, detail="Solo el empleador puede ver las aplicaciones")
+    
+    applications = await db.job_applications.find(
+        {"job_id": job_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    return applications
+
+@api_router.get("/my-job-applications")
+async def get_my_applications(authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
+    """Get all job applications submitted by the current user"""
+    user = await get_current_user(authorization, session_token)
+    
+    applications = await db.job_applications.find(
+        {"applicant_user_id": user.user_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    return applications
+
+@api_router.get("/my-jobs")
+async def get_my_jobs(authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
+    """Get all jobs posted by the current user"""
+    user = await get_current_user(authorization, session_token)
+    
+    jobs = await db.jobs.find(
+        {"employer_user_id": user.user_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    # Add application count to each job
+    for job in jobs:
+        count = await db.job_applications.count_documents({"job_id": job["job_id"]})
+        job["application_count"] = count
+        # Get pending applications count
+        pending = await db.job_applications.count_documents({
+            "job_id": job["job_id"],
+            "status": "recibida"
+        })
+        job["pending_applications"] = pending
+    
+    return jobs
+
+@api_router.put("/job-applications/{application_id}/status")
+async def update_application_status(
+    application_id: str, 
+    status: str,
+    rejection_reason: Optional[str] = None,
+    authorization: Optional[str] = Header(None), 
+    session_token: Optional[str] = Cookie(None)
+):
+    """Update job application status (employer only)"""
+    user = await get_current_user(authorization, session_token)
+    
+    if status not in ["recibida", "en_revision", "aceptada", "rechazada"]:
+        raise HTTPException(status_code=400, detail="Estado inválido")
+    
+    application = await db.job_applications.find_one({"application_id": application_id}, {"_id": 0})
+    if not application:
+        raise HTTPException(status_code=404, detail="Aplicación no encontrada")
+    
+    # Verify employer owns the job
+    job = await db.jobs.find_one({"job_id": application["job_id"]}, {"_id": 0})
+    if not job or job["employer_user_id"] != user.user_id:
+        raise HTTPException(status_code=403, detail="No tienes permiso para actualizar esta aplicación")
+    
+    update_data = {
+        "status": status,
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    if status == "rechazada" and rejection_reason:
+        update_data["rejection_reason"] = rejection_reason
+    
+    await db.job_applications.update_one(
+        {"application_id": application_id},
+        {"$set": update_data}
+    )
+    
+    # Send notification to applicant
+    if status == "aceptada":
+        message = f"🎉 ¡Felicidades! Tu aplicación para '{application['job_title']}' fue ACEPTADA"
+    elif status == "rechazada":
+        message = f"📋 Tu aplicación para '{application['job_title']}' no fue seleccionada. ¡Te animamos a seguir aplicando!"
+    else:
+        message = f"📋 Tu aplicación para '{application['job_title']}' está en revisión"
+    
+    await send_ws_notification(application["applicant_user_id"], message, "application_status")
+    
+    return await db.job_applications.find_one({"application_id": application_id}, {"_id": 0})
+
+@api_router.get("/pulperias/{pulperia_id}/job-applications")
+async def get_pulperia_job_applications(pulperia_id: str, authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
+    """Get all job applications for a pulperia's jobs"""
+    user = await get_current_user(authorization, session_token)
+    
+    # Verify ownership
+    pulperia = await db.pulperias.find_one({"pulperia_id": pulperia_id}, {"_id": 0})
+    if not pulperia or pulperia["owner_user_id"] != user.user_id:
+        raise HTTPException(status_code=403, detail="No tienes permiso")
+    
+    applications = await db.job_applications.find(
+        {"pulperia_id": pulperia_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(200)
+    
+    return applications
+
+# ============================================
 # SERVICE ENDPOINTS
 # ============================================
 
