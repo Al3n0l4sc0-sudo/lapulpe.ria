@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
-import { Store } from 'lucide-react';
+import { XCircle } from 'lucide-react';
 import { BACKEND_URL } from '../config/api';
 import { useAuth } from '../contexts/AuthContext';
+import GalacticLoader from '../components/GalacticLoader';
 
 // Detectar si es el dominio de producción (lapulperiahn.shop)
 const isCustomDomain = () => {
@@ -102,37 +103,45 @@ const GoogleCallback = () => {
   }, [searchParams, navigate, loginWithUser]);
 
   return (
-    <div className="min-h-screen bg-stone-950 flex items-center justify-center">
-      <div className="text-center px-4">
+    <div className="min-h-screen bg-stone-950 flex items-center justify-center relative overflow-hidden">
+      {/* Nebulosa de fondo */}
+      <div 
+        className="absolute inset-0 animate-nebula-pulse"
+        style={{
+          background: `
+            radial-gradient(ellipse 100% 80% at 30% 50%, rgba(220, 38, 38, 0.25), transparent 50%),
+            radial-gradient(ellipse 80% 60% at 70% 40%, rgba(250, 204, 21, 0.15), transparent 45%),
+            radial-gradient(ellipse 60% 50% at 50% 70%, rgba(147, 51, 234, 0.1), transparent 40%)
+          `
+        }}
+      />
+      {/* Estrellas */}
+      <div 
+        className="absolute inset-0 animate-twinkle"
+        style={{
+          backgroundImage: `
+            radial-gradient(1.5px 1.5px at 10% 20%, rgba(255,255,255,0.7), transparent),
+            radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.5), transparent),
+            radial-gradient(1.5px 1.5px at 50% 30%, rgba(255,255,255,0.6), transparent),
+            radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.5), transparent),
+            radial-gradient(1.5px 1.5px at 90% 45%, rgba(255,255,255,0.6), transparent)
+          `
+        }}
+      />
+      
+      <div className="relative z-10 text-center px-4">
         {error ? (
           <>
-            <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-10 h-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+            <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/30">
+              <XCircle className="w-10 h-10 text-red-400" />
             </div>
             <p className="text-red-400 font-medium text-lg">{error}</p>
             <p className="text-stone-500 text-sm mt-2">Redirigiendo...</p>
           </>
         ) : (
           <>
-            <div className="relative inline-block mb-6">
-              <div className="w-20 h-20 bg-gradient-to-br from-red-500 to-red-700 rounded-3xl flex items-center justify-center shadow-2xl shadow-red-500/30">
-                <Store className="w-10 h-10 text-white" />
-              </div>
-              <div className="absolute -inset-2">
-                <div className="w-full h-full border-4 border-red-300/20 rounded-full animate-spin border-t-red-400"></div>
-              </div>
-            </div>
-            
-            <h2 className="text-xl font-bold text-white mb-2">{status}</h2>
-            <p className="text-stone-400 text-sm">Conectando con Google</p>
-            
-            <div className="flex justify-center gap-2 mt-4">
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-            </div>
+            <GalacticLoader size="large" text={status} />
+            <p className="text-stone-500 text-sm mt-4">Conectando con Google</p>
           </>
         )}
       </div>
