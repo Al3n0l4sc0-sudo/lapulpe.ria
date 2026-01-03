@@ -241,6 +241,32 @@ const MapView = () => {
     }
   };
 
+  // Product search function
+  const handleProductSearch = async () => {
+    if (!productSearch.trim()) {
+      setProductResults([]);
+      setShowProductResults(false);
+      return;
+    }
+    
+    setSearchingProducts(true);
+    try {
+      const response = await api.get(`/api/products?search=${encodeURIComponent(productSearch)}`);
+      setProductResults(response.data || []);
+      setShowProductResults(true);
+    } catch (error) {
+      toast.error('Error buscando productos');
+    } finally {
+      setSearchingProducts(false);
+    }
+  };
+
+  const clearProductSearch = () => {
+    setProductSearch('');
+    setProductResults([]);
+    setShowProductResults(false);
+  };
+
   const cartCount = useMemo(() => cart.reduce((sum, item) => sum + item.quantity, 0), [cart]);
 
   // Display pulperias based on active tab
