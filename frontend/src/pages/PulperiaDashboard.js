@@ -349,7 +349,7 @@ const PulperiaDashboard = () => {
       const dataToSend = {
         name: pulperiaForm.name,
         description: pulperiaForm.description,
-        address: pulperiaForm.address,
+        address: pulperiaForm.is_online_only ? '' : pulperiaForm.address,
         phone: pulperiaForm.phone,
         email: pulperiaForm.email,
         website: pulperiaForm.website,
@@ -358,9 +358,10 @@ const PulperiaDashboard = () => {
         banner_url: pulperiaForm.banner_url,
         title_font: pulperiaForm.title_font,
         background_color: pulperiaForm.background_color,
-        location: {
-          lat: parseFloat(pulperiaForm.lat),
-          lng: parseFloat(pulperiaForm.lng)
+        is_online_only: pulperiaForm.is_online_only,
+        location: pulperiaForm.is_online_only ? null : {
+          lat: parseFloat(pulperiaForm.lat) || 0,
+          lng: parseFloat(pulperiaForm.lng) || 0
         }
       };
       
