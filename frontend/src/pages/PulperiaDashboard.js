@@ -251,6 +251,14 @@ const PulperiaDashboard = () => {
       const myPulperias = pulperiasRes.data.filter(p => p.owner_user_id === userRes.data.user_id);
       setPulperias(myPulperias);
       
+      // Get ad slot
+      try {
+        const slotRes = await api.get('/api/featured-ads/my-slot');
+        setMyAdSlot(slotRes.data);
+      } catch (e) {
+        setMyAdSlot(null);
+      }
+      
       if (myPulperias.length > 0) {
         setSelectedPulperia(myPulperias[0]);
         await fetchPulperiaData(myPulperias[0].pulperia_id);
