@@ -1895,7 +1895,32 @@ async def update_application_status(
     else:
         message = f"📋 Tu aplicación para '{application['job_title']}' está en revisión"
     
-    await send_ws_notification(application["applicant_user_id"], message, "application_status")
+    try:
+        await send_ws_notification(application["applicant_user_id"], message, "application_status")
+    except Exception as e:
+        logger.warning(f"WebSocket notification failed: {e}")
+    
+    # Send email notification to applicant
+    try:
+        applicant = await db.users.find_one({"user_id": application["applicant_user_id"]}, {"_id": 0})
+        if applicant and applicant.get("email"):
+            pulperia_name = application.get("pulperia_name", "La Pulpería")
+            if status == "aceptada":
+                await send_application_accepted(
+                    applicant_email=applicant["email"],
+                    job_title=application["job_title"],
+                    pulperia_name=pulperia_name
+                )
+                logger.info(f"[EMAIL] Application accepted notification sent to {applicant['email']}")
+            elif status == "rechazada":
+                await send_application_rejected(
+                    applicant_email=applicant["email"],
+                    job_title=application["job_title"],
+                    pulperia_name=pulperia_name
+                )
+                logger.info(f"[EMAIL] Application rejected notification sent to {applicant['email']}")
+    except Exception as e:
+        logger.error(f"[EMAIL] Failed to send application status notification: {e}")
     
     return await db.job_applications.find_one({"application_id": application_id}, {"_id": 0})
 
