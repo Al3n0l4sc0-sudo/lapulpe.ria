@@ -308,6 +308,124 @@ async def change_user_type(type_change: UserTypeChange, authorization: Optional[
     updated_user["is_admin"] = updated_user.get("email") == ADMIN_EMAIL
     return updated_user
 
+@api_router.put("/auth/profile-picture")
+async def update_profile_picture(data: ProfilePictureUpdate, authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
+    """Update user profile picture"""
+    user = await get_current_user(authorization, session_token)
+    
+    await db.users.update_one(
+        {"user_id": user.user_id},
+        {"$set": {"picture": data.picture_url, "custom_picture": True}}
+    )
+    
+    updated_user = await db.users.find_one({"user_id": user.user_id}, {"_id": 0})
+    updated_user["is_admin"] = updated_user.get("email") == ADMIN_EMAIL
+    return updated_user
+
+# ============================================
+# REPORTES Y ESTADÍSTICAS (v1.1)
+# ============================================
+
+@api_router.get("/pulperias/{pulperia_id}/reports")
+async def get_pulperia_reports(pulperia_id: str, period: str = "week", authorization: Optional[str] = Header(None), session_token: Optional[str] = Cookie(None)):
+    """Get sales reports for a pulperia"""
+    user = await get_current_user(authorization, session_token)
+    
+    pulperia = await db.pulperias.find_one({"pulperia_id": pulperia_id}, {"_id": 0})
+    if not pulperia:
+        raise HTTPException(status_code=404, detail="Pulpería no encontrada")
+    
+    if pulperia["owner_user_id"] != user.user_id and user.email != ADMIN_EMAIL:
+        raise HTTPException(status_code=403, detail="No tienes permiso para ver estos reportes")
+    
+    # Calculate date range
+    now = datetime.now(timezone.utc)
+    if period == "day":
+        start_date = now - timedelta(days=1)
+    elif period == "week":
+        start_date = now - timedelta(days=7)
+    elif period == "month":
+        start_date = now - timedelta(days=30)
+    else:
+        start_date = now - timedelta(days=7)
+    
+    # Get orders in period
+    orders = await db.orders.find({
+        "pulperia_id": pulperia_id,
+        "status": "completed",
+        "created_at": {"$gte": start_date.isoformat()}
+    }, {"_id": 0}).to_list(1000)
+    
+    # Calculate metrics
+    total_sales = len(orders)
+    total_revenue = sum(order.get("total", 0) for order in orders)
+    
+    # Products sold count
+    product_counts = {}
+    for order in orders:
+        for item in order.get("items", []):
+            pid = item.get("product_id", "unknown")
+            pname = item.get("product_name", "Desconocido")
+            if pid not in product_counts:
+                product_counts[pid] = {"name": pname, "quantity": 0, "revenue": 0}
+            product_counts[pid]["quantity"] += item.get("quantity", 0)
+            product_counts[pid]["revenue"] += item.get("price", 0) * item.get("quantity", 0)
+    
+    # Top 5 products
+    top_products = sorted(product_counts.values(), key=lambda x: x["quantity"], reverse=True)[:5]
+    
+    # Sales by hour
+    sales_by_hour = {}
+    for order in orders:
+        try:
+            created = order.get("created_at", "")
+            if isinstance(created, str):
+                hour = datetime.fromisoformat(created.replace("Z", "+00:00")).hour
+            else:
+                hour = created.hour
+            sales_by_hour[hour] = sales_by_hour.get(hour, 0) + 1
+        except:
+            pass
+    
+    # Peak hours
+    peak_hours = sorted(sales_by_hour.items(), key=lambda x: x[1], reverse=True)[:3]
+    
+    # Customer frequency
+    customer_counts = {}
+    for order in orders:
+        cid = order.get("customer_user_id", "unknown")
+        cname = order.get("customer_name", "Cliente")
+        if cid not in customer_counts:
+            customer_counts[cid] = {"name": cname, "orders": 0}
+        customer_counts[cid]["orders"] += 1
+    
+    frequent_customers = sorted(customer_counts.values(), key=lambda x: x["orders"], reverse=True)[:5]
+    
+    return {
+        "period": period,
+        "total_sales": total_sales,
+        "total_revenue": total_revenue,
+        "average_order": round(total_revenue / total_sales, 2) if total_sales > 0 else 0,
+        "top_products": top_products,
+        "peak_hours": [{"hour": h, "orders": c} for h, c in peak_hours],
+        "frequent_customers": frequent_customers,
+        "sales_trend": [{"date": (now - timedelta(days=i)).strftime("%d/%m"), "sales": len([o for o in orders if o.get("created_at", "").startswith((now - timedelta(days=i)).strftime("%Y-%m-%d"))])} for i in range(6, -1, -1)]
+    }
+
+# ============================================
+# HISTORIAL DE PRECIOS (v1.1)
+# ============================================
+
+@api_router.get("/products/{product_id}/price-history")
+async def get_price_history(product_id: str):
+    """Get price history for a product"""
+    history = await db.price_history.find(
+        {"product_id": product_id},
+        {"_id": 0}
+    ).sort("changed_at", -1).to_list(10)
+    
+    return history
+
 # ============================================
 # PULPERIA ENDPOINTS
 # ============================================
