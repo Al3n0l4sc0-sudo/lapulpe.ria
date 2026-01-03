@@ -519,13 +519,14 @@ const PulperiaDashboard = () => {
 
   const createPulperia = async (lat, lng) => {
     try {
-      const response = await api.post(
-        `/api/pulperias`,
-        {
-          ...pulperiaForm,
-          location: { lat, lng }
-        }
-      );
+      // Preparar datos, sin location si es online-only
+      const dataToSend = {
+        ...pulperiaForm,
+        location: pulperiaForm.is_online_only ? null : { lat, lng },
+        address: pulperiaForm.is_online_only ? '' : pulperiaForm.address
+      };
+      
+      const response = await api.post(`/api/pulperias`, dataToSend);
       
       toast.success('Pulpería creada exitosamente');
       setShowPulperiaDialog(false);
@@ -540,7 +541,11 @@ const PulperiaDashboard = () => {
         hours: '',
         lat: '',
         lng: '',
-        logo_url: ''
+        logo_url: '',
+        banner_url: '',
+        title_font: 'default',
+        background_color: '#DC2626',
+        is_online_only: false
       });
       await fetchData();
     } catch (error) {
