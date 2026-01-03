@@ -145,15 +145,14 @@ const GlobalAnnouncementsPage = ({ user }) => {
                   
                   {/* Content */}
                   <div className="p-4">
-                    {/* Image */}
+                    {/* Image - Adaptive size */}
                     {announcement.image_url && (
-                      <div className="relative mb-4 rounded-xl overflow-hidden">
+                      <div className="relative mb-4 rounded-xl overflow-hidden bg-stone-900">
                         <img 
                           src={announcement.image_url} 
                           alt={announcement.title}
-                          className="w-full h-48 object-cover"
+                          className="w-full h-auto max-h-[500px] object-contain"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 to-transparent" />
                       </div>
                     )}
                     
