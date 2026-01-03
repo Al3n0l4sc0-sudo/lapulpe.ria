@@ -1771,12 +1771,30 @@ async def apply_to_job(job_id: str, application_data: JobApplicationCreate, auth
     
     await db.job_applications.insert_one(application_doc)
     
-    # Send notification to employer
-    await send_ws_notification(
-        job["employer_user_id"],
-        f"📋 Nueva aplicación de {user.name} para: {job['title']}",
-        "job_application"
-    )
+    # Send notification to employer (WebSocket)
+    try:
+        await send_ws_notification(
+            job["employer_user_id"],
+            f"📋 Nueva aplicación de {user.name} para: {job['title']}",
+            "job_application"
+        )
+    except Exception as e:
+        logger.warning(f"WebSocket notification failed: {e}")
+    
+    # Send email notification to employer
+    try:
+        employer = await db.users.find_one({"user_id": job["employer_user_id"]}, {"_id": 0})
+        if employer and employer.get("email"):
+            await send_job_application_notification(
+                owner_email=employer["email"],
+                job_title=job["title"],
+                applicant_name=user.name,
+                applicant_city=application_data.city,
+                applicant_age=application_data.age
+            )
+            logger.info(f"[EMAIL] Job application notification sent to {employer['email']}")
+    except Exception as e:
+        logger.error(f"[EMAIL] Failed to send job application notification: {e}")
     
     return await db.job_applications.find_one({"application_id": application_id}, {"_id": 0})
 
