@@ -3,17 +3,25 @@
 
 import axios from 'axios';
 
-// Backend URL - SIEMPRE usar la variable de entorno del preview
-export const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://achiev-meritocracy.preview.emergentagent.com';
-
-// Dominio personalizado
-export const CUSTOM_DOMAIN = 'lapulperiastore.net';
-
-// Helper para detectar si estamos en el dominio personalizado
-export const isCustomDomain = () => {
-  const host = window.location.hostname;
-  return host === CUSTOM_DOMAIN || host === `www.${CUSTOM_DOMAIN}`;
+// BACKEND URL DINÁMICO - Detecta automáticamente el dominio
+// Si estás en lapulperiahn.shop, usa ese backend
+// Si estás en preview, usa el preview backend
+const getBackendURL = () => {
+  const hostname = window.location.hostname;
+  
+  // Si estamos en lapulperiahn.shop, usar ese dominio
+  if (hostname === 'lapulperiahn.shop' || hostname === 'www.lapulperiahn.shop') {
+    return `https://${hostname}`;
+  }
+  
+  // Si estamos en cualquier otro dominio (preview, local, etc), usar el origin actual
+  return window.location.origin;
 };
+
+export const BACKEND_URL = getBackendURL();
+
+console.log('[API Config] Backend URL:', BACKEND_URL);
+console.log('[API Config] Current hostname:', window.location.hostname);
 
 // Crear instancia de axios configurada
 const api = axios.create({
