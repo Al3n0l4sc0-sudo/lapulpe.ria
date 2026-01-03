@@ -2679,10 +2679,10 @@ async def upload_image(file: UploadFile = File(...), authorization: Optional[str
     # Read file content
     content = await file.read()
     
-    # Check file size (max 5MB)
-    max_size = 5 * 1024 * 1024  # 5MB
+    # Check file size (max 15MB - increased from 5MB)
+    max_size = 15 * 1024 * 1024  # 15MB
     if len(content) > max_size:
-        raise HTTPException(status_code=400, detail="Archivo demasiado grande. Máximo 5MB.")
+        raise HTTPException(status_code=400, detail="Archivo demasiado grande. Máximo 15MB.")
     
     # Convert to base64 data URL
     base64_content = base64.b64encode(content).decode('utf-8')
