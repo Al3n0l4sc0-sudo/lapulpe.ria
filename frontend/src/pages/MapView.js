@@ -252,17 +252,30 @@ const MapView = () => {
     
     setSearchingProducts(true);
     try {
-      const response = await api.get(`/api/products?search=${encodeURIComponent(productSearch)}`);
-      setProductResults(response.data || []);
+      if (searchMode === 'products') {
+        const response = await api.get(`/api/products?search=${encodeURIComponent(productSearch)}`);
+        setProductResults(response.data || []);
+      } else {
+        // Search pulperias
+        const response = await api.get(`/api/pulperias?search=${encodeURIComponent(productSearch)}`);
+        setProductResults(response.data || []);
+      }
       setShowProductResults(true);
     } catch (error) {
-      toast.error('Error buscando productos');
+      toast.error(searchMode === 'products' ? 'Error buscando productos' : 'Error buscando pulperías');
     } finally {
       setSearchingProducts(false);
     }
   };
 
   const clearProductSearch = () => {
+    setProductSearch('');
+    setProductResults([]);
+    setShowProductResults(false);
+  };
+  
+  const toggleSearchMode = () => {
+    setSearchMode(prev => prev === 'products' ? 'pulperias' : 'products');
     setProductSearch('');
     setProductResults([]);
     setShowProductResults(false);
