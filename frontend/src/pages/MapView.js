@@ -109,6 +109,12 @@ const MapView = () => {
   const [cart, setCart] = useState([]);
   const [isMapFullscreen, setIsMapFullscreen] = useState(false);
   const [activeTab, setActiveTab] = useState('nearby'); // 'nearby' | 'favorites'
+  
+  // Product search states
+  const [productSearch, setProductSearch] = useState('');
+  const [productResults, setProductResults] = useState([]);
+  const [searchingProducts, setSearchingProducts] = useState(false);
+  const [showProductResults, setShowProductResults] = useState(false);
 
   const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
     const R = 6371;
