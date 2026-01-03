@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 """
 Backend API Testing for La Pulpería
-Tests the specific endpoints mentioned in the review request
+Tests the specific endpoints mentioned in the review request:
+1. Email Service Configuration
+2. Create Online-Only Pulperia functionality
 """
 
 import requests
 import json
 import sys
 import os
+import importlib.util
 from datetime import datetime
 
 # Get backend URL from environment
