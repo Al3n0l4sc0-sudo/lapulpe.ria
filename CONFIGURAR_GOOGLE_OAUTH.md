@@ -28,7 +28,7 @@
 
 ```
 https://lapulperiastore.net/auth/callback
-https://job-market-hub-1.preview.emergentagent.com/auth/callback
+https://tienda-control-6.preview.emergentagent.com/auth/callback
 ```
 
 ⚠️ **IMPORTANTE:**
@@ -42,7 +42,7 @@ https://job-market-hub-1.preview.emergentagent.com/auth/callback
 
 ```
 https://lapulperiastore.net
-https://job-market-hub-1.preview.emergentagent.com
+https://tienda-control-6.preview.emergentagent.com
 ```
 
 ⚠️ **IMPORTANTE:**
@@ -63,13 +63,13 @@ Después de guardar, tu configuración debe verse así:
 ### ✅ URIs de redirección autorizados:
 ```
 ✓ https://lapulperiastore.net/auth/callback
-✓ https://job-market-hub-1.preview.emergentagent.com/auth/callback
+✓ https://tienda-control-6.preview.emergentagent.com/auth/callback
 ```
 
 ### ✅ Orígenes JavaScript autorizados:
 ```
 ✓ https://lapulperiastore.net
-✓ https://job-market-hub-1.preview.emergentagent.com
+✓ https://tienda-control-6.preview.emergentagent.com
 ```
 
 ## 🧪 PROBAR EL LOGIN
@@ -84,7 +84,7 @@ Después de guardar, tu configuración debe verse así:
 
 ### Opción B: Dominio de Preview (para pruebas)
 
-1. Ir a: `https://job-market-hub-1.preview.emergentagent.com`
+1. Ir a: `https://tienda-control-6.preview.emergentagent.com`
 2. Click en "Comenzar con Google"
 3. Autorizar la aplicación
 4. ✅ Deberías ser redirigido correctamente
@@ -206,7 +206,7 @@ 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
 
 **Dominios configurados:**
 - Producción: `https://lapulperiastore.net`
-- Preview/Testing: `https://job-market-hub-1.preview.emergentagent.com`
+- Preview/Testing: `https://tienda-control-6.preview.emergentagent.com`
 
 ## ✅ CHECKLIST FINAL
 

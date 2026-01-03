@@ -12,13 +12,13 @@
 **URIs de redirección autorizados:**
 ```
 https://lapulperiastore.net/auth/callback
-https://job-market-hub-1.preview.emergentagent.com/auth/callback
+https://tienda-control-6.preview.emergentagent.com/auth/callback
 ```
 
 **Orígenes JavaScript autorizados:**
 ```
 https://lapulperiastore.net
-https://job-market-hub-1.preview.emergentagent.com
+https://tienda-control-6.preview.emergentagent.com
 ```
 
 ## 🏪 Base de Datos Poblada
@@ -204,7 +204,7 @@ CORS_ORIGINS=*
 
 **Frontend (.env):**
 ```env
-REACT_APP_BACKEND_URL=https://job-market-hub-1.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://tienda-control-6.preview.emergentagent.com
 REACT_APP_DOMAIN=lapulperiastore.net
 WDS_SOCKET_PORT=443
 ```

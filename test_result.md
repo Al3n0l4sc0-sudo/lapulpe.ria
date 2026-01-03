@@ -256,7 +256,7 @@
 - **Total de pruebas**: 9
 - **Exitosas**: 9 (100%)
 - **Fallidas**: 0
-- **Backend URL**: https://job-market-hub-1.preview.emergentagent.com/api
+- **Backend URL**: https://tienda-control-6.preview.emergentagent.com/api
 
 ### Datos de Prueba Creados:
 - 2 pulperías (1 física, 1 solo en línea)
@@ -563,7 +563,7 @@
 - **Exitosas**: 7 (87.5%)
 - **Limitadas por autenticación**: 1 (12.5%)
 - **Fallidas**: 0
-- **URL Probada**: https://job-market-hub-1.preview.emergentagent.com
+- **URL Probada**: https://tienda-control-6.preview.emergentagent.com
 - **Screenshots**: 2 capturas documentando las mejoras visuales
 
 ### Visual UI Testing Agent Notes:
@@ -704,7 +704,7 @@
 - **Fully working**: 8 (100%)
 - **Failed**: 0
 - **Authentication-limited**: 2 (Map markers, Profile camera - expected)
-- **URL Tested**: https://job-market-hub-1.preview.emergentagent.com
+- **URL Tested**: https://tienda-control-6.preview.emergentagent.com
 - **Screenshots**: 4 captured (landing, mobile, full page, final)
 
 ### v1.1 Testing Agent Notes:
@@ -752,7 +752,7 @@
    - Backend service running correctly with no critical errors
 
 ### Backend Service Status:
-✅ **Backend Connectivity** - Service accessible and responding at https://job-market-hub-1.preview.emergentagent.com/api
+✅ **Backend Connectivity** - Service accessible and responding at https://tienda-control-6.preview.emergentagent.com/api
 ✅ **Authentication System** - Working correctly, proper error handling
 ✅ **API Endpoints** - All tested endpoints responding appropriately
 ✅ **Database Connection** - MongoDB connected and functioning
@@ -762,7 +762,7 @@
 - **Total requirements tested**: 2
 - **Fully working**: 2 (100%)
 - **Failed**: 0
-- **Backend URL**: https://job-market-hub-1.preview.emergentagent.com/api
+- **Backend URL**: https://tienda-control-6.preview.emergentagent.com/api
 
 ### Testing Agent Notes:
 - Both review request requirements are properly implemented and working

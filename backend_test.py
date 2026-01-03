@@ -14,7 +14,7 @@ import importlib.util
 from datetime import datetime
 
 # Get backend URL from environment
-BACKEND_URL = "https://job-market-hub-1.preview.emergentagent.com/api"
+BACKEND_URL = "https://tienda-control-6.preview.emergentagent.com/api"
 
 class BackendTester:
     def __init__(self):
