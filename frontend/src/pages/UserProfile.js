@@ -322,15 +322,15 @@ const UserProfile = () => {
         <div className="h-px bg-gradient-to-r from-transparent via-stone-700/50 to-transparent my-4" />
 
         {/* Support Section - Simplificado */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 px-2">
+        <div className="space-y-3 border border-stone-800/50 rounded-2xl p-4">
+          <div className="flex items-center gap-2">
             <Heart className="w-4 h-4 text-red-400" />
             <h3 className="font-bold text-white text-sm">Apoya al Creador</h3>
           </div>
           
           <a 
             href="mailto:onol4sco05@gmail.com"
-            className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-all group"
+            className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-all group border border-stone-800/30"
           >
             <Mail className="w-5 h-5 text-red-400 group-hover:text-red-300" />
             <div className="flex-1 min-w-0">
@@ -343,7 +343,7 @@ const UserProfile = () => {
             href="https://paypal.me/alejandronolasco979?locale.x=es_XC&country.x=HN"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-all group"
+            className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-all group border border-stone-800/30"
           >
             <CreditCard className="w-5 h-5 text-blue-400 group-hover:text-blue-300" />
             <div className="flex-1 min-w-0">
