@@ -282,10 +282,136 @@ class BackendTester:
                 )
                 
         except Exception as e:
+    def test_health_endpoint(self):
+        """Test GET /api/health endpoint - health check"""
+        try:
+            response = self.session.get(f"{self.base_url}/health", timeout=10)
+            
+            if response.status_code == 200:
+                health_data = response.json()
+                if isinstance(health_data, dict):
+                    # Check if it has the expected structure
+                    if "status" in health_data:
+                        status = health_data.get("status")
+                        service = health_data.get("service", "unknown")
+                        
+                        if status == "healthy":
+                            self.log_test(
+                                "GET /api/health - Health check endpoint",
+                                True,
+                                f"Health check exitoso. Status: {status}, Service: {service}"
+                            )
+                        else:
+                            self.log_test(
+                                "GET /api/health - Health check endpoint",
+                                False,
+                                f"Health check indica problema. Status: {status}",
+                                health_data
+                            )
+                    else:
+                        self.log_test(
+                            "GET /api/health - Health check endpoint",
+                            False,
+                            "Respuesta no contiene campo 'status'",
+                            health_data
+                        )
+                else:
+                    self.log_test(
+                        "GET /api/health - Health check endpoint",
+                        False,
+                        f"Respuesta no es un objeto. Tipo: {type(health_data)}",
+                        health_data
+                    )
+            else:
+                self.log_test(
+                    "GET /api/health - Health check endpoint",
+                    False,
+                    f"Status code: {response.status_code}",
+                    response.text
+                )
+                
+        except Exception as e:
             self.log_test(
                 "GET /api/health - Health check endpoint",
                 False,
                 f"Error de conexión: {str(e)}"
+            )
+    
+    def test_email_service_configuration(self):
+        """Test email service configuration by checking if the service is properly set up"""
+        try:
+            # Check if email service module exists and can be imported
+            email_service_path = "/app/backend/services/email_service.py"
+            if os.path.exists(email_service_path):
+                # Try to import the email service module
+                spec = importlib.util.spec_from_file_location("email_service", email_service_path)
+                email_service = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(email_service)
+                
+                # Check if required functions exist
+                required_functions = [
+                    'send_email',
+                    'send_order_notification', 
+                    'send_order_accepted',
+                    'send_order_ready',
+                    'send_job_application_notification',
+                    'send_application_accepted'
+                ]
+                
+                missing_functions = []
+                for func_name in required_functions:
+                    if not hasattr(email_service, func_name):
+                        missing_functions.append(func_name)
+                
+                if not missing_functions:
+                    self.log_test(
+                        "Email service configuration",
+                        True,
+                        f"Email service está correctamente configurado con todas las funciones requeridas: {required_functions}"
+                    )
+                else:
+                    self.log_test(
+                        "Email service configuration",
+                        False,
+                        f"Funciones faltantes en email service: {missing_functions}"
+                    )
+                    
+                # Check if RESEND_API_KEY is configured
+                env_path = "/app/backend/.env"
+                if os.path.exists(env_path):
+                    with open(env_path, 'r') as f:
+                        env_content = f.read()
+                        if "RESEND_API_KEY" in env_content and "re_" in env_content:
+                            self.log_test(
+                                "Email service API key configuration",
+                                True,
+                                "RESEND_API_KEY está configurado en el archivo .env"
+                            )
+                        else:
+                            self.log_test(
+                                "Email service API key configuration",
+                                False,
+                                "RESEND_API_KEY no está configurado correctamente en .env"
+                            )
+                else:
+                    self.log_test(
+                        "Email service API key configuration",
+                        False,
+                        "Archivo .env no encontrado"
+                    )
+                    
+            else:
+                self.log_test(
+                    "Email service configuration",
+                    False,
+                    f"Email service module no encontrado en {email_service_path}"
+                )
+                
+        except Exception as e:
+            self.log_test(
+                "Email service configuration",
+                False,
+                f"Error al verificar email service: {str(e)}"
             )
     
     def test_backend_health(self):
