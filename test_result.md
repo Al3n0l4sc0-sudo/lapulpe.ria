@@ -512,3 +512,9 @@
 - La eliminación de medallas mini del PulperiaProfile está completada
 - La limitación de autenticación impide pruebas completas de áreas protegidas
 - No se encontraron errores críticos en la implementación
+
+## agent_communication:
+    -agent: "main"
+    -message: "Implemented visual UI improvements for La Pulpería app including Mini Nebula effects, GalacticLoader, Profile improvements, Chamba button glow, and PulperiaProfile badge removal"
+    -agent: "testing"
+    -message: "Visual UI improvements testing completed. All components properly implemented and working. CSS animations functional, starry background active, GalacticLoader with store emoji implemented. Authentication required for full Header/BottomNav testing but code verification confirms proper implementation. Chamba button yellow glow logic correctly implemented. Profile page improvements and PulperiaProfile badge removal completed successfully."
