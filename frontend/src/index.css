@@ -460,6 +460,20 @@ body {
   border-radius: inherit;
 }
 
+/* Custom marker styles */
+.custom-pulperia-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+.custom-pulperia-marker div {
+  transition: transform 0.2s ease;
+}
+
+.custom-pulperia-marker:hover div {
+  transform: scale(1.1);
+}
+
 /* Gradient text */
 .gradient-text {
   background: linear-gradient(135deg, #dc2626 0%, #f87171 50%, #dc2626 100%);
