@@ -115,6 +115,7 @@ const MapView = () => {
   const [productResults, setProductResults] = useState([]);
   const [searchingProducts, setSearchingProducts] = useState(false);
   const [showProductResults, setShowProductResults] = useState(false);
+  const [searchMode, setSearchMode] = useState('products'); // 'products' or 'pulperias'
 
   const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
     const R = 6371;
