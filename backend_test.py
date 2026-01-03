@@ -113,7 +113,127 @@ class BackendTester:
                 f"Error de conexión: {str(e)}"
             )
     
-    def test_health_endpoint(self):
+    def test_products_search_endpoint(self):
+        """Test GET /api/products?search=test endpoint - should return products array"""
+        try:
+            response = self.session.get(f"{self.base_url}/products?search=test", timeout=10)
+            
+            if response.status_code == 200:
+                products_data = response.json()
+                if isinstance(products_data, list):
+                    self.log_test(
+                        "GET /api/products?search=test - Products search endpoint",
+                        True,
+                        f"Endpoint funciona correctamente. Retornó {len(products_data)} productos"
+                    )
+                    
+                    # Validate product structure if any products found
+                    if len(products_data) > 0:
+                        sample_product = products_data[0]
+                        required_fields = ['product_id', 'name', 'price', 'pulperia_id']
+                        missing_fields = [field for field in required_fields if field not in sample_product]
+                        
+                        if not missing_fields:
+                            self.log_test(
+                                "Products search data structure validation",
+                                True,
+                                f"Los productos contienen todos los campos requeridos. Campos encontrados: {list(sample_product.keys())}"
+                            )
+                        else:
+                            self.log_test(
+                                "Products search data structure validation",
+                                False,
+                                f"Campos faltantes en productos: {missing_fields}",
+                                sample_product
+                            )
+                    else:
+                        self.log_test(
+                            "Products search results",
+                            True,
+                            "No se encontraron productos con el término 'test' (comportamiento válido)"
+                        )
+                else:
+                    self.log_test(
+                        "GET /api/products?search=test - Products search endpoint",
+                        False,
+                        f"Respuesta no es una lista. Tipo: {type(products_data)}",
+                        products_data
+                    )
+            else:
+                self.log_test(
+                    "GET /api/products?search=test - Products search endpoint",
+                    False,
+                    f"Status code: {response.status_code}",
+                    response.text
+                )
+                
+        except Exception as e:
+            self.log_test(
+                "GET /api/products?search=test - Products search endpoint",
+                False,
+                f"Error de conexión: {str(e)}"
+            )
+    
+    def test_pulperias_search_endpoint(self):
+        """Test GET /api/pulperias?search=test endpoint - should return pulperias array"""
+        try:
+            response = self.session.get(f"{self.base_url}/pulperias?search=test", timeout=10)
+            
+            if response.status_code == 200:
+                pulperias_data = response.json()
+                if isinstance(pulperias_data, list):
+                    self.log_test(
+                        "GET /api/pulperias?search=test - Pulperias search endpoint",
+                        True,
+                        f"Endpoint funciona correctamente. Retornó {len(pulperias_data)} pulperías"
+                    )
+                    
+                    # Validate pulperia structure if any pulperias found
+                    if len(pulperias_data) > 0:
+                        sample_pulperia = pulperias_data[0]
+                        required_fields = ['pulperia_id', 'name', 'owner_user_id']
+                        missing_fields = [field for field in required_fields if field not in sample_pulperia]
+                        
+                        if not missing_fields:
+                            self.log_test(
+                                "Pulperias search data structure validation",
+                                True,
+                                f"Las pulperías contienen todos los campos requeridos. Campos encontrados: {list(sample_pulperia.keys())}"
+                            )
+                        else:
+                            self.log_test(
+                                "Pulperias search data structure validation",
+                                False,
+                                f"Campos faltantes en pulperías: {missing_fields}",
+                                sample_pulperia
+                            )
+                    else:
+                        self.log_test(
+                            "Pulperias search results",
+                            True,
+                            "No se encontraron pulperías con el término 'test' (comportamiento válido)"
+                        )
+                else:
+                    self.log_test(
+                        "GET /api/pulperias?search=test - Pulperias search endpoint",
+                        False,
+                        f"Respuesta no es una lista. Tipo: {type(pulperias_data)}",
+                        pulperias_data
+                    )
+            else:
+                self.log_test(
+                    "GET /api/pulperias?search=test - Pulperias search endpoint",
+                    False,
+                    f"Status code: {response.status_code}",
+                    response.text
+                )
+                
+        except Exception as e:
+            self.log_test(
+                "GET /api/pulperias?search=test - Pulperias search endpoint",
+                False,
+                f"Error de conexión: {str(e)}"
+            )
         """Test GET /api/health endpoint - health check"""
         try:
             response = self.session.get(f"{self.base_url}/health", timeout=10)
