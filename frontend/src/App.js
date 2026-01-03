@@ -4,6 +4,7 @@ import { Toaster } from 'sonner';
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import StarryBackground from './components/StarryBackground';
+import GalacticLoader from './components/GalacticLoader';
 import LandingPage from './pages/LandingPage';
 import './App.css';
 
@@ -29,13 +30,35 @@ const AdAssignmentLog = lazy(() => import('./pages/AdAssignmentLog'));
 const RecommendedPage = lazy(() => import('./pages/RecommendedPage'));
 const FeaturedAdsPage = lazy(() => import('./pages/FeaturedAdsPage'));
 
-// Enhanced loading spinner with starry background
+// Enhanced loading spinner with nebula background
 const LoadingSpinner = () => (
   <div className="min-h-screen bg-stone-950 flex items-center justify-center relative overflow-hidden">
-    <StarryBackground density={80} enableParallax={false} />
-    <div className="relative z-10 flex flex-col items-center gap-4">
-      <div className="w-12 h-12 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin"></div>
-      <p className="text-stone-500 text-sm animate-pulse">Cargando...</p>
+    {/* Nebulosa de fondo */}
+    <div 
+      className="absolute inset-0 animate-nebula-pulse"
+      style={{
+        background: `
+          radial-gradient(ellipse 100% 80% at 30% 50%, rgba(220, 38, 38, 0.2), transparent 50%),
+          radial-gradient(ellipse 80% 60% at 70% 40%, rgba(250, 204, 21, 0.15), transparent 45%),
+          radial-gradient(ellipse 60% 50% at 50% 70%, rgba(147, 51, 234, 0.1), transparent 40%)
+        `
+      }}
+    />
+    {/* Estrellas */}
+    <div 
+      className="absolute inset-0 animate-twinkle"
+      style={{
+        backgroundImage: `
+          radial-gradient(1.5px 1.5px at 10% 20%, rgba(255,255,255,0.7), transparent),
+          radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.5), transparent),
+          radial-gradient(1.5px 1.5px at 50% 30%, rgba(255,255,255,0.6), transparent),
+          radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.5), transparent),
+          radial-gradient(1.5px 1.5px at 90% 45%, rgba(255,255,255,0.6), transparent)
+        `
+      }}
+    />
+    <div className="relative z-10">
+      <GalacticLoader size="default" text="Cargando..." />
     </div>
   </div>
 );
