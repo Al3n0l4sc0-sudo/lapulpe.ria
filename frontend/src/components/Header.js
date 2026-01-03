@@ -184,7 +184,7 @@ const Header = ({ user, title, subtitle, onOrderUpdate }) => {
               {showDropdown && (
                 <div 
                   className="fixed inset-x-4 top-16 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96 galactic-card rounded-2xl shadow-2xl shadow-black/50 overflow-hidden"
-                  style={{ zIndex: 9999 }}
+                  style={{ zIndex: 99999 }}
                 >
                   {/* Header */}
                   <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between bg-gradient-to-r from-stone-900/50 to-transparent">
