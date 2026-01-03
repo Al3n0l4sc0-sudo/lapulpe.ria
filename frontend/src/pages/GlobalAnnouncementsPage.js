@@ -76,43 +76,14 @@ const GlobalAnnouncementsPage = ({ user }) => {
               <Megaphone className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-lg font-black text-white">Centro de Anuncios</h2>
+              <h2 className="text-lg font-black text-white">Anuncios</h2>
               <p className="text-sm text-orange-300">Ofertas exclusivas y promociones</p>
             </div>
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="flex bg-stone-800/50 backdrop-blur-sm rounded-xl p-1 border border-stone-700/50 mb-6">
-          <button
-            onClick={() => setActiveTab('global')}
-            className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${
-              activeTab === 'global' 
-                ? 'bg-gradient-to-r from-orange-600 to-amber-500 text-white shadow-lg' 
-                : 'text-stone-400 hover:text-white'
-            }`}
-          >
-            <Megaphone className="w-4 h-4" />
-            Globales
-            {globalAnnouncements.length > 0 && (
-              <span className="ml-1 bg-white/20 px-1.5 py-0.5 rounded-full text-xs">
-                {globalAnnouncements.length}
-              </span>
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab('featured')}
-            className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${
-              activeTab === 'featured' 
-                ? 'bg-gradient-to-r from-orange-600 to-amber-500 text-white shadow-lg' 
-                : 'text-stone-400 hover:text-white'
-            }`}
-          >
-            <Star className="w-4 h-4" />
-            Destacados
-            {featuredAds.length > 0 && (
-              <span className="ml-1 bg-white/20 px-1.5 py-0.5 rounded-full text-xs">
-                {featuredAds.length}
+        {/* All Announcements - No Tabs */}
+        <div className="space-y-4">
               </span>
             )}
           </button>
