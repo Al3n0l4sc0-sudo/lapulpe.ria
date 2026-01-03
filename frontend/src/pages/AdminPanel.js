@@ -35,6 +35,7 @@ const AdminPanel = () => {
   const [logs, setLogs] = useState([]);
   const [messages, setMessages] = useState([]);
   const [featuredAdSlots, setFeaturedAdSlots] = useState([]);
+  const [globalAnnouncements, setGlobalAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPlan, setSelectedPlan] = useState('destacado');
@@ -51,6 +52,7 @@ const AdminPanel = () => {
   const [showBadgeDialog, setShowBadgeDialog] = useState(false);
   const [showSuspendDialog, setShowSuspendDialog] = useState(false);
   const [showEnableAdSlotDialog, setShowEnableAdSlotDialog] = useState(false);
+  const [showGlobalAnnouncementDialog, setShowGlobalAnnouncementDialog] = useState(false);
   const [selectedPulperia, setSelectedPulperia] = useState(null);
   
   // Forms
@@ -59,6 +61,14 @@ const AdminPanel = () => {
   const [suspendReason, setSuspendReason] = useState('');
   const [suspendDays, setSuspendDays] = useState(7);
   const [adSlotDays, setAdSlotDays] = useState(30);
+  
+  // Global Announcement Form
+  const [globalAnnTitle, setGlobalAnnTitle] = useState('');
+  const [globalAnnContent, setGlobalAnnContent] = useState('');
+  const [globalAnnImageUrl, setGlobalAnnImageUrl] = useState('');
+  const [globalAnnLinkUrl, setGlobalAnnLinkUrl] = useState('');
+  const [globalAnnPriority, setGlobalAnnPriority] = useState(0);
+  const [globalAnnExpiresDays, setGlobalAnnExpiresDays] = useState(30);
 
   const handlePasswordSubmit = () => {
     if (passwordInput === ADMIN_PASSWORD) {
