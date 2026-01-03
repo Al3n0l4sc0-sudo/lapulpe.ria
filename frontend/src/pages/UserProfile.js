@@ -444,6 +444,14 @@ const UserProfile = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Editor de foto de perfil */}
+      <ProfilePictureEditor
+        user={user}
+        open={showPictureEditor}
+        onOpenChange={setShowPictureEditor}
+        onUpdate={(updatedUser) => setUser(updatedUser)}
+      />
     </div>
   );
 };
