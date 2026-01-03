@@ -129,3 +129,46 @@
 4. Verificar tab de Logros en perfil de pulpería
 5. Verificar que sesión persiste después de refresh
 6. Verificar disclaimer no aparece segunda vez
+
+## Backend Testing Results - 2026-01-03T01:09:35
+
+### Backend API Tests Completed:
+✅ **GET /api/jobs** - Lista de empleos
+   - Endpoint funciona correctamente
+   - Retorna estructura de datos válida con campos requeridos (job_id, title, description, category, pay_rate, location)
+   - Probado con 2 empleos de prueba
+
+✅ **GET /api/pulperias** - Lista de pulperías con campo is_online_only
+   - Endpoint funciona correctamente
+   - Campo `is_online_only` presente y funcionando
+   - Detectó 1 pulpería "solo en línea" de 2 pulperías totales
+   - Estructura de datos válida con campos requeridos (pulperia_id, name, owner_user_id)
+
+✅ **GET /api/featured-ads** - Lista de anuncios destacados
+   - Endpoint funciona correctamente
+   - Retorna anuncios activos y no expirados
+   - Estructura de datos válida con campos requeridos (ad_id, pulperia_id, pulperia_name, is_active)
+   - Probado con 1 anuncio destacado activo
+
+### Backend Service Status:
+✅ **Conectividad del Backend** - Servicio accesible y respondiendo
+✅ **Base de Datos** - MongoDB conectada y funcionando
+✅ **Estructura de APIs** - Todos los endpoints siguen el formato esperado
+
+### Test Summary:
+- **Total de pruebas**: 9
+- **Exitosas**: 9 (100%)
+- **Fallidas**: 0
+- **Backend URL**: https://domain-explorer-2.preview.emergentagent.com/api
+
+### Datos de Prueba Creados:
+- 2 pulperías (1 física, 1 solo en línea)
+- 2 empleos de prueba
+- 1 anuncio destacado activo
+
+### Testing Agent Notes:
+- Todos los endpoints del backend funcionan correctamente según la solicitud de revisión
+- El campo `is_online_only` está implementado y funciona en las pulperías
+- Los anuncios destacados se filtran correctamente por estado activo y fecha de expiración
+- No se encontraron problemas críticos en las APIs del backend
+- **FRONTEND TESTING NO REALIZADO** - Como se especificó en las instrucciones, solo se probaron las APIs del backend
