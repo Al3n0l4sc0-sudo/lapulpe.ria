@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { api, BACKEND_URL } from '../config/api';
 import { toast } from 'sonner';
-import { User as UserIcon, LogOut, Mail, CreditCard, Heart, Shield, Store, ShoppingBag, ArrowRightLeft, Eye, XCircle, AlertTriangle } from 'lucide-react';
+import { User as UserIcon, LogOut, Mail, CreditCard, Heart, Shield, Store, ShoppingBag, ArrowRightLeft, Eye, XCircle, AlertTriangle, Sparkles, Star, Rocket } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import AnimatedBackground from '../components/AnimatedBackground';
+import GalacticLoader from '../components/GalacticLoader';
 import { useAuth } from '../contexts/AuthContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { Button } from '../components/ui/button';
@@ -33,7 +34,6 @@ const UserProfile = () => {
       }
     }
     
-    // Fetch user's pulperias if they are a pulperia owner
     const fetchMyPulperias = async () => {
       if (user?.user_type === 'pulperia') {
         try {
@@ -70,12 +70,10 @@ const UserProfile = () => {
       setCloseConfirmation('');
       setSelectedPulperiaToClose(null);
       
-      // Refresh pulperias list
       const res = await api.get('/api/pulperias');
       const mine = res.data.filter(p => p.owner_user_id === user.user_id);
       setMyPulperias(mine);
       
-      // If no more pulperias, they can create a new one
       if (mine.length === 0) {
         toast.info('Puedes crear una nueva pulpería desde el Dashboard');
       }
@@ -120,7 +118,6 @@ const UserProfile = () => {
       setUser(response.data);
       toast.success(`¡Cambiado a ${newType === 'cliente' ? 'Cliente' : 'Pulpería'}!`);
       
-      // Redirect to appropriate page
       if (newType === 'cliente') {
         navigate('/map');
       } else {
@@ -138,108 +135,156 @@ const UserProfile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-900 via-red-800 to-red-900">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-red-400/30 rounded-full animate-spin border-t-white mx-auto"></div>
-          <p className="mt-4 text-white/80 font-medium">Cargando...</p>
+      <div className="min-h-screen bg-stone-950 flex items-center justify-center relative overflow-hidden">
+        <AnimatedBackground variant="minimal" />
+        <div className="relative z-10">
+          <GalacticLoader size="large" text="Cargando perfil..." />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-stone-900 via-stone-800 to-stone-900 pb-24">
-      <AnimatedBackground variant="minimal" />
-      {/* Header */}
-      <div className="bg-gradient-to-br from-red-800 to-red-900 text-white px-6 py-10 text-center">
-        {user?.picture ? (
-          <img
-            src={user.picture}
-            alt={user.name}
-            className="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-white/30 shadow-xl"
-          />
-        ) : (
-          <div className="w-24 h-24 bg-white/20 rounded-full mx-auto mb-4 flex items-center justify-center">
-            <UserIcon className="w-12 h-12" />
+    <div className="min-h-screen bg-stone-950 pb-24 relative overflow-hidden">
+      <AnimatedBackground />
+      
+      {/* Header con nebulosa personalizada */}
+      <div className="relative overflow-hidden">
+        {/* Fondo con nebulosa animada del perfil */}
+        <div 
+          className="absolute inset-0 animate-nebula-pulse"
+          style={{
+            background: `
+              radial-gradient(ellipse 120% 100% at 50% 0%, rgba(220, 38, 38, 0.4), transparent 50%),
+              radial-gradient(ellipse 80% 80% at 20% 50%, rgba(250, 204, 21, 0.2), transparent 40%),
+              radial-gradient(ellipse 80% 80% at 80% 50%, rgba(147, 51, 234, 0.15), transparent 40%)
+            `
+          }}
+        />
+        
+        {/* Estrellas en el header */}
+        <div 
+          className="absolute inset-0 animate-twinkle"
+          style={{
+            backgroundImage: `
+              radial-gradient(2px 2px at 15% 25%, rgba(255,255,255,0.8), transparent),
+              radial-gradient(1.5px 1.5px at 35% 65%, rgba(255,255,255,0.6), transparent),
+              radial-gradient(2px 2px at 55% 20%, rgba(255,255,255,0.7), transparent),
+              radial-gradient(1.5px 1.5px at 75% 45%, rgba(255,255,255,0.5), transparent),
+              radial-gradient(2px 2px at 90% 75%, rgba(255,255,255,0.6), transparent)
+            `
+          }}
+        />
+        
+        <div className="relative text-white px-6 py-10 text-center">
+          {/* Avatar con glow animado */}
+          <div className="relative inline-block mb-4">
+            <div className="absolute inset-0 bg-gradient-to-r from-red-500 via-yellow-500 to-red-500 rounded-full blur-lg opacity-50 animate-pulse scale-110" />
+            {user?.picture ? (
+              <img
+                src={user.picture}
+                alt={user.name}
+                className="relative w-24 h-24 rounded-full border-2 border-white/30 shadow-2xl"
+              />
+            ) : (
+              <div className="relative w-24 h-24 bg-gradient-to-br from-red-600 to-red-800 rounded-full flex items-center justify-center border-2 border-white/30">
+                <UserIcon className="w-12 h-12" />
+              </div>
+            )}
+            {/* Indicador de tipo de cuenta */}
+            <div className={`absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center ${
+              user?.user_type === 'cliente' 
+                ? 'bg-gradient-to-br from-blue-500 to-blue-700' 
+                : 'bg-gradient-to-br from-amber-500 to-amber-700'
+            } border-2 border-stone-950 shadow-lg`}>
+              {user?.user_type === 'cliente' ? (
+                <ShoppingBag className="w-4 h-4 text-white" />
+              ) : (
+                <Store className="w-4 h-4 text-white" />
+              )}
+            </div>
           </div>
-        )}
-        <h1 className="text-2xl font-black mb-1">{user?.name}</h1>
-        <p className="text-white/70 text-sm">{user?.email}</p>
-        <div className="inline-flex items-center gap-2 mt-3 bg-white/20 px-4 py-1.5 rounded-full text-sm font-medium">
-          {user?.user_type === 'cliente' ? (
-            <><ShoppingBag className="w-4 h-4" /> Cliente</>
-          ) : (
-            <><Store className="w-4 h-4" /> Dueño de Pulpería</>
+          
+          {/* Nombre con efecto */}
+          <h1 className="text-2xl font-black mb-1 font-galactic tracking-wide">{user?.name}</h1>
+          <p className="text-white/60 text-sm mb-3">{user?.email}</p>
+          
+          {/* Badge de tipo de cuenta */}
+          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium border border-white/10">
+            <Sparkles className="w-4 h-4 text-yellow-400" />
+            {user?.user_type === 'cliente' ? 'Cliente Galáctico' : 'Dueño Estelar'}
+          </div>
+          
+          {/* Admin Badge */}
+          {user?.is_admin && (
+            <div className="inline-flex items-center gap-2 mt-2 ml-2 bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-1 rounded-full text-sm font-bold text-white shadow-lg shadow-amber-500/30">
+              <Shield className="w-4 h-4" /> Admin
+            </div>
           )}
         </div>
-        
-        {/* Admin Badge */}
-        {user?.is_admin && (
-          <div className="inline-flex items-center gap-2 mt-2 ml-2 bg-amber-500 px-3 py-1 rounded-full text-sm font-bold text-amber-900">
-            <Shield className="w-4 h-4" /> Admin
-          </div>
-        )}
       </div>
 
-      {/* Profile Actions */}
-      <div className="px-4 py-6 space-y-4">
+      {/* Profile Actions - Sin recuadros innecesarios */}
+      <div className="relative z-10 px-4 py-6 space-y-3">
         {/* Admin Panel Access */}
         {user?.is_admin && (
           <button
             onClick={() => navigate('/admin')}
-            className="w-full bg-gradient-to-r from-amber-600 to-amber-500 rounded-2xl shadow-lg p-4 flex items-center gap-4 hover:from-amber-500 hover:to-amber-400 transition-all"
+            className="w-full bg-gradient-to-r from-amber-600 to-orange-500 rounded-2xl p-4 flex items-center gap-4 hover:from-amber-500 hover:to-orange-400 transition-all shadow-lg shadow-amber-500/20 active:scale-[0.98]"
           >
-            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
-              <Shield className="w-6 h-6 text-amber-600" />
+            <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+              <Shield className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1 text-left">
               <p className="font-bold text-white">Panel de Administrador</p>
-              <p className="text-sm text-white/80">Gestionar anuncios y pulperías</p>
+              <p className="text-sm text-white/70">Gestionar anuncios y pulperías</p>
             </div>
+            <Rocket className="w-5 h-5 text-white/60" />
           </button>
         )}
 
         {/* View Ad Assignment Log */}
         <button
           onClick={() => navigate('/ad-log')}
-          className="w-full bg-stone-800/50 backdrop-blur-sm rounded-2xl border border-stone-700/50 p-4 flex items-center gap-4 hover:border-blue-500/50 transition-all active:scale-[0.99]"
+          className="w-full p-4 flex items-center gap-4 hover:bg-white/5 rounded-2xl transition-all active:scale-[0.98] group"
         >
-          <div className="w-12 h-12 bg-blue-900/50 rounded-xl flex items-center justify-center border border-blue-700">
+          <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
             <Eye className="w-6 h-6 text-blue-400" />
           </div>
           <div className="flex-1 text-left">
             <p className="font-bold text-white">Registro de Anuncios</p>
-            <p className="text-sm text-stone-400">Ve cómo se asignan los perks</p>
+            <p className="text-sm text-stone-500">Ve cómo se asignan los perks</p>
           </div>
+          <Star className="w-5 h-5 text-stone-600 group-hover:text-blue-400 transition-colors" />
         </button>
 
         {/* Change Account Type */}
         <button
           onClick={handleChangeUserType}
           disabled={changingType}
-          className="w-full bg-stone-800/50 backdrop-blur-sm rounded-2xl border border-stone-700/50 p-4 flex items-center gap-4 hover:border-orange-500/50 transition-all active:scale-[0.99] disabled:opacity-50"
+          className="w-full p-4 flex items-center gap-4 hover:bg-white/5 rounded-2xl transition-all active:scale-[0.98] disabled:opacity-50 group"
         >
-          <div className="w-12 h-12 bg-orange-900/50 rounded-xl flex items-center justify-center border border-orange-700">
+          <div className="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center group-hover:bg-orange-500/30 transition-colors">
             <ArrowRightLeft className="w-6 h-6 text-orange-400" />
           </div>
           <div className="flex-1 text-left">
             <p className="font-bold text-white">
               {changingType ? 'Cambiando...' : 'Cambiar Tipo de Cuenta'}
             </p>
-            <p className="text-sm text-stone-400">
-              Actualmente: {user?.user_type === 'cliente' ? 'Cliente' : 'Pulpería'} → {user?.user_type === 'cliente' ? 'Pulpería' : 'Cliente'}
+            <p className="text-sm text-stone-500">
+              {user?.user_type === 'cliente' ? 'Cliente' : 'Pulpería'} → {user?.user_type === 'cliente' ? 'Pulpería' : 'Cliente'}
             </p>
           </div>
         </button>
 
         {/* Close Store - Only for pulperia owners with pulperias */}
         {user?.user_type === 'pulperia' && myPulperias.length > 0 && (
-          <div className="bg-stone-800/50 backdrop-blur-sm rounded-2xl border border-red-900/50 p-4">
+          <div className="p-4 rounded-2xl bg-red-950/30 border border-red-900/30">
             <div className="flex items-center gap-2 mb-3">
               <XCircle className="w-5 h-5 text-red-400" />
               <h3 className="font-bold text-red-400">Cerrar Tienda</h3>
             </div>
-            <p className="text-sm text-stone-400 mb-3">
+            <p className="text-sm text-stone-500 mb-3">
               Cierra tu pulpería permanentemente. Podrás crear una nueva después.
             </p>
             {myPulperias.map(pulperia => (
@@ -249,7 +294,7 @@ const UserProfile = () => {
                   setSelectedPulperiaToClose(pulperia);
                   setShowCloseStoreDialog(true);
                 }}
-                className="w-full p-3 bg-red-900/20 border border-red-800/50 rounded-xl flex items-center gap-3 hover:bg-red-900/30 transition-all mb-2 last:mb-0"
+                className="w-full p-3 bg-red-900/20 rounded-xl flex items-center gap-3 hover:bg-red-900/30 transition-all mb-2 last:mb-0"
               >
                 <Store className="w-5 h-5 text-red-400" />
                 <span className="text-white flex-1 text-left">{pulperia.name}</span>
@@ -262,59 +307,56 @@ const UserProfile = () => {
         {/* Logout Button */}
         <button
           onClick={handleLogout}
-          className="w-full bg-stone-800/50 backdrop-blur-sm rounded-2xl border border-stone-700/50 p-4 flex items-center gap-4 hover:border-red-500/50 transition-all active:scale-[0.99]"
+          className="w-full p-4 flex items-center gap-4 hover:bg-white/5 rounded-2xl transition-all active:scale-[0.98] group"
         >
-          <div className="w-12 h-12 bg-red-900/50 rounded-xl flex items-center justify-center border border-red-700">
+          <div className="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center group-hover:bg-red-500/30 transition-colors">
             <LogOut className="w-6 h-6 text-red-400" />
           </div>
           <div className="flex-1 text-left">
             <p className="font-bold text-white">Cerrar Sesión</p>
-            <p className="text-sm text-stone-400">Salir de tu cuenta</p>
+            <p className="text-sm text-stone-500">Salir de tu cuenta</p>
           </div>
         </button>
 
-        {/* Support Section */}
-        <div className="bg-stone-800/50 backdrop-blur-sm rounded-2xl border border-stone-700/50 p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <Heart className="w-5 h-5 text-red-400" />
-            <h3 className="font-bold text-white">Apoya al Creador</h3>
+        {/* Divider */}
+        <div className="h-px bg-gradient-to-r from-transparent via-stone-700/50 to-transparent my-4" />
+
+        {/* Support Section - Simplificado */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 px-2">
+            <Heart className="w-4 h-4 text-red-400" />
+            <h3 className="font-bold text-white text-sm">Apoya al Creador</h3>
           </div>
           
-          <div className="space-y-3">
-            <a 
-              href="mailto:onol4sco05@gmail.com"
-              className="flex items-center gap-3 p-3 bg-stone-700/30 rounded-xl hover:bg-stone-700/50 transition-all border border-stone-600"
-            >
-              <Mail className="w-5 h-5 text-red-400" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-stone-300">Contacto</p>
-                <p className="text-xs text-red-400 truncate">onol4sco05@gmail.com</p>
-              </div>
-            </a>
+          <a 
+            href="mailto:onol4sco05@gmail.com"
+            className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-all group"
+          >
+            <Mail className="w-5 h-5 text-red-400 group-hover:text-red-300" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-stone-300">Contacto</p>
+              <p className="text-xs text-stone-500 truncate">onol4sco05@gmail.com</p>
+            </div>
+          </a>
 
-            <a 
-              href="https://paypal.me/alejandronolasco979?locale.x=es_XC&country.x=HN"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 p-3 bg-blue-900/30 rounded-xl hover:bg-blue-900/50 transition-all border border-blue-700"
-            >
-              <CreditCard className="w-5 h-5 text-blue-400" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-stone-300">PayPal</p>
-                <p className="text-xs text-blue-400 truncate">paypal.me/alejandronolasco979</p>
-              </div>
-            </a>
-          </div>
-
-          <p className="text-center text-xs text-stone-500 mt-4">
-            Tu apoyo ayuda a mantener la plataforma 🙏
-          </p>
+          <a 
+            href="https://paypal.me/alejandronolasco979?locale.x=es_XC&country.x=HN"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-all group"
+          >
+            <CreditCard className="w-5 h-5 text-blue-400 group-hover:text-blue-300" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-stone-300">PayPal</p>
+              <p className="text-xs text-stone-500 truncate">Ayuda a mantener la plataforma 🙏</p>
+            </div>
+          </a>
         </div>
 
         {/* Footer */}
-        <div className="text-center pt-4">
-          <p className="text-sm text-stone-400 font-medium">La Pulpería v2.0</p>
-          <p className="text-xs text-stone-500 mt-1">© 2024 - Conectando comunidades hondureñas</p>
+        <div className="text-center pt-6">
+          <p className="text-sm text-stone-500 font-medium font-galactic">La Pulpería v2.0</p>
+          <p className="text-xs text-stone-600 mt-1">© 2024 - Conectando comunidades hondureñas</p>
         </div>
       </div>
 
@@ -322,7 +364,7 @@ const UserProfile = () => {
       
       {/* Dialog para cerrar tienda */}
       <Dialog open={showCloseStoreDialog} onOpenChange={setShowCloseStoreDialog}>
-        <DialogContent className="bg-stone-950 border-red-800 max-w-md">
+        <DialogContent className="bg-stone-950 border-red-800/50 max-w-md">
           <DialogHeader>
             <DialogTitle className="text-red-400 flex items-center gap-3">
               <AlertTriangle className="w-6 h-6" />
@@ -331,7 +373,7 @@ const UserProfile = () => {
           </DialogHeader>
           
           <div className="space-y-4">
-            <div className="bg-red-900/20 border border-red-800/50 rounded-xl p-4">
+            <div className="bg-red-900/20 rounded-xl p-4">
               <p className="text-red-300 font-medium mb-2">⚠️ Esta acción eliminará los datos de esta tienda</p>
               <ul className="text-sm text-red-200/70 space-y-1 list-disc pl-4">
                 <li>Se eliminarán todos tus productos</li>
