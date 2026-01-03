@@ -12,20 +12,15 @@ import GalacticLoader from '../components/GalacticLoader';
 
 const GlobalAnnouncementsPage = ({ user }) => {
   const navigate = useNavigate();
-  const [globalAnnouncements, setGlobalAnnouncements] = useState([]);
-  const [featuredAds, setFeaturedAds] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [globalRes, featuredRes] = await Promise.all([
-          api.get('/api/global-announcements').catch(() => ({ data: [] })),
-          api.get('/api/featured-ads').catch(() => ({ data: [] }))
-        ]);
-        
-        setGlobalAnnouncements(globalRes.data || []);
-        setFeaturedAds(featuredRes.data || []);
+        // Los anuncios globales son los featured ads de las pulperías
+        const response = await api.get('/api/featured-ads').catch(() => ({ data: [] }));
+        setAnnouncements(response.data || []);
       } catch (error) {
         console.error('Error fetching announcements:', error);
       } finally {
@@ -47,12 +42,6 @@ const GlobalAnnouncementsPage = ({ user }) => {
   };
 
   const cartCount = JSON.parse(localStorage.getItem('cart') || '[]').length;
-  
-  // Combinar todos los anuncios
-  const allAnnouncements = [
-    ...globalAnnouncements.map(a => ({ ...a, type: 'global' })),
-    ...featuredAds.map(a => ({ ...a, type: 'featured' }))
-  ];
 
   if (loading) {
     return (
@@ -81,50 +70,38 @@ const GlobalAnnouncementsPage = ({ user }) => {
               <Megaphone className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-lg font-black text-white">Anuncios</h2>
-              <p className="text-sm text-orange-300">Ofertas exclusivas y promociones</p>
+              <h2 className="text-lg font-black text-white">Anuncios Globales</h2>
+              <p className="text-sm text-orange-300">Ofertas de nuestras pulperías</p>
             </div>
           </div>
         </div>
 
-        {/* All Announcements */}
+        {/* Announcements */}
         <div className="space-y-4">
-          {allAnnouncements.length === 0 ? (
+          {announcements.length === 0 ? (
             <div className="bg-stone-800/50 backdrop-blur-sm rounded-2xl border border-stone-700/50 p-8 text-center">
               <Megaphone className="w-12 h-12 mx-auto text-stone-600 mb-3" />
               <h3 className="text-white font-bold mb-2">Sin anuncios</h3>
               <p className="text-stone-500 text-sm">No hay anuncios activos en este momento</p>
             </div>
           ) : (
-            allAnnouncements.map((item, index) => (
+            announcements.map((ad) => (
               <div 
-                key={item.announcement_id || item.ad_id || index}
-                className={`bg-stone-800/50 backdrop-blur-sm rounded-2xl border overflow-hidden transition-all hover:border-orange-500/50 ${
-                  item.type === 'global' && item.priority > 5 ? 'border-orange-500/30' : 'border-stone-700/50'
-                }`}
+                key={ad.ad_id}
+                className="bg-stone-800/50 backdrop-blur-sm rounded-2xl border border-stone-700/50 overflow-hidden transition-all hover:border-orange-500/50"
               >
-                {/* Priority Badge for Global */}
-                {item.type === 'global' && item.priority > 5 && (
-                  <div className="bg-gradient-to-r from-orange-600 to-amber-500 px-4 py-1.5 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-white" />
-                    <span className="text-white text-xs font-bold">DESTACADO</span>
-                  </div>
-                )}
-                
-                {/* Sponsored Badge for Featured */}
-                {item.type === 'featured' && (
-                  <div className="bg-gradient-to-r from-amber-600 to-yellow-500 px-4 py-1.5 flex items-center gap-2">
-                    <Star className="w-4 h-4 text-white" />
-                    <span className="text-white text-xs font-bold">PATROCINADO</span>
-                  </div>
-                )}
+                {/* Badge */}
+                <div className="bg-gradient-to-r from-orange-600 to-amber-500 px-4 py-1.5 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-white" />
+                  <span className="text-white text-xs font-bold">ANUNCIO GLOBAL</span>
+                </div>
                 
                 {/* Image - Fixed aspect ratio */}
-                {(item.image_url) && (
+                {ad.image_url && (
                   <div className="relative bg-stone-900 aspect-video">
                     <img 
-                      src={item.image_url} 
-                      alt={item.title || item.pulperia_name || 'Anuncio'}
+                      src={ad.image_url} 
+                      alt={ad.title || ad.pulperia_name || 'Anuncio'}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -132,54 +109,33 @@ const GlobalAnnouncementsPage = ({ user }) => {
                 
                 {/* Content */}
                 <div className="p-4">
-                  <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
-                    {item.type === 'global' && item.priority > 5 && (
-                      <Zap className="w-5 h-5 text-amber-400" />
-                    )}
-                    {item.title || item.pulperia_name}
+                  <h3 className="text-lg font-bold text-white mb-2">
+                    {ad.title || ad.pulperia_name}
                   </h3>
                   
-                  {(item.content || item.description) && (
+                  {ad.description && (
                     <p className="text-stone-400 text-sm mb-4 whitespace-pre-wrap">
-                      {item.content || item.description}
+                      {ad.description}
                     </p>
                   )}
                   
                   {/* Footer */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-xs text-stone-500">
+                      <Store className="w-3 h-3" />
+                      <span>{ad.pulperia_name}</span>
+                      <span className="mx-1">•</span>
                       <Calendar className="w-3 h-3" />
-                      {formatDate(item.created_at)}
-                      {item.type === 'featured' && item.pulperia_name && (
-                        <>
-                          <span className="mx-1">•</span>
-                          <Store className="w-3 h-3" />
-                          {item.pulperia_name}
-                        </>
-                      )}
+                      {formatDate(ad.created_at)}
                     </div>
                     
-                    {item.link_url && (
-                      <a 
-                        href={item.link_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-orange-400 text-sm font-medium hover:text-orange-300 transition-colors"
-                      >
-                        Ver más
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                    )}
-                    
-                    {item.type === 'featured' && item.pulperia_id && (
-                      <button
-                        onClick={() => navigate(`/pulperia/${item.pulperia_id}`)}
-                        className="flex items-center gap-1 text-orange-400 text-sm font-medium hover:text-orange-300 transition-colors"
-                      >
-                        Ver tienda
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
-                    )}
+                    <button
+                      onClick={() => navigate(`/pulperia/${ad.pulperia_id}`)}
+                      className="flex items-center gap-1 text-orange-400 text-sm font-medium hover:text-orange-300 transition-colors"
+                    >
+                      Ver tienda
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               </div>
