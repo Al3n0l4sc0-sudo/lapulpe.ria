@@ -492,10 +492,39 @@ const MapView = () => {
             </div>
           </div>
           
-          {/* Product Search Bar - Google Style */}
+          {/* Unified Search Bar - Google Style */}
           <div className="px-4 py-3">
             <div className="relative">
-              <div className="bg-white rounded-2xl shadow-xl border border-stone-200 overflow-hidden">
+              {/* Search Bar Container */}
+              <div className="bg-gradient-to-r from-stone-900 to-stone-800 rounded-2xl shadow-xl border border-stone-700/50 overflow-hidden backdrop-blur-xl">
+                {/* Toggle Button */}
+                <div className="flex items-center justify-center py-2 px-4 border-b border-stone-700/50">
+                  <button
+                    onClick={toggleSearchMode}
+                    className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${
+                      searchMode === 'products' 
+                        ? 'bg-red-600 text-white shadow-lg shadow-red-500/30' 
+                        : 'bg-stone-700/50 text-stone-300 hover:bg-stone-700'
+                    }`}
+                  >
+                    <Package className="w-4 h-4" />
+                    Productos
+                  </button>
+                  <div className="w-px h-6 bg-stone-700 mx-2" />
+                  <button
+                    onClick={toggleSearchMode}
+                    className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${
+                      searchMode === 'pulperias' 
+                        ? 'bg-red-600 text-white shadow-lg shadow-red-500/30' 
+                        : 'bg-stone-700/50 text-stone-300 hover:bg-stone-700'
+                    }`}
+                  >
+                    <Store className="w-4 h-4" />
+                    Pulperías
+                  </button>
+                </div>
+                
+                {/* Search Input */}
                 <div className="flex items-center px-4 py-3">
                   <Search className="w-5 h-5 text-stone-400 flex-shrink-0" />
                   <input
@@ -503,18 +532,24 @@ const MapView = () => {
                     value={productSearch}
                     onChange={(e) => setProductSearch(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleProductSearch()}
-                    placeholder="Buscar productos... ej: leche, pan, huevos"
-                    className="flex-1 ml-3 text-stone-900 placeholder:text-stone-400 outline-none text-base bg-transparent"
+                    placeholder={searchMode === 'products' 
+                      ? "Buscar productos... ej: leche, pan, huevos" 
+                      : "Buscar pulperías... ej: La Bodega"
+                    }
+                    className="flex-1 ml-3 text-white placeholder:text-stone-500 outline-none text-base bg-transparent"
                   />
                   {productSearch && (
-                    <button onClick={clearProductSearch} className="p-1 hover:bg-stone-100 rounded-full">
+                    <button 
+                      onClick={clearProductSearch} 
+                      className="p-1.5 hover:bg-stone-700/50 rounded-full transition-colors"
+                    >
                       <X className="w-5 h-5 text-stone-400" />
                     </button>
                   )}
                   <button
                     onClick={handleProductSearch}
                     disabled={searchingProducts}
-                    className="ml-2 bg-red-600 hover:bg-red-500 text-white font-medium px-4 py-2 rounded-xl transition-colors disabled:opacity-50"
+                    className="ml-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-medium px-5 py-2 rounded-xl transition-all disabled:opacity-50 shadow-lg shadow-red-500/20"
                   >
                     {searchingProducts ? (
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -525,13 +560,13 @@ const MapView = () => {
                 </div>
               </div>
               
-              {/* Product Results Dropdown */}
-              {showProductResults && productResults.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-stone-200 max-h-80 overflow-y-auto z-50">
-                  <div className="p-3 border-b border-stone-100">
-                    <p className="text-stone-500 text-sm">{productResults.length} productos encontrados</p>
+              {/* Results Dropdown - Products */}
+              {showProductResults && searchMode === 'products' && productResults.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-stone-900 rounded-2xl shadow-2xl border border-stone-700/50 max-h-80 overflow-y-auto z-50 animate-in slide-in-from-top-2 duration-200">
+                  <div className="p-3 border-b border-stone-700/50 bg-stone-800/50">
+                    <p className="text-stone-400 text-sm">{productResults.length} productos encontrados</p>
                   </div>
-                  <div className="divide-y divide-stone-100">
+                  <div className="divide-y divide-stone-800">
                     {productResults.map((product) => (
                       <button
                         key={product.product_id}
@@ -539,25 +574,66 @@ const MapView = () => {
                           navigate(`/pulperia/${product.pulperia_id}`);
                           clearProductSearch();
                         }}
-                        className="w-full p-3 flex items-center gap-3 hover:bg-stone-50 transition-colors text-left"
+                        className="w-full p-3 flex items-center gap-3 hover:bg-stone-800/50 transition-colors text-left"
                       >
                         {product.image_url ? (
-                          <img src={product.image_url} alt="" className="w-12 h-12 rounded-lg object-cover bg-stone-100" />
+                          <img src={product.image_url} alt="" className="w-12 h-12 rounded-lg object-cover bg-stone-800" />
                         ) : (
-                          <div className="w-12 h-12 rounded-lg bg-stone-100 flex items-center justify-center">
-                            <Package className="w-5 h-5 text-stone-400" />
+                          <div className="w-12 h-12 rounded-lg bg-stone-800 flex items-center justify-center">
+                            <Package className="w-5 h-5 text-stone-500" />
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-stone-900 truncate">{product.name}</p>
+                          <p className="font-medium text-white truncate">{product.name}</p>
                           <p className="text-sm text-stone-500 truncate">{product.pulperia_name || 'Pulpería'}</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-red-600">L {product.price?.toFixed(0)}</p>
+                          <p className="font-bold text-red-400">L {product.price?.toFixed(0)}</p>
                           {product.available ? (
-                            <span className="text-xs text-green-600">Disponible</span>
+                            <span className="text-xs text-green-400">Disponible</span>
                           ) : (
-                            <span className="text-xs text-stone-400">Agotado</span>
+                            <span className="text-xs text-stone-500">Agotado</span>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Results Dropdown - Pulperias */}
+              {showProductResults && searchMode === 'pulperias' && productResults.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-stone-900 rounded-2xl shadow-2xl border border-stone-700/50 max-h-80 overflow-y-auto z-50 animate-in slide-in-from-top-2 duration-200">
+                  <div className="p-3 border-b border-stone-700/50 bg-stone-800/50">
+                    <p className="text-stone-400 text-sm">{productResults.length} pulperías encontradas</p>
+                  </div>
+                  <div className="divide-y divide-stone-800">
+                    {productResults.map((pulperia) => (
+                      <button
+                        key={pulperia.pulperia_id}
+                        onClick={() => {
+                          navigate(`/pulperia/${pulperia.pulperia_id}`);
+                          clearProductSearch();
+                        }}
+                        className="w-full p-3 flex items-center gap-3 hover:bg-stone-800/50 transition-colors text-left"
+                      >
+                        {pulperia.logo_url ? (
+                          <img src={pulperia.logo_url} alt="" className="w-12 h-12 rounded-lg object-cover bg-stone-800" />
+                        ) : (
+                          <div className="w-12 h-12 rounded-lg bg-red-600/20 flex items-center justify-center">
+                            <Store className="w-5 h-5 text-red-400" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-white truncate">{pulperia.name}</p>
+                          <p className="text-sm text-stone-500 truncate">{pulperia.address || 'Sin dirección'}</p>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          {pulperia.rating > 0 && (
+                            <>
+                              <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                              <span className="text-amber-400 text-sm font-medium">{pulperia.rating.toFixed(1)}</span>
+                            </>
                           )}
                         </div>
                       </button>
@@ -568,10 +644,16 @@ const MapView = () => {
               
               {/* No Results */}
               {showProductResults && productResults.length === 0 && !searchingProducts && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-stone-200 p-6 text-center z-50">
-                  <Package className="w-10 h-10 mx-auto text-stone-300 mb-2" />
-                  <p className="text-stone-500 text-sm">No se encontraron productos</p>
-                  <p className="text-stone-400 text-xs mt-1">Intenta con otro término de búsqueda</p>
+                <div className="absolute top-full left-0 right-0 mt-2 bg-stone-900 rounded-2xl shadow-2xl border border-stone-700/50 p-6 text-center z-50 animate-in slide-in-from-top-2 duration-200">
+                  {searchMode === 'products' ? (
+                    <Package className="w-10 h-10 mx-auto text-stone-600 mb-2" />
+                  ) : (
+                    <Store className="w-10 h-10 mx-auto text-stone-600 mb-2" />
+                  )}
+                  <p className="text-stone-400 text-sm">
+                    {searchMode === 'products' ? 'No se encontraron productos' : 'No se encontraron pulperías'}
+                  </p>
+                  <p className="text-stone-600 text-xs mt-1">Intenta con otro término de búsqueda</p>
                 </div>
               )}
             </div>
