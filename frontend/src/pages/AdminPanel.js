@@ -630,50 +630,104 @@ const AdminPanel = () => {
           </div>
         )}
 
-        {/* Badges Tab */}
-        {activeTab === 'badges' && (
+        {/* Global Announcements Tab */}
+        {activeTab === 'globales' && (
           <div className="space-y-4">
-            <div className="bg-stone-800/50 backdrop-blur-sm rounded-2xl p-6 border border-stone-700/50">
-              <h3 className="text-xl font-black text-white mb-2 flex items-center gap-2">
-                <Trophy className="w-6 h-6 text-amber-400" />
-                Sistema de Badges
-              </h3>
-              <p className="text-stone-400 text-sm mb-6">
-                Asigna badges únicos estilo gaming a las pulperías destacadas
-              </p>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {BADGES.map(badge => (
-                  <div key={badge.id} className="bg-stone-900/50 rounded-xl p-4 border border-stone-700/50 hover:border-stone-600 transition-all">
-                    <BadgeDisplay badgeId={badge.id} size="lg" showName={true} />
-                  </div>
-                ))}
+            {/* Create New */}
+            <div className="bg-gradient-to-r from-orange-600/20 to-amber-600/20 backdrop-blur-sm rounded-2xl p-4 border border-orange-500/30">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-orange-400 flex items-center gap-2">
+                  <Megaphone className="w-5 h-5" />
+                  Anuncios Globales (1000 Lps)
+                </h3>
+                <Button
+                  onClick={() => setShowGlobalAnnouncementDialog(true)}
+                  className="bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 text-white"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Crear Anuncio
+                </Button>
               </div>
+              <p className="text-stone-400 text-sm">
+                Los anuncios globales aparecen para TODOS los usuarios de la app
+              </p>
             </div>
             
-            {/* Pulperias with badges */}
+            {/* Active Announcements */}
             <div className="bg-stone-800/50 backdrop-blur-sm rounded-2xl p-4 border border-stone-700/50">
-              <h3 className="font-bold text-white mb-4">Pulperías con Badge</h3>
-              <div className="space-y-3">
-                {pulperias.filter(p => p.badge).map(pulperia => (
-                  <div key={pulperia.pulperia_id} className="flex items-center justify-between bg-stone-900/50 rounded-xl p-3 border border-stone-700/50">
-                    <div className="flex items-center gap-3">
-                      {pulperia.logo_url ? (
-                        <img src={pulperia.logo_url} alt={pulperia.name} className="w-10 h-10 rounded-lg object-cover" />
-                      ) : (
-                        <div className="w-10 h-10 rounded-lg bg-red-600 flex items-center justify-center">
-                          <Store className="w-5 h-5 text-white" />
+              <h3 className="font-bold text-white mb-4">Anuncios Activos</h3>
+              
+              {globalAnnouncements.length === 0 ? (
+                <div className="text-center py-8">
+                  <Megaphone className="w-12 h-12 mx-auto text-stone-600 mb-3" />
+                  <p className="text-stone-500">No hay anuncios globales</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {globalAnnouncements.map(announcement => (
+                    <div 
+                      key={announcement.announcement_id} 
+                      className={`bg-stone-900/50 rounded-xl p-4 border transition-all ${
+                        announcement.is_active ? 'border-green-500/30' : 'border-stone-700/50 opacity-60'
+                      }`}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            {announcement.priority > 5 && (
+                              <span className="bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full text-xs font-bold">
+                                DESTACADO
+                              </span>
+                            )}
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                              announcement.is_active 
+                                ? 'bg-green-500/20 text-green-400' 
+                                : 'bg-stone-500/20 text-stone-400'
+                            }`}>
+                              {announcement.is_active ? 'Activo' : 'Inactivo'}
+                            </span>
+                          </div>
+                          <h4 className="font-bold text-white">{announcement.title}</h4>
+                          <p className="text-stone-400 text-sm line-clamp-2">{announcement.content}</p>
+                          <div className="flex items-center gap-3 mt-2 text-xs text-stone-500">
+                            <span>Creado: {new Date(announcement.created_at).toLocaleDateString('es-HN')}</span>
+                            {announcement.expires_at && (
+                              <span>Expira: {new Date(announcement.expires_at).toLocaleDateString('es-HN')}</span>
+                            )}
+                          </div>
                         </div>
-                      )}
-                      <span className="font-bold text-white">{pulperia.name}</span>
+                        {announcement.image_url && (
+                          <img 
+                            src={announcement.image_url} 
+                            alt="" 
+                            className="w-16 h-16 rounded-lg object-cover ml-3"
+                          />
+                        )}
+                      </div>
+                      
+                      <div className="flex gap-2 mt-3">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleToggleGlobalAnnouncement(announcement.announcement_id)}
+                          className={announcement.is_active ? 'text-orange-400 hover:bg-orange-900/20' : 'text-green-400 hover:bg-green-900/20'}
+                        >
+                          {announcement.is_active ? 'Desactivar' : 'Activar'}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteGlobalAnnouncement(announcement.announcement_id)}
+                          className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                        >
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          Eliminar
+                        </Button>
+                      </div>
                     </div>
-                    <BadgeDisplay badgeId={pulperia.badge} size="sm" showName={true} />
-                  </div>
-                ))}
-                {pulperias.filter(p => p.badge).length === 0 && (
-                  <p className="text-center text-stone-500 py-8">No hay pulperías con badges aún</p>
-                )}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
