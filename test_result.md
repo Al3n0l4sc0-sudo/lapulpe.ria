@@ -227,7 +227,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Global Announcements API"
     - "BottomNav - Pestaña Anuncios"
     - "Header - Z-index notificaciones"
   stuck_tasks: []
