@@ -101,3 +101,31 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+## Latest Update: 2026-01-03
+
+### Tasks Implemented:
+1. **Sección de Empleo con colores amarillos** - Página de Jobs actualizada con tema amarillo
+2. **Pulperías Solo en Línea** - Opción para crear pulperías sin dirección física
+3. **Anuncios con imágenes completas** - Rediseño de anuncios para mostrar imágenes en tamaño completo
+4. **Sistema de Meritocracia como Tab** - Agregado tab de Logros en perfil de pulperías
+5. **Sesión Persistente** - Sesión dura 1 año, no se cierra al refrescar
+6. **Disclaimer una sola vez** - No muestra disclaimer a usuarios que ya lo vieron
+7. **Fondo Estrellado** - Animaciones de estrellas y nebulosas agregadas
+8. **Limpieza de datos de prueba** - Eliminadas 3 pulperías demo del sistema
+
+### Endpoints a Probar:
+- GET /api/jobs - Lista de empleos
+- POST /api/jobs - Crear empleo (requiere auth)
+- GET /api/pulperias - Lista pulperías con campo is_online_only
+- POST /api/pulperias - Crear pulpería con opción is_online_only
+- GET /api/pulperias/{id}/achievements - Logros de pulpería
+- GET /api/featured-ads - Anuncios globales destacados
+
+### Test Scenarios:
+1. Verificar página de Jobs carga con colores amarillos
+2. Verificar que se puede crear pulpería marcando "Solo en línea"
+3. Verificar que anuncios muestran imágenes completas
+4. Verificar tab de Logros en perfil de pulpería
+5. Verificar que sesión persiste después de refresh
+6. Verificar disclaimer no aparece segunda vez
