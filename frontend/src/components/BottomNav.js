@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { MapPin, Search, ShoppingCart, User, LayoutDashboard, History, Briefcase } from 'lucide-react';
+import { MapPin, Megaphone, ShoppingCart, User, LayoutDashboard, History, Briefcase } from 'lucide-react';
 import MiniNebula from './MiniNebula';
 
 const BottomNav = ({ user, cartCount = 0, activeTab }) => {
@@ -14,11 +14,12 @@ const BottomNav = ({ user, cartCount = 0, activeTab }) => {
   const navItems = user?.user_type === 'pulperia' ? [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard', testId: 'nav-dashboard', tab: 'dashboard' },
     { icon: Briefcase, label: 'Chamba', path: '/jobs', testId: 'nav-jobs', tab: 'jobs', isChamba: true },
+    { icon: Megaphone, label: 'Anuncios', path: '/anuncios-globales', testId: 'nav-anuncios', tab: 'anuncios', isAnuncios: true },
     { icon: History, label: 'Historial', path: '/order-history', testId: 'nav-history', tab: 'historial' },
     { icon: User, label: 'Perfil', path: '/profile', testId: 'nav-profile', tab: 'perfil' },
   ] : [
     { icon: MapPin, label: 'Mapa', path: '/map', testId: 'nav-map', tab: 'mapa' },
-    { icon: Search, label: 'Buscar', path: '/search', testId: 'nav-search', tab: 'buscar' },
+    { icon: Megaphone, label: 'Anuncios', path: '/anuncios-globales', testId: 'nav-anuncios', tab: 'anuncios', isAnuncios: true },
     { icon: Briefcase, label: 'Chamba', path: '/jobs', testId: 'nav-jobs', tab: 'jobs', isChamba: true },
     { icon: ShoppingCart, label: 'Carrito', path: '/cart', testId: 'nav-cart', tab: 'carrito', badge: cartCount },
     { icon: User, label: 'Perfil', path: '/profile', testId: 'nav-profile', tab: 'perfil' },
