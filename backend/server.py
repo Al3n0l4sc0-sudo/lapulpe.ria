@@ -38,6 +38,16 @@ from models.schemas import (
 # Importar configuración de logros
 from config.achievements import ACHIEVEMENT_DEFINITIONS, AD_PLANS
 
+# Importar servicio de emails
+from services.email_service import (
+    send_order_notification,
+    send_order_accepted,
+    send_order_ready,
+    send_job_application_notification,
+    send_application_accepted,
+    send_application_rejected
+)
+
 # ============================================
 # v1.1 - NUEVOS MODELOS
 # ============================================
