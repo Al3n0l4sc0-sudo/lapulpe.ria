@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { api, BACKEND_URL } from '../config/api';
 import { toast } from 'sonner';
-import { User as UserIcon, LogOut, Mail, CreditCard, Heart, Shield, Store, ShoppingBag, ArrowRightLeft, Eye, XCircle, AlertTriangle, Sparkles, Star, Rocket } from 'lucide-react';
+import { User as UserIcon, LogOut, Mail, CreditCard, Heart, Shield, Store, ShoppingBag, ArrowRightLeft, Eye, XCircle, AlertTriangle, Sparkles, Star, Rocket, Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import AnimatedBackground from '../components/AnimatedBackground';
 import GalacticLoader from '../components/GalacticLoader';
+import ProfilePictureEditor from '../components/profile/ProfilePictureEditor';
 import { useAuth } from '../contexts/AuthContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { Button } from '../components/ui/button';
