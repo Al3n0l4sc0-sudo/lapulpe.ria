@@ -741,6 +741,10 @@ const AdminPanel = () => {
                   <Tv className="w-5 h-5" />
                   Slots de Anuncios Activos (1000 Lps/mes)
                 </h3>
+                <p className="text-stone-400 text-sm mb-4">
+                  Habilita a las pulperías para que puedan subir sus anuncios destacados
+                </p>
+              </div>
               
               {featuredAdSlots.length === 0 ? (
                 <div className="text-center py-8">
