@@ -43,14 +43,12 @@ const BottomNav = ({ user, cartCount = 0, activeTab }) => {
               className={`relative flex flex-col items-center gap-1 py-2 px-3 rounded-xl transition-all duration-300 ${
                 active 
                   ? isChamba ? 'text-yellow-400' : 'text-red-400' 
-                  : isChamba ? 'text-yellow-500/60 hover:text-yellow-400' : 'text-stone-500 hover:text-stone-300'
+                  : 'text-stone-500 hover:text-stone-300'
               }`}
             >
-              {/* Glow effect for Chamba - Yellow */}
-              {isChamba && (
-                <div className={`absolute inset-0 rounded-xl blur-md transition-opacity duration-300 ${
-                  active ? 'bg-yellow-500/30 opacity-100' : 'bg-yellow-500/20 opacity-0 group-hover:opacity-100'
-                } animate-pulse-slow`} />
+              {/* Glow effect for Chamba - Yellow - SOLO cuando está activo */}
+              {isChamba && active && (
+                <div className="absolute inset-0 rounded-xl blur-md bg-yellow-500/25 animate-pulse-slow" />
               )}
               
               {/* Glow effect for active non-Chamba */}
