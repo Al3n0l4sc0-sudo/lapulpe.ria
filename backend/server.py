@@ -16,14 +16,33 @@ import httpx
 import asyncio
 import json
 
+# ============================================
+# LA PULPERÍA v1.0 - Backend API
+# Arquitectura refactorizada con módulos separados
+# ============================================
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+
+# Importar modelos desde módulo separado
+from models.schemas import (
+    User, Pulperia, PulperiaCreate, Product, ProductCreate,
+    Order, OrderItem, OrderCreate, OrderStatusUpdate,
+    Review, ReviewCreate, Job, JobCreate, JobApplication,
+    Service, ServiceCreate, Advertisement, AdvertisementCreate,
+    AdAssignmentLog, AdminAdActivation, FeaturedAd, FeaturedAdSlot,
+    PulperiaAchievement, PulperiaStats, SessionRequest, UserTypeChange,
+    AnnouncementCreate, ClosePulperiaRequest
+)
+
+# Importar configuración de logros
+from config.achievements import ACHIEVEMENT_DEFINITIONS, AD_PLANS
 
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ.get('DB_NAME', 'la_pulperia_db')]
 
-app = FastAPI(title="La Pulpería API", version="2.0.0")
+app = FastAPI(title="La Pulpería API", version="1.0.0", description="Backend para La Pulpería - Marketplace de pulperías hondureñas")
 api_router = APIRouter(prefix="/api")
 
 # Admin email for special access
