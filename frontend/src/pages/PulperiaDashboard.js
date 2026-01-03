@@ -193,6 +193,8 @@ const PulperiaDashboard = () => {
     phone: '',
     email: '',
     website: '',
+    instagram_url: '',
+    facebook_url: '',
     hours: '',
     lat: '',
     lng: '',
