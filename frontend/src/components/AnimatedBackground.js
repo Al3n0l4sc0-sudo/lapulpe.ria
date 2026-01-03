@@ -1,6 +1,6 @@
-// AnimatedBackground - Galactic Market Theme
-// Nebulosas multicolor con énfasis en rojo, estrellas y estrellas fugaces
-// Optimizado para rendimiento
+// AnimatedBackground - Nebulosa Realista
+// Colores: Rojo dominante, púrpura, azul, amarillo/naranja
+// Estrellas y estrellas fugaces ocasionales
 
 import { useEffect, useState, memo } from 'react';
 
@@ -15,26 +15,22 @@ const AnimatedBackground = memo(({ color = 'red', variant = 'full' }) => {
       const id = Date.now();
       const star = {
         id,
-        left: Math.random() * 60 + 10, // 10-70%
-        top: Math.random() * 30, // 0-30%
-        duration: 1.5 + Math.random() * 1, // 1.5-2.5s
-        delay: 0
+        left: Math.random() * 60 + 10,
+        top: Math.random() * 30,
+        duration: 1.5 + Math.random() * 1,
       };
       
       setShootingStars(prev => [...prev, star]);
       
-      // Remover después de la animación
       setTimeout(() => {
         setShootingStars(prev => prev.filter(s => s.id !== id));
       }, star.duration * 1000 + 500);
     };
     
-    // Primera estrella fugaz después de 5 segundos
     const initialTimeout = setTimeout(createShootingStar, 5000);
     
-    // Crear estrellas fugaces cada 8-15 segundos
     const interval = setInterval(() => {
-      if (Math.random() > 0.4) { // 60% de probabilidad
+      if (Math.random() > 0.4) {
         createShootingStar();
       }
     }, 8000 + Math.random() * 7000);
@@ -45,45 +41,46 @@ const AnimatedBackground = memo(({ color = 'red', variant = 'full' }) => {
     };
   }, [variant]);
 
-  // Colores según el tema
-  const themes = {
+  // Colores de nebulosa realista
+  const nebulaColors = {
     red: {
-      // Nebulosa multicolor con énfasis en rojo
-      nebula1: 'rgba(220, 38, 38, 0.2)', // Rojo principal
-      nebula2: 'rgba(185, 28, 28, 0.15)', // Rojo oscuro
-      nebula3: 'rgba(147, 51, 234, 0.1)', // Púrpura
-      nebula4: 'rgba(59, 130, 246, 0.08)', // Azul
-      nebula5: 'rgba(249, 115, 22, 0.1)', // Naranja
-      particle: 'bg-red-400/30',
+      // Nebulosa realista con múltiples colores
+      primary: 'rgba(220, 38, 38, 0.25)', // Rojo brillante
+      secondary: 'rgba(185, 28, 28, 0.18)', // Rojo oscuro
+      purple: 'rgba(147, 51, 234, 0.12)', // Púrpura
+      blue: 'rgba(59, 130, 246, 0.08)', // Azul
+      yellow: 'rgba(250, 204, 21, 0.15)', // Amarillo
+      orange: 'rgba(249, 115, 22, 0.12)', // Naranja
+      pink: 'rgba(236, 72, 153, 0.08)', // Rosa
       glow: '#dc2626'
     },
     yellow: {
-      nebula1: 'rgba(245, 158, 11, 0.18)',
-      nebula2: 'rgba(217, 119, 6, 0.12)',
-      nebula3: 'rgba(251, 191, 36, 0.1)',
-      nebula4: 'rgba(220, 38, 38, 0.08)',
-      nebula5: 'rgba(234, 179, 8, 0.1)',
-      particle: 'bg-amber-400/30',
+      primary: 'rgba(250, 204, 21, 0.2)',
+      secondary: 'rgba(245, 158, 11, 0.15)',
+      purple: 'rgba(147, 51, 234, 0.08)',
+      blue: 'rgba(59, 130, 246, 0.06)',
+      yellow: 'rgba(253, 224, 71, 0.18)',
+      orange: 'rgba(249, 115, 22, 0.12)',
+      pink: 'rgba(220, 38, 38, 0.08)',
       glow: '#f59e0b'
     }
   };
 
-  const c = themes[color] || themes.red;
+  const c = nebulaColors[color] || nebulaColors.red;
 
   if (variant === 'minimal') {
     return (
       <>
-        {/* Minimal nebula */}
         <div 
-          className="fixed inset-0 pointer-events-none z-0 opacity-30 gpu-accelerated"
+          className="fixed inset-0 pointer-events-none z-0 opacity-40 gpu-accelerated"
           style={{
             background: `
-              radial-gradient(ellipse 80% 50% at 20% 40%, ${c.nebula1}, transparent),
-              radial-gradient(ellipse 60% 40% at 80% 60%, ${c.nebula2}, transparent)
+              radial-gradient(ellipse 80% 50% at 20% 40%, ${c.primary}, transparent),
+              radial-gradient(ellipse 60% 40% at 80% 60%, ${c.secondary}, transparent),
+              radial-gradient(ellipse 40% 30% at 60% 80%, ${c.yellow}, transparent)
             `
           }}
         />
-        {/* Minimal stars */}
         <div className="fixed inset-0 pointer-events-none z-0 gpu-accelerated">
           <div 
             className="absolute inset-0 animate-twinkle"
@@ -104,27 +101,38 @@ const AnimatedBackground = memo(({ color = 'red', variant = 'full' }) => {
 
   return (
     <>
-      {/* Capa de nebulosas multicolor */}
+      {/* Capa 1: Nebulosa principal - Rojo y Amarillo dominantes */}
       <div 
         className="fixed inset-0 pointer-events-none z-0 animate-nebula-pulse gpu-accelerated"
         style={{
           background: `
-            radial-gradient(ellipse 100% 60% at 15% 30%, ${c.nebula1}, transparent 70%),
-            radial-gradient(ellipse 80% 50% at 85% 70%, ${c.nebula2}, transparent 60%),
-            radial-gradient(ellipse 60% 40% at 50% 90%, ${c.nebula3}, transparent 50%),
-            radial-gradient(ellipse 50% 35% at 70% 20%, ${c.nebula4}, transparent 50%),
-            radial-gradient(ellipse 40% 30% at 30% 60%, ${c.nebula5}, transparent 40%)
+            radial-gradient(ellipse 120% 80% at 10% 20%, ${c.primary}, transparent 60%),
+            radial-gradient(ellipse 100% 70% at 90% 80%, ${c.secondary}, transparent 55%),
+            radial-gradient(ellipse 80% 60% at 30% 70%, ${c.yellow}, transparent 50%),
+            radial-gradient(ellipse 70% 50% at 80% 30%, ${c.orange}, transparent 45%)
           `
         }}
       />
       
-      {/* Segunda capa de nebulosa con movimiento sutil */}
+      {/* Capa 2: Acentos de color - Púrpura, Azul, Rosa */}
       <div 
-        className="fixed inset-0 pointer-events-none z-0 animate-nebula-drift opacity-50 gpu-accelerated"
+        className="fixed inset-0 pointer-events-none z-0 animate-nebula-drift opacity-70 gpu-accelerated"
         style={{
           background: `
-            radial-gradient(ellipse 70% 45% at 25% 50%, ${c.nebula1}, transparent 60%),
-            radial-gradient(ellipse 50% 35% at 75% 30%, ${c.nebula3}, transparent 50%)
+            radial-gradient(ellipse 60% 45% at 70% 50%, ${c.purple}, transparent 50%),
+            radial-gradient(ellipse 50% 35% at 20% 90%, ${c.blue}, transparent 45%),
+            radial-gradient(ellipse 45% 30% at 50% 20%, ${c.pink}, transparent 40%),
+            radial-gradient(ellipse 40% 25% at 85% 15%, ${c.yellow}, transparent 35%)
+          `
+        }}
+      />
+      
+      {/* Capa 3: Brillo central sutil */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-0 opacity-30 gpu-accelerated"
+        style={{
+          background: `
+            radial-gradient(ellipse 50% 40% at 50% 50%, ${c.yellow}, transparent 60%)
           `
         }}
       />
@@ -153,7 +161,7 @@ const AnimatedBackground = memo(({ color = 'red', variant = 'full' }) => {
           }}
         />
         
-        {/* Estrellas medianas - Capa 2 */}
+        {/* Estrellas medianas */}
         <div 
           className="absolute inset-0 animate-twinkle-delayed"
           style={{
@@ -182,14 +190,15 @@ const AnimatedBackground = memo(({ color = 'red', variant = 'full' }) => {
           }}
         />
 
-        {/* Estrellas con color (rojas/naranjas sutiles) */}
+        {/* Estrellas con color */}
         <div 
-          className="absolute inset-0 animate-pulse-slow opacity-60"
+          className="absolute inset-0 animate-pulse-slow opacity-70"
           style={{
             backgroundImage: `
-              radial-gradient(2px 2px at 20% 50%, rgba(239, 68, 68, 0.6), transparent),
-              radial-gradient(2px 2px at 60% 30%, rgba(249, 115, 22, 0.5), transparent),
-              radial-gradient(2px 2px at 85% 70%, rgba(239, 68, 68, 0.5), transparent)
+              radial-gradient(2px 2px at 20% 50%, rgba(239, 68, 68, 0.7), transparent),
+              radial-gradient(2px 2px at 60% 30%, rgba(250, 204, 21, 0.6), transparent),
+              radial-gradient(2px 2px at 85% 70%, rgba(239, 68, 68, 0.6), transparent),
+              radial-gradient(2px 2px at 35% 85%, rgba(250, 204, 21, 0.5), transparent)
             `
           }}
         />
@@ -211,14 +220,12 @@ const AnimatedBackground = memo(({ color = 'red', variant = 'full' }) => {
               animation: `shooting-star ${star.duration}s ease-out forwards`
             }}
           >
-            {/* Cabeza de la estrella */}
             <div 
               className="w-1 h-1 rounded-full bg-white"
               style={{
                 boxShadow: `0 0 6px 2px rgba(255,255,255,0.8), 0 0 12px 4px ${c.glow}`
               }}
             />
-            {/* Cola de la estrella */}
             <div 
               className="absolute top-0 right-0 h-0.5 origin-right"
               style={{
@@ -233,12 +240,13 @@ const AnimatedBackground = memo(({ color = 'red', variant = 'full' }) => {
       
       {/* Partículas flotantes */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className={`absolute w-1.5 h-1.5 ${c.particle} rounded-full animate-float-1 blur-[1px]`} style={{ left: '8%', top: '25%' }} />
+        <div className="absolute w-1.5 h-1.5 bg-red-400/30 rounded-full animate-float-1 blur-[1px]" style={{ left: '8%', top: '25%' }} />
         <div className="absolute w-1 h-1 bg-white/20 rounded-full animate-float-2 blur-[0.5px]" style={{ left: '25%', top: '65%' }} />
-        <div className={`absolute w-1 h-1 ${c.particle} rounded-full animate-float-3`} style={{ left: '65%', top: '35%' }} />
+        <div className="absolute w-1 h-1 bg-amber-400/30 rounded-full animate-float-3" style={{ left: '65%', top: '35%' }} />
         <div className="absolute w-0.5 h-0.5 bg-white/30 rounded-full animate-float-1" style={{ left: '80%', top: '75%' }} />
-        <div className={`absolute w-1.5 h-1.5 ${c.particle} rounded-full animate-float-2 blur-[1px]`} style={{ left: '45%', top: '88%' }} />
+        <div className="absolute w-1.5 h-1.5 bg-yellow-400/25 rounded-full animate-float-2 blur-[1px]" style={{ left: '45%', top: '88%' }} />
         <div className="absolute w-1 h-1 bg-purple-400/20 rounded-full animate-float-3" style={{ left: '92%', top: '15%' }} />
+        <div className="absolute w-1 h-1 bg-orange-400/25 rounded-full animate-float-1" style={{ left: '15%', top: '50%' }} />
       </div>
     </>
   );
