@@ -29,6 +29,7 @@ const AdminPanel = lazy(() => import('./pages/AdminPanel'));
 const AdAssignmentLog = lazy(() => import('./pages/AdAssignmentLog'));
 const RecommendedPage = lazy(() => import('./pages/RecommendedPage'));
 const FeaturedAdsPage = lazy(() => import('./pages/FeaturedAdsPage'));
+const GlobalAnnouncementsPage = lazy(() => import('./pages/GlobalAnnouncementsPage'));
 
 // Enhanced loading spinner with nebula background
 const LoadingSpinner = () => (
