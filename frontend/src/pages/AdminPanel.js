@@ -739,9 +739,8 @@ const AdminPanel = () => {
               <div className="bg-amber-900/20 backdrop-blur-sm rounded-2xl p-4 border border-amber-500/30">
                 <h3 className="font-bold text-amber-400 mb-4 flex items-center gap-2">
                   <Tv className="w-5 h-5" />
-                  Slots de Anuncios para Pulperías (1000 Lps)
-                Slots de Anuncios Activos (1000 Lps/mes)
-              </h3>
+                  Slots de Anuncios Activos (1000 Lps/mes)
+                </h3>
               
               {featuredAdSlots.length === 0 ? (
                 <div className="text-center py-8">
